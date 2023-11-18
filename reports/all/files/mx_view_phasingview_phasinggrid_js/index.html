@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/phasingview/phasinggrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/phasingview/phasinggrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">111.63</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">171</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">20.63</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.99</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * It shows information about the phasing steps
+ * 
+ * @height
+ * @searchBar
+ * @collapsed
+ * @width
+ */
+function PhasingGrid(args) {
+}
+
+/**
+ * {&quot;processingPrograms&quot;:&quot;grenades_parallelproc&quot;,
+ * &quot;autoProcId&quot;:909816,
+ * &quot;phasingEndTime&quot;:&quot;Feb 20, 2013 1:37:17 PM&quot;,
+ * &quot;autoProcIntegrationId&quot;:1010078,
+ * &quot;processingStatus&quot;:true,
+ * &quot;anomalous&quot;:false,
+ * &quot;name&quot;:&quot;Thermo_2&quot;,
+ * &quot;proposalId&quot;:12,
+ * &quot;spaceGroupShortName&quot;:&quot;C222&quot;,
+ * &quot;lowRes&quot;:&quot;3.5&quot;,
+ * &quot;spaceGroup&quot;:&quot; P 6 &quot;,
+ * &quot;autoProcScalingId&quot;:909827,
+ * &quot;statisticsValue&quot;:null,
+ * &quot;enantiomorph&quot;:null,
+ * &quot;acronym&quot;:&quot;MWB&quot;,
+ * &quot;blSampleId&quot;:525682,
+ * &quot;phasingStatus&quot;:null,
+ * &quot;code&quot;:&quot;&quot;,
+ * &quot;phasingPrograms&quot;:&quot;shelxc&quot;,
+ * &quot;dataCollectionId&quot;:1640501,
+ * &quot;phasingStepId&quot;:27742,
+ * &quot;solventContent&quot;:null,
+ * &quot;phasingAnalysisId&quot;:null,
+ * &quot;sessionId&quot;:43041,
+ * &quot;phasingStepType&quot;:&quot;PREPARE&quot;,
+ * &quot;metric&quot;:null,
+ * &quot;proteinId&quot;:339373,
+ * &quot;phasingStartTime&quot;:&quot;Feb 20, 2013 1:37:16 PM&quot;,
+ * &quot;method&quot;:&quot;SAD&quot;,
+ * &quot;previousPhasingStepId&quot;:null,
+ * &quot;highRes&quot;:&quot;50.0&quot;}
+ * 
+ * 
+ */
+PhasingGrid.prototype.load = function(data) {
+	this.store.loadData(data, false);
+};
+
+PhasingGrid.prototype._getTbar = function() {
+	var _this = this;
+	var actions = [];
+
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		text : &#039;Add&#039;,
+		icon: &#039;images/icon/add.png&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+		
+		}
+	}));
+	return actions;
+};
+
+PhasingGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;phasingStepId&#039; ]
+	});
+    
+    this.store.sort(&#039;phasingStepId&#039;);
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : &#039;Phasing steps&#039;,
+		store : this.store,
+        cls : &#039;border-grid&#039;,
+		layout : &#039;fit&#039;,
+		columns : [
+             {
+			text : &#039;phasingStepId&#039;,
+            hidden : true,
+			dataIndex : &#039;phasingStepId&#039;,
+			flex : 1
+		}, 
+            {
+			text : &#039;Space Group&#039;,
+            hidden : true,
+			dataIndex : &#039;spaceGroupShortName&#039;,
+			flex : 1
+		},
+        {
+			text : &#039;Prepare&#039;,
+			dataIndex : &#039;phasingStepType&#039;,
+			flex : 0.2,
+            renderer : function(e, sample, record){
+				var html  = &quot;&quot;;
+				try{              
+                    dust.render(&quot;phasinggrid.prepare&quot;, record.data, function(err, out){
+                        html = out;
+                    });
+				}
+				catch(e){
+					return &quot;Parsing error&quot;;
+				}
+				return html;
+			}
+		},   
+         {
+			text : &#039;Substructure Determination&#039;,
+			dataIndex : &#039;phasingStepType&#039;,
+			flex : 0.4,
+            renderer : function(e, sample, record){
+				var html  = &quot;&quot;;
+				try{              
+                    dust.render(&quot;phasinggrid.substructure&quot;, record.data.children, function(err, out){
+                        html = out;
+                    });
+				}
+				catch(e){
+					return &quot;Parsing error&quot;;
+				}
+				return html;
+			}
+		},    
+         {
+			text : &#039;Phasing&#039;,
+			dataIndex : &#039;phasingStepType&#039;,
+			flex : 1,
+            renderer : function(e, sample, record){
+				var html  = &quot;&quot;;
+                var output = function(err, out){
+                            html = html + &quot;&lt;br /&gt;&quot; + out;
+                };
+                                       
+				try{   
+                    var subs =  record.data.children;                    
+                    for (var i = 0 ;i &lt; subs.length; i++){ 
+                        for (var j = 0 ;j &lt; subs[i].children.length; j++){
+                            var child =   subs[i].children[j];
+                            if (child.metric){                                                                                              
+                                  if (child.statisticsValue){                                       
+                                        child.statistics = [];                                       
+                                        for(k=0; k &lt; child.metric.split(&quot;,&quot;).length; k++){
+                                            child.statistics.push({
+                                                name : child.metric.split(&quot;,&quot;)[k],
+                                                value : child.statisticsValue.split(&quot;,&quot;)[k]
+                                            });
+                                       
+                                    }
+                                }
+                            }
+                        }         
+                        dust.render(&quot;phasinggrid.stats&quot;, subs[i].children, output);
+                    }
+				}
+				catch(e){
+					return &quot;Parsing error &quot; + e;
+				}
+				return html;
+			}
+		}            
+      
+
+		],
+		flex : 1
+	});
+
+	/** Adding the tbar **/
+	if (this.tbar) {
+		this.panel.addDocked({
+			xtype : &#039;toolbar&#039;,
+			cls : &#039;toolBarGrid&#039;,
+			height : 48,
+			items : this._getTbar()
+		});
+	}
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

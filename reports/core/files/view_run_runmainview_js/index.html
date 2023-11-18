@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/run/runmainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/run/runmainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">108.49</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">145</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">18.55</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.40</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function RunMainView() {
+	this.id = BUI.id();
+	MainView.call(this);
+}
+
+RunMainView.prototype.getPanel = MainView.prototype.getPanel;
+
+RunMainView.prototype.getOutputPanel = function() {
+	this.outputStore = Ext.create(&#039;Ext.data.Store&#039;, {
+	    fields:[&#039;name&#039;, &#039;value&#039;, &#039;type&#039;, &#039;targetId&#039;, &#039;tool&#039;, &#039;i&#039; ],
+	    groupField: &#039;tool&#039;,
+	    sorters : [{property: &#039;i&#039;, direction : &#039;DESC&#039;}]
+	});
+
+	return Ext.create(&#039;Ext.grid.Panel&#039;, {
+	    store: this.outputStore,
+	    cls : &#039;border-grid&#039;,
+	    features: [{ftype:&#039;grouping&#039;}],
+	    columns: [
+	        { text: &#039;Tool&#039;,  dataIndex: &#039;tool&#039;, flex : 1, hidden:true },
+	        { text: &#039;id&#039;,  dataIndex: &#039;i&#039;, flex : 1, hidden:true },
+	        { text: &#039;Name&#039;,  dataIndex: &#039;name&#039;, flex : 1 },
+	        { text: &#039;value&#039;, dataIndex: &#039;value&#039;, flex : 1 },
+	        { text: &#039;type&#039;, dataIndex: &#039;type&#039;, flex : 1 },
+	        { text: &#039;target&#039;, dataIndex: &#039;targetId&#039;, flex : 1, hidden:true },
+	        { text: &#039;&#039;, dataIndex: &#039;targetId&#039;, flex : 1, renderer : function(grid, opt, record){
+        		var url =EXI.credentialManager.getConnections()[0].exiUrl + &quot;/file/&quot; + record.data.targetId + &quot;/download&quot;;
+        		return &quot;&lt;div&gt;&lt;a style=&#039;color:blue;&#039; href=&#039;&quot;+ url +&quot;&#039;&gt;Download&lt;/a&gt;&lt;/div&gt;&quot;;
+	        } 
+        }
+	    ]
+	});
+};
+
+
+RunMainView.prototype.getGeneralContainerList = function(run) {
+	var li = &quot;&lt;ul class=&#039;generalContainerRunList&#039;&gt;&quot;;
+	li = li + &quot;&lt;li&gt;Name: &quot; + run.name + &quot;&lt;/li&gt;&quot;;
+	li = li + &quot;&lt;li&gt;Status: &quot; + run.status + &quot;&lt;/li&gt;&quot;;
+	li = li + &quot;&lt;li&gt;&quot; + run.creationDate + &quot;&lt;/li&gt;&quot;;
+	return li;
+};
+
+RunMainView.prototype.getGeneralContainer = function(run) {
+	return {
+		xtype : &#039;panel&#039;,
+		title : &quot;General&quot;,
+		margin : 10,
+		border : 1,
+		style: {borderColor:&#039;gray&#039;, borderStyle:&#039;solid&#039;, borderWidth:&#039;1px&#039;},
+		items : [
+		         {
+		        	 html 		: this.getGeneralContainerList(run),
+		        	 margin 	: &#039;10 0 0 50&#039;
+		         }
+		]
+	};
+};
+
+RunMainView.prototype.getMainPanel = function() {
+	
+};
+
+RunMainView.prototype.getTabs = function() {
+	return  Ext.createWidget(&#039;tabpanel&#039;,
+			{
+				plain : true,
+				margin : &#039;20 0 0 0&#039;,
+				items : [
+				     	this.getMainPanel(),
+					{
+						tabConfig : {
+							title : &#039;Output Files&#039;
+						},
+						items : [ {
+							xtype : &#039;container&#039;,
+							layout : &#039;fit&#039;,
+							height : 700,
+							padding : 20,
+							cls : &#039;border-grid&#039;,
+							items : [ 
+							         this.getOutputPanel()
+							]
+						}
+
+						]
+					}
+//				     	,
+//					{
+//						tabConfig : {
+//							title : &quot;Input&quot;,
+//						},
+//						items : [  
+//									{
+//										xtype : &#039;container&#039;,
+//										layout : &#039;vbox&#039;,
+//										height : 700,
+//										padding : 20,
+//										cls : &#039;border-grid&#039;,
+//										items : [ 
+//										     	]
+//									}
+//					]
+//			}
+			]});
+};
+
+RunMainView.prototype.getContainer = function() {
+	return Ext.create(&#039;Ext.container.Container&#039;, {
+	    layout: {
+	        type: &#039;anchor&#039;
+	    },
+	    defaults : {
+			anchor : &#039;100%&#039;,
+			hideEmptyLabel : false },
+	    margin : 5,
+		bodyStyle : {
+			&quot;background-color&quot; : &quot;#E6E6E6&quot; 
+		},
+	    items: [
+	            
+	            	this.getTabs()
+	            ]
+	});
+};
+
+RunMainView.prototype.loadMain = function(run) {
+	
+};
+
+RunMainView.prototype.load = function(run) {
+	if (run != null) {
+		this.panel.setTitle(run.name);
+		var parsed = [];
+		for (var i = 0; i &lt; run.jobs.length; i++) {
+			for (var j = 0; j &lt; run.jobs[i].output.length; j++) {
+				run.jobs[i].output[j][&quot;tool&quot;] = run.jobs[i].name + &quot; &quot; + run.jobs[i].version;
+				run.jobs[i].output[j][&quot;i&quot;] = i;
+				parsed.push(run.jobs[i].output[j]);
+			}
+		}
+		this.outputStore.loadData(parsed);
+	}
+	this.loadMain(run);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

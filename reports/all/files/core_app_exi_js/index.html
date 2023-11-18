@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - core/app/exi.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>core/app/exi.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">119.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">308</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.85</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.74</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function Exi(args) {
+	var _this = this;
+	
+	this.headerCssClass = &quot;titlePanel&quot;;
+	
+	/** Active Menu **/
+	this.mainMenu = new MainMenu();
+	/** When user is not logged in **/
+	this.anonymousMenu = null;
+	/** When user is logged in **/
+	this.userMenu = null;
+	
+	/** If false when opening a new tab it will close the already open ones **/
+	this.keepTabs = false;
+	
+	
+	this.controllers = [new ExiController(), new ProposalExiController(), new ShippingExiController()];
+	
+	if (args != null){
+		if (args.menu != null){
+			this.mainMenu = args.menu;
+			this.userMenu = args.menu;
+		}
+		if (args.anonymousMenu != null){
+			this.anonymousMenu = args.anonymousMenu;
+		}
+		
+		if (args.headerCssClass != null){
+			this.headerCssClass = args.headerCssClass;
+		}
+		
+		if (args.controllers != null){
+			for (var i = 0; i &lt; args.controllers.length; i++) {
+				this.controllers.push(args.controllers[i]);
+			}
+		}
+	}
+	/** Status bar **/
+	this.mainStatusBar = new MainStatusBar();
+	
+	/** Proposal manager **/
+	this.proposalManager = new ProposalManager();
+	
+	this.credentialManager = new CredentialManager();
+	this.credentialManager.onLogout.attach(function(sender){
+		_this.mainMenu.populateCredentialsMenu();
+		_this.clearMainPanel();
+		_this.clearNavigationPanel();
+		_this.setAnonymousMenu();
+		Ext.getCmp(&quot;navigation&quot;).collapse();
+		location.hash = &#039;/welcome&#039;;
+	});
+	
+	
+	this.credentialManager.onLogin.attach(function(sender){
+		_this.mainMenu.populateCredentialsMenu();
+		_this.setUserMenu();
+	});
+	
+	this.credentialManager.onActiveProposalChanged.attach(function(sender){
+		_this.mainMenu.populateCredentialsMenu();
+	});
+	
+	/** AUTHENTICATION FORM **/
+	this.authenticationForm = new AuthenticationForm();
+	this.authenticationForm.onAuthenticate.attach(function(sender, args){
+		var authenticationManager = new AuthenticationManager();
+        
+		authenticationManager.onSuccess.attach(function(sender, data){
+            
+			/** This user has been authenticated **/           
+			_this.credentialManager.addCredential(data.user, data.roles, data.token, args.site, args.exiUrl, args.properties);
+			_this.authenticationForm.window.close();			
+			var credential = EXI.credentialManager.getCredentialByUserName(data.user);
+          
+			if (credential.isManager()||credential.isLocalContact()){
+				location.hash = &quot;/welcome/manager/&quot; + data.user + &quot;/main&quot;;
+			}
+			else{
+				location.hash = &quot;/welcome/user/&quot; + data.user + &quot;/main&quot;;        
+			}
+			
+            
+			/** Authenticating EXI in the offline system**/            
+			_this.getDataAdapter().exi.offline.authenticate();
+			
+		});
+		authenticationManager.onError.attach(function(sender, data){
+			alert(&quot;error&quot;);
+		});
+		authenticationManager.login(args.user, args.password, args.site);
+	});
+	
+	this.onAfterRender = new Event(this);
+}
+
+/**
+ * This method append to args the values of the active connection: url, token and proposal
+ */
+Exi.prototype.appendDataAdapterParameters = function(args) {
+    if (!args){ args = {};}
+    
+     /** Is your token still valid */     
+     
+    if (EXI.credentialManager.getCredentials()[0]){        
+        if (!EXI.credentialManager.getCredentials()[0].isValid()){                        
+           location.hash = &#039;/welcome&#039;;
+           return;
+        }        
+    }	
+            
+    var connections = EXI.credentialManager.getConnections();
+    /** Authentication data adapter does not need any token **/
+    if (connections.length &gt; 0){
+        args.url = connections[0].url;
+        args.token = connections[0].token;
+        args.proposal = connections[0].proposal;			
+    }
+    return args;
+        	
+};
+
+
+Exi.prototype.getDataAdapter = function(args) {   
+    var dataAdapter =  new DataAdapterFactory(this.appendDataAdapterParameters(args));       
+    return dataAdapter;  	
+};
+
+Exi.prototype.setAnonymousMenu = function() {
+	this.mainMenu = this.anonymousMenu;
+	Ext.getCmp(&quot;mainMenu&quot;).removeAll();
+	Ext.getCmp(&quot;mainMenu&quot;).add(EXI.mainMenu.getPanel());
+};
+
+Exi.prototype.setUserMenu = function() {
+	this.mainMenu = this.userMenu;
+	Ext.getCmp(&quot;mainMenu&quot;).removeAll();
+	Ext.getCmp(&quot;mainMenu&quot;).add(EXI.mainMenu.getPanel());
+};
+
+
+Exi.prototype.loadSelected = function(selected) {
+};
+
+
+
+
+/**
+ * Adds a new Main panel to the center panel
+ * @param mainView
+ */
+Exi.prototype.addMainPanel = function(mainView) {
+	if (!this.keepTabs){
+		Ext.getCmp(&#039;main_panel&#039;).removeAll();
+	}
+	Ext.getCmp(&#039;main_panel&#039;).add(mainView.getPanel());
+	Ext.getCmp(&#039;main_panel&#039;).setActiveTab(Ext.getCmp(&#039;main_panel&#039;).items.length - 1);
+};
+
+Exi.prototype.getSelectedDataCollections = function() {
+	var selected = [];
+	for (var i = 0; i &lt; this.experimentListView.length; i++) {
+		selected = selected.concat(this.experimentListView[i].getSelected());
+	}
+	return selected;
+};
+
+Exi.prototype.addNavigationPanel = function(listView) {
+	Ext.getCmp(&#039;navigation&#039;).add(listView.getPanel());
+	if (Ext.getCmp(&quot;navigation&quot;) != null){
+		Ext.getCmp(&quot;navigation&quot;).expand();
+        this.showNavigationPanel();
+	}
+};
+
+Exi.prototype.hideNavigationPanel = function(listView) {
+	if (Ext.getCmp(&quot;navigation&quot;) != null){
+		Ext.getCmp(&#039;navigation&#039;).hide();
+	}
+};
+
+Exi.prototype.showNavigationPanel = function(listView) {
+	if (Ext.getCmp(&quot;navigation&quot;) != null){
+		Ext.getCmp(&#039;navigation&#039;).show();
+	}
+};
+
+
+Exi.prototype.clearNavigationPanel = function() {
+	Ext.getCmp(&#039;navigation&#039;).removeAll();
+};
+
+Exi.prototype.clearMainPanel = function() {
+	Ext.getCmp(&#039;main_panel&#039;).removeAll();
+};
+
+Exi.prototype.setLoadingNavigationPanel = function(isLoading) {
+	Ext.getCmp(&#039;navigation&#039;).setLoading(isLoading);
+};
+
+Exi.prototype.setLoadingMainPanel = function(isLoading) {
+	Ext.getCmp(&#039;main_panel&#039;).setLoading(isLoading);
+};
+
+Exi.prototype.setError = function(error) {
+	this.mainStatusBar.showError(error);
+};
+
+Exi.prototype.setLoading = function(isLoading) {
+	if ((isLoading == null) || (isLoading  == true)){
+		this.mainStatusBar.showBusy();
+	}
+	else{
+		this.mainStatusBar.showReady();
+	}
+};
+
+Exi.prototype.getHeader = function(error) {
+	return &#039;&lt;img class=&quot;titleImage&quot; src=&quot;images/logo_EMBL.png&quot;&gt;&lt;span class=&quot;title&quot;&gt;Extended ISPyB&lt;/span&gt;&#039;;
+};
+
+Exi.prototype.show = function() {
+	var _this = this;
+	Ext.application({
+				name : &#039;ExiSAXS&#039;,
+				launch : function() {
+					Ext.create(
+									&#039;Ext.container.Viewport&#039;,
+									{
+										layout : &#039;border&#039;,
+										items : [
+												{
+													region : &#039;north&#039;,
+													xtype : &#039;component&#039;,
+													padding : 10,
+													height : 75,
+													html : _this.getHeader(),
+													cls : _this.headerCssClass
+
+												}, {
+													region : &#039;north&#039;,
+													cls : &#039;toolbarPanel&#039;,
+													id : &#039;mainMenu&#039;,
+													xtype : &#039;panel&#039;,
+													width : 400,
+													items : _this.mainMenu.getPanel() },
+
+												{
+													xtype : &#039;panel&#039;,
+													id : &#039;navigation&#039;,
+													region : &#039;west&#039;,
+													width : 250,
+													split : false,
+													title : &#039;Browse by&#039;,
+													cls : &#039;navigation&#039;,
+													collapsible : true,
+													collapsed : true
+													
+
+												},
+//												{
+//													xtype : &#039;panel&#039;,
+//													id : &#039;workspace&#039;,
+//													region : &#039;east&#039;,
+//													width : 250,
+//													collapsed : true,
+//													title : &#039;Workspace&#039;,
+//													split : false,
+//													layout : &#039;fit&#039;,
+////													title : &#039;Browse by&#039;,
+//													cls : &#039;navigation&#039;,
+//													collapsible : true,
+//													items : [_this.workspacePanel.getPanel()]
+//
+//												},
+												{
+													region : &#039;center&#039;,
+													id : &#039;main_panel&#039;,
+													xtype : &#039;tabpanel&#039;,
+													cls : &#039;navigation&#039;,
+													plain : true,
+													items : []
+												},
+												{
+														region : &#039;south&#039;,
+														xtype : &#039;panel&#039;,
+														cls : &#039;statusBar&#039;,
+														bbar : _this.mainStatusBar.getBar() 
+												}
+													],
+										listeners : {
+											afterrender : function(component, eOpts) {
+														_this.mainMenu.populateCredentialsMenu();
+														_this.onAfterRender.notify();
+														
+//														/** If there is a user login then we show the menu **/
+														if (_this.credentialManager.getCredentials() == 0){
+															_this.setAnonymousMenu();
+														}
+														else{
+															_this.setUserMenu();
+															_this.mainMenu.populateCredentialsMenu();
+														}
+											} } });
+				}
+
+			});
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

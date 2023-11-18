@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/samplesgrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/samplesgrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">101.63</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">208</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">36.36</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.95</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function SamplesGrid(args) {
+	this.height = 500;
+	this.id = BUI.id();
+	this.tbar = false;
+	this.width = 100;
+	this.title = &quot;Samples list&quot;;
+	this.margin = &quot;5 5 5 5&quot;;
+
+	if (args != null) {
+		if (args.title != null) {
+			this.title = args.title;
+		}
+		if (args.margin != null) {
+			this.margin = args.margin;
+		}
+
+		if (args.height != null) {
+			this.height = args.height;
+		}
+
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+
+		if (args.width != null) {
+			this.width = args.width;
+		}		
+	}
+
+	this.onSelected = new Event(this);
+	
+	Ext.define(&#039;BLSampleModel&#039;, {
+			extend : &#039;Ext.data.Model&#039;,
+			fields : [
+				{
+					name : &#039;proteinAcronym&#039;,
+					mapping : &#039;proteinAcronym&#039;
+				},{
+					name : &#039;name&#039;,
+					mapping : &#039;name&#039;
+				}, {
+					name : &#039;spaceGroup&#039;,
+					mapping : &#039;spaceGroup&#039;
+				}, {
+					name : &#039;beamlineLocation&#039;,
+					mapping : &#039;beamlineLocation&#039;
+				}, {
+					name : &#039;code&#039;,
+					mapping : &#039;code&#039;
+				}, {
+					name : &#039;shipment&#039;,
+					mapping : &#039;shipping&#039;
+				}, {
+					name : &#039;cellA&#039;,
+					mapping : &#039;cellA&#039;
+				}, {
+					name : &#039;cellB&#039;,
+					mapping : &#039;cellB&#039;
+				}, {
+					name : &#039;cellC&#039;,
+					mapping : &#039;cellC&#039;
+				}, {
+					name : &#039;cellAlpha&#039;,
+					mapping : &#039;cellAlpha&#039;
+				}, {
+					name : &#039;cellBeta&#039;,
+					mapping : &#039;cellBeta&#039;
+				}, {
+					name : &#039;cellGamma&#039;,
+					mapping : &#039;cellGamma&#039;
+				}],
+			idProperty : &#039;blSampleId&#039;
+		});
+}
+
+SamplesGrid.prototype.load = function(crystal) {
+	try{
+		this.crystal = crystal;	
+		this.loadSampleList();
+	}
+	catch(e){
+		EXI.setError(e);
+	}
+		
+};
+
+SamplesGrid.prototype.loadSampleList = function() {
+	var _this = this;
+	this.panel.setLoading();
+	function onSuccess(sender, samples){
+		_this.store.loadData(samples);
+		_this.panel.setLoading(false);
+	}
+	EXI.getDataAdapter({onSuccess: onSuccess}).mx.sample.getSampleInfoByCrystalId(this.crystal.crystalId);
+	//EXI.getDataAdapter({onSuccess: onSuccess}).mx.sample.getSamplesByCrystalId(this.crystal.crystalId);
+	//EXI.getDataAdapter({onSuccess: onSuccess}).mx.sample.getSampleInfoByProposalId();
+};
+	
+SamplesGrid.prototype.getByCrystalId = function(crystal) {
+	for (var i = 0; i &lt; this.data.length; i++) {
+				if (this.data[i].crystalId == crystal.crystalId){
+					return this.data[i];
+				} 
+	}
+};	
+SamplesGrid.prototype.getPanel = function() {
+	var _this = this;
+	
+	this.store2 = Ext.create(&#039;Ext.data.Store&#039;, {
+			model : &#039;BLSampleModel&#039;,
+			data : []
+		});
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;Protein&#039;, &#039;SpaceGroup&#039;, &#039;SampleName&#039;, &#039;Code&#039; , &#039;Shipment&#039;, &#039;Dewar&#039;, &#039;Container&#039;, &#039;Location&#039;, &#039;Cell&#039;],
+		emptyText : &quot;No samples&quot;,
+		data : []
+	});
+
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : this.title,
+		store : this.store,
+		layout : &#039;fit&#039;,
+		icon : &#039;../images/icon/sessions.png&#039;,
+		cls : &#039;border-grid&#039;,
+		height : this.height,
+		margin : this.margin,
+		emptyText : &quot;No samples&quot;,
+		columns : 	[	
+		{
+			text          : &#039;SampleName&#039;,
+			dataIndex     : &#039;sampleName&#039;,
+			width         : 100
+		},
+		{
+			text          : &#039;Protein&#039;,
+			dataIndex     : &#039;proteinAcronym&#039;,
+			width:100
+		},
+		{
+			text          : &#039;SpaceGroup&#039;,
+			dataIndex     : &#039;crystalSpaceGroup&#039;,
+			width:100
+		},		
+		{
+			text          : &#039;Code&#039;,
+			dataIndex     : &#039;code&#039;,
+			width         : 100
+		},
+		{
+			text          : &#039;Location&#039;,
+			dataIndex     : &#039;containerSampleChangerLocation&#039;,
+			width         : 100
+		},		
+				{
+			text          : &#039;Shipment&#039;,
+			dataIndex     : &#039;shipment&#039;,
+			flex : 0.1,
+			renderer : function(grid, a, record){
+				return record.data.containerVO.DewarVO.ShippingVO.name;
+			}
+		},
+		{
+			text          : &#039;Dewar&#039;,
+			dataIndex     : &#039;dewar&#039;,
+			flex : 0.1,
+			renderer : function(grid, a, record){
+				return record.data.containerVO.DewarVO.code;
+			}
+		},
+		{
+			text          : &#039;Location in SC&#039;,
+			dataIndex     : &#039;sampleChangerLocation&#039;,
+			flex : 0.1,
+			renderer : function(grid, a, record){
+				return record.data.containerVO.sampleChangerLocation;
+			}
+		},	
+		{
+			text          : &#039;Cell&#039;,
+			dataIndex     : &#039;cell&#039;,
+			flex : 0.1,
+			renderer : function renderUnitCell(grid, a, record) {
+				var nbDec = 2;
+				if (record.data.crystalVO) {
+					var s = (record.data.CellA ? Number(record.data.crystalVO.CellA).toFixed(nbDec) + &quot;, &quot; : &quot;&quot;);
+					s += (record.data.crystalVO.CellB ? Number(record.data.crystalVO.CellB).toFixed(nbDec) + &quot;, &quot;: &quot;&quot;);
+					s += (record.data.crystalVO.CellC ? Number(record.data.crystalVO.CellC).toFixed(nbDec) + &quot;&lt;br /&gt;&quot;: &quot;&quot;);
+					s += (record.data.crystalVO.CellAlpha ? Number(record.data.crystalVO.CellAlpha).toFixed(nbDec) + &quot;, &quot; : &quot;&quot;);
+					s += (record.data.crystalVO.CellBeta ? Number(record.data.crystalVO.CellBeta).toFixed(nbDec) + &quot;, &quot; : &quot;&quot;);
+					s += (record.data.crystalVO.CellGamma ? Number(record.data.crystalVO.CellGamma).toFixed(nbDec): &quot;&quot;);
+					return s;
+				}
+			return &quot;&quot;;
+			}
+		},
+		{
+			text          : &#039;Protein&#039;,
+			dataIndex     : &#039;proteinAcronym&#039;,
+			flex : 0.1,
+			renderer : function(grid, a, record){
+						return record.data.crystalVO.proteinVO.acronym;
+			}
+		}	
+		] 
+	});
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

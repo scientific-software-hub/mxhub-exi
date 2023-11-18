@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/autoprocintegration/autoprocintegrationgrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/autoprocintegration/autoprocintegrationgrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">106.54</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">383</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">40.38</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.95</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* It shows information from the autoprocessing like cells (a,b,c,alpha,beta,gamma) and also about phasing
+*
+* @class AutoProcIntegrationGrid
+* @constructor
+*/
+function AutoProcIntegrationGrid(args) {
+	this.height = 500;
+	this.tbar = false;
+	this.id = BUI.id();
+	
+	this.preventSelection = false;
+	this.maxHeight = 500;
+	this.minHeight = 500;
+    this.minHeight = 500;
+      
+    this.collapsed = true;
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+        
+		if (args.maxHeight != null) {
+			this.maxHeight = args.maxHeight;
+		}
+		if (args.searchBar != null) {
+			this.searchBar = args.searchBar;
+		}
+
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+
+		if (args.collapsed != null) {
+			this.collapsed = args.collapsed;
+		}
+
+		if (args.width != null) {
+			this.width = args.width;
+		}              
+	}	
+	this.onSelected = new Event(this);
+}
+
+AutoProcIntegrationGrid.prototype.parseData = function(data) {
+     /** Adding stats */
+    for(var i = 0; i &lt; data.length; i++){
+         try{             
+            data[i].statistics = this.getStatistics(data[i]);
+            data[i].collapsed = this.getCollapseStatistics(data[i]);
+            data[i].phasing = this.getPhasing(data[i]);    
+                      
+            data[i].downloadFilesUrl = EXI.getDataAdapter().mx.autoproc.downloadAttachmentListByautoProcProgramsIdList(data[i].v_datacollection_summary_phasing_autoProcProgramId);
+            console.log(data[i].downloadFilesUrl);                                          
+         }
+         catch(e){
+             
+         }  
+    }
+    
+    var anomalous = _.filter(data, function(o) { return o.v_datacollection_summary_phasing_anomalous; });
+    var nonanomalous = _.filter(data, function(o) { return o.v_datacollection_summary_phasing_anomalous == false; });
+    /**Set non anomalous first */
+    data = new AutoprocessingRanker().rank(anomalous, &quot;v_datacollection_summary_phasing_autoproc_space_group&quot;);    
+    data = _.concat(new AutoprocessingRanker().rank(nonanomalous, &quot;v_datacollection_summary_phasing_autoproc_space_group&quot;),data);    
+    return data;
+};
+
+AutoProcIntegrationGrid.prototype.load = function(data) {      
+    this.data =this.parseData(data);
+       
+    if (this.collapsed){        
+        this.loadCollapsed(this.data);
+    }
+    else{
+       
+	    this.store.loadData(this.data, false);
+    }
+};
+
+AutoProcIntegrationGrid.prototype.loadCollapsed = function(data) {
+	this.store.loadData([{ collapsed : true, items : data}], false);
+};
+
+AutoProcIntegrationGrid.prototype.selectRowByAutoProcIntegrationId = function(autoProcIntegrationId) {
+	this.preventSelection = true;
+	this.panel.getSelectionModel().select(this.store.find(&quot;v_datacollection_summary_phasing_autoProcIntegrationId&quot;, autoProcIntegrationId));
+};
+
+AutoProcIntegrationGrid.prototype.getPhasing = function(data) {      
+    var phasing = [];
+    
+    if (data.spaceGroupShortName){        
+        var spaceGroups = data.spaceGroupShortName.split(&#039;,&#039;);
+        var steps = data.phasingStepType.split(&#039;PREPARE&#039;);        
+        for(var i = 0; i &lt; spaceGroups.length; i++){            
+            phasing.push({
+                spaceGroup              : spaceGroups[i],
+                prepare                 : true,
+                sub                     : steps[i+1].indexOf(&quot;SUBSTRUCTUREDETERMINATION&quot;) != -1,
+                phasing                 : steps[i+1].indexOf(&quot;PHASING&quot;) != -1,
+                model                   : steps[i+1].indexOf(&quot;MODEL&quot;) != -1,
+                autoProcIntegrationId   : data.v_datacollection_summary_phasing_autoProcIntegrationId
+            });
+        }
+        
+        
+    }
+    return phasing;
+};                 
+
+AutoProcIntegrationGrid.prototype.getCollapseStatistics = function(data) {	                    
+    var type = data.scalingStatisticsType.split(&quot;,&quot;);
+    function getValue(attribute, i, decimals){
+        
+        if (attribute){
+            var splitted = attribute.split(&quot;,&quot;);
+            if (splitted[i]){
+                if (decimals){
+                    try{ 
+                        return Number( splitted[i]).toFixed(decimals)
+                    }
+                    catch(e){
+                        return &quot;NaN&quot;;
+                    }
+                }
+                return splitted[i];
+            }
+        }
+        return &quot;&quot;;        
+     }      
+    
+     for (var i = 0; i &lt; type.length; i++) {
+        if (type[i]){           
+                data[type[i]] = {
+                                            type 					: type[i],
+                                            resolutionLimitLow 		: getValue(data.resolutionLimitLow, i,1),
+                                            resolutionLimitHigh 	: getValue(data.resolutionLimitHigh, i,1),
+                                            multiplicity 			: getValue(data.multiplicity, i, 1),
+                                            meanIOverSigI 			: getValue(data.meanIOverSigI, i, 1),
+                                            completeness 			: getValue(data.completeness, i, 1),
+                                            rMerge 			        : getValue(data.rMerge, i, 1),
+                                            ccHalf 			        : getValue(data.ccHalf, i,1),
+                                            rPimWithinIPlusIMinus 	: getValue(data.rPimWithinIPlusIMinus, i,1),
+                                            rMeasAllIPlusIMinus 	: getValue(data.rMeasAllIPlusIMinus, i,1)
+                                           
+                                            
+               };            
+        }       
+    }        
+    return data;    				
+};
+
+
+AutoProcIntegrationGrid.prototype.getStatistics = function(data) {	                    
+    var type = data.scalingStatisticsType.split(&quot;,&quot;);
+    function getValue(attribute, i, decimals){        
+        if (attribute){
+            var splitted = attribute.split(&quot;,&quot;);
+            if (splitted[i]){
+                if (decimals){
+                    try{ 
+                        return Number( splitted[i]).toFixed(decimals)
+                    }
+                    catch(e){
+                        return &quot;NaN&quot;;
+                    }
+                }
+                return splitted[i];
+            }
+        }
+        return &quot;&quot;;        
+    }
+    
+    var parsed = [];
+    for (var i = 0; i &lt; type.length; i++) {       
+        parsed.push({
+            type 					: type[i],
+            resolutionLimitLow 		: getValue(data.resolutionLimitLow, i),
+            resolutionLimitHigh 	: getValue(data.resolutionLimitHigh, i),
+            multiplicity 			: getValue(data.multiplicity, i),
+            meanIOverSigI 			: getValue(data.meanIOverSigI, i),
+            completeness 			: getValue(data.completeness, i),
+            rMerge 			        : getValue(data.rMerge, i),
+            ccHalf 			        : getValue(data.ccHalf, i),
+            rPimWithinIPlusIMinus 	: getValue(data.rPimWithinIPlusIMinus, i),
+            rMeasAllIPlusIMinus 	: getValue(data.rMeasAllIPlusIMinus, i)
+            
+        });
+        
+    }
+            
+    return parsed;    				
+};
+
+AutoProcIntegrationGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		
+		fields : [ &#039;autoProcId&#039;,
+		           &#039;refinedCellA&#039;, 
+                   &#039;v_datacollection_summary_phasing_autoProcIntegrationId&#039;,
+		           &#039;autoProcIntegrationId&#039;,
+		           &#039;v_datacollection_summary_phasing_anomalous&#039;,
+		           &#039;v_datacollection_summary_phasing_processingPrograms&#039;,
+		           &#039;v_datacollection_summary_phasing_autoproc_space_group&#039;]
+	});
+  
+	
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {		
+		store : this.store,		
+        //tbar: this.getToolBar(),
+        margin : 10,
+		//cls : &#039;border-grid&#039;,
+        height : this.height,
+        layout : &#039;fit&#039;,
+		columns : [             
+                    {
+                        text : &#039;autoProcIntegrationId&#039;,
+                        dataIndex : &#039;processingPrograms&#039;,
+                        flex : 1,
+                        hidden : true,
+                        renderer : function(e, sample, record){
+                            return record.data.v_datacollection_summary_phasing_autoProcIntegrationId;
+                        }
+                    },        
+                    {
+                        dataIndex: &#039;dataCollectionGroup&#039;,
+                        name: &#039;dataCollectionGroup&#039;,
+                        flex: 1.5,
+                        hidden: false,
+                        renderer: function(grid, e, record) {                            
+                            var data = record.data;                            
+                            var html = &quot;&quot;;                                                                      
+                            if (_this.collapsed){              
+                                dust.render(&quot;collapsed.autoprocintegrationgrid.template&quot;, data.items, function(err, out) {
+                                    html = html + out;
+                                
+                                });
+                            }
+                            else{
+                                dust.render(&quot;autoprocintegrationgrid.template&quot;, data, function(err, out) {
+                                    html = html + out;
+                                
+                                });
+                                
+                            }
+                            return html;
+                        }
+                    }                        		
+		],
+		flex : 1,
+          viewConfig : {
+                preserveScrollOnRefresh : true,
+                stripeRows              : false,                
+	    	}
+	});
+
+    this.panel.on(&#039;boxready&#039;, function() {
+        _this.attachCallBackAfterRender();
+    });
+	return this.panel;
+};
+
+
+/*
+AutoProcIntegrationGrid.prototype.getToolBar = function() {
+    var _this = this;
+    return Ext.create(&#039;Ext.toolbar.Toolbar&#039;, {
+        width: 500,
+        items: [
+            {
+                xtype: &#039;checkboxfield&#039;,
+                boxLabel: &#039;Summary&#039;,
+                checked : true,
+                id: this.id + &quot;_collapse&quot;,
+                listeners: {
+                    change: function(field, e) {
+                        _this.collapsed = e;
+                        _this.load(_this.data);
+                        _this.attachCallBackAfterRender();
+                     
+                    }
+                }
+            }
+          
+        ]
+    });
+};*/
+/**
+* Attaches the events to lazy load to the images. Images concerned are with the class img-responsive and smalllazy
+*
+* @method attachCallBackAfterRender
+*/
+AutoProcIntegrationGrid.prototype.attachCallBackAfterRender = function() {
+    var _this = this;    
+    var timer3 = setTimeout(function() {
+            $(&#039;a[data-toggle=&quot;tab&quot;]&#039;).on(&#039;shown.bs.tab&#039;, function (e) {
+                var target = $(e.target).attr(&quot;href&quot;); // activated tab  
+                var autoprocProgramId = null;              
+                /** Activate tab of data collections */
+                if (target.startsWith(&quot;#tab_files_&quot;)){
+                    var onSuccess = function(sender, data){
+                        var html = &quot;&quot;;                                                
+                        if (data){
+                            for (var i = 0; i &lt; data[0].length; i++) {
+                                var element = data[0][i];    
+                                                            
+                                element.url =  EXI.getDataAdapter().mx.autoproc.getDownloadAttachmentUrl(data[0][i].autoProcProgramAttachmentId); 
+                            }
+                            dust.render(&quot;files.autoprocintegrationgrid.template&quot;, data[0], function(err, out) {                                                                                               
+                                html = html + out;
+                            });
+                            $(target).html(html);
+                        }
+                    };
+                    var onError = function(sender, data){
+                        $(target).html(&quot;Error retrieving data&quot;);
+                    };
+                     /** Retrieve data collections */
+                    autoprocProgramId = target.slice(11);
+                    EXI.getDataAdapter({onSuccess:onSuccess, onError:onError}).mx.autoproc.getAttachmentListByautoProcProgramsIdList(autoprocProgramId);
+                }
+                
+                
+                 if (target.startsWith(&quot;#plots&quot;)){
+                        /** Get autoprocIntegrationId */
+                        autoprocProgramId = target.slice(6);
+                        /** Rfactor */
+                        var rFactorPlotter = new AutoProcIntegrationCurvePlotter({
+		                    height : 250,
+		                    title : &quot;Rfactor vs Resolution&quot;,
+		                    legend : &#039;never&#039;,
+                            targetId : &quot;rFactor_&quot; + autoprocProgramId + &quot;_plot&quot;
+	                    });                             
+                        $(&quot;#rFactor_&quot; + autoprocProgramId).html(rFactorPlotter.getHTML());                         
+                        rFactorPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleRfactor(autoprocProgramId));
+                        
+                           /** Rfactor */
+                        var completenessPlotter = new AutoProcIntegrationCurvePlotter({
+		                    height : 250,
+		                    title : &quot;Completeness vs Resolution&quot;,
+		                    legend : &#039;never&#039;,
+                            targetId : &quot; completeness_&quot; + autoprocProgramId + &quot;_plot&quot;
+	                    });                             
+                        $(&quot;#completeness_&quot; + autoprocProgramId).html(completenessPlotter.getHTML());                         
+                        completenessPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleCompleteness(autoprocProgramId));
+	                  
+                      	var isigmaPlotter = new AutoProcIntegrationCurvePlotter({
+                            height :250,
+                            title : &quot;I/SigmaI vs Resolution&quot;,
+                            legend : &#039;never&#039;,
+                            targetId : &quot; sigmaI_&quot; + autoprocProgramId + &quot;_plot&quot;
+                        });
+                        $(&quot;#sigmaI_&quot; + autoprocProgramId).html(isigmaPlotter.getHTML());                         
+                        isigmaPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleISigma(autoprocProgramId));
+	                  
+                      
+                       var cc2Plotter = new AutoProcIntegrationCurvePlotter({
+                            height : 250,
+                            title : &quot;CC/2 vs Resolution&quot;,
+                            legend : &#039;never&#039;,
+                            targetId : &quot;cc2_&quot; + autoprocProgramId + &quot;_plot&quot;
+                        });
+                         $(&quot;#cc2_&quot; + autoprocProgramId).html(cc2Plotter.getHTML());                         
+                        cc2Plotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleCC2(autoprocProgramId));
+	                  
+                       var sigmaAnnoPlotter = new AutoProcIntegrationCurvePlotter({
+                            height : 250,
+                            title : &quot;SigAno vs Resolution&quot;,
+                            legend : &#039;never&#039;,
+                            targetId : &quot;sigmaAnno_&quot; + autoprocProgramId + &quot;_plot&quot;
+                        });
+                         $(&quot;#sigmaAnno_&quot; + autoprocProgramId).html(sigmaAnnoPlotter.getHTML());                         
+                        sigmaAnnoPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleSigmaAno(autoprocProgramId));
+                        
+                          var annoCorrPlotter = new AutoProcIntegrationCurvePlotter({
+                            height : 250,
+                            title : &quot;Anom Corr vs Resolution&quot;,
+                            legend : &#039;never&#039;,
+                            targetId : &quot;anno_&quot; + autoprocProgramId + &quot;_plot&quot;
+                        });
+                         $(&quot;#anno_&quot; + autoprocProgramId).html(annoCorrPlotter.getHTML());                         
+                        annoCorrPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleAnnoCorrection(autoprocProgramId));	                  
+                 }                                
+            });
+    }, 1000);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

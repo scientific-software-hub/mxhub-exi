@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/prepareexperiment/preparemainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/prepareexperiment/preparemainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">115.94</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">314</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">46.09</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.02</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This class renders the steps and panels of every class used in the prepare experiment tab
+*
+* @class PrepareMainView
+* @constructor
+*/
+function PrepareMainView(args) {
+	this.icon = &#039;../images/icon/contacts.png&#039;;
+	this.queueGridList = [];
+    
+	MainView.call(this);
+    
+    var _this = this;
+
+    this.currentStep = 1;
+    if (args) {
+        if (args.currentStep) {
+            this.currentStep = args.currentStep;
+        }
+    }
+
+    this.steps = [&quot;&quot;,&quot;/selectSampleChanger&quot;,&quot;/loadSampleChanger&quot;,&quot;/confirm&quot;];
+
+    this.height = 550;
+    this.width = 1300;
+    
+    this.dewarListSelector = new DewarListSelectorGrid({height : this.height - 12, width : this.width - 60});
+    this.sampleChangerSelector = new SampleChangerSelector({height : this.height - 12, width : this.width - 0});
+    this.loadSampleChangerView = new LoadSampleChangerView({height : this.height - 12, width : this.width - 0});
+    this.confirmShipmentView = new ConfirmShipmentView();
+
+    this.dewarListSelector.onSelect.attach(function(sender, dewar){  
+            $(&#039;#step-3&#039;).attr(&quot;disabled&quot;, true);
+            _this.loadSampleChangerView.sampleChangerName = &quot;&quot;;
+            _this.save(&quot;sampleChangerName&quot;,&quot;&quot;);     
+            if (dewar.shippingStatus == &quot;processing&quot;){
+                _this.updateStatus(dewar.shippingId, &quot;at_ESRF&quot;);
+            } 
+            if (dewar.shippingStatus != &quot;processing&quot;){
+                _this.updateStatus(dewar.shippingId, &quot;processing&quot;);
+            }      
+     });
+     
+    this.dewarListSelector.onSelectionChange.attach(function(sender, dewars){
+    });
+
+    this.selectedContainerId = null;
+    this.selectedContainerCapacity = null;
+    this.selectedPuck = null;
+    this.sampleChangerName = null;
+
+    this.sampleChangerSelector.onSampleChangerSelected.attach(function(sender,changerName){
+        $(&#039;#next-button&#039;).attr(&quot;disabled&quot;, false);
+        $(&#039;#step-3&#039;).attr(&quot;disabled&quot;, false);
+        _this.sampleChangerName = changerName;
+        _this.save(&#039;sampleChangerName&#039;, changerName);
+        if (typeof(Storage) != &quot;undefined&quot;) {
+            sessionStorage.removeItem(&#039;puckData&#039;);
+        }
+        _this.loadSampleChangerView.sampleChangerName = changerName;
+    });
+
+};
+
+
+/**
+* Stores on the DB the status given a shippingId
+* Status may be : [at_ESRF, processing, opened, ready to go]
+*
+* @method updateStatus
+* @return 
+*/
+PrepareMainView.prototype.updateStatus = function(shippingId, status) {
+    var _this = this;
+    _this.dewarListSelector.panel.setLoading(&quot;Updating shipment Status&quot;);
+    var onStatusSuccess = function(sender, dewar) {             
+        EXI.mainStatusBar.showReady(&quot;Processing update successfully&quot;);
+        _this.dewarListSelector.panel.setLoading(false);
+        _this.load();
+    };
+    var onError = function(data){
+            EXI.setError(data);
+    };
+    
+    EXI.getDataAdapter({onSuccess : onStatusSuccess, onError : onError}).proposal.shipping.updateStatus(shippingId,status);
+};
+
+/**
+* Manages the showing and hiding buttons
+*
+* @method manageButtons
+* @return 
+*/
+PrepareMainView.prototype.manageButtons = function () {
+    if (this.currentStep == 1) {
+        $(&#039;#previous-button-div&#039;).hide();
+        $(&#039;#next-button&#039;).attr(&quot;disabled&quot;, false); 
+    } else {
+        $(&#039;#previous-button-div&#039;).show();
+    }
+    if (this.currentStep == 2) {
+        $(&#039;#next-button&#039;).attr(&quot;disabled&quot;, true);
+    }
+    if (this.currentStep &lt; 3) {
+        $(&#039;#next-button-div&#039;).show();  
+        $(&#039;#done-button-div&#039;).hide();
+    }
+    if (this.currentStep == 3) {
+        $(&#039;#next-button-div&#039;).hide();
+    }
+};
+
+/**
+* Manages the step change when the buttons next or previous are clicked
+*
+* @method changeStep
+* @param {Integer} direction An integer that is positive for the next button and negative for the previous button
+* @return 
+*/
+PrepareMainView.prototype.changeStep = function (direction) {
+    this.currentStep += direction;
+    location.href = &quot;#/mx/prepare/main&quot; + this.steps[this.currentStep-1];
+};
+
+/**
+* Manages the disable state of the step buttons
+*
+* @method manageStepButtons
+* @return 
+*/
+PrepareMainView.prototype.manageStepButtons = function () {
+    if (this.loadSampleChangerView.sampleChangerName == &quot;&quot;) {
+        $(&#039;#step-3&#039;).attr(&quot;disabled&quot;, true);
+    } else {
+        $(&#039;#step-3&#039;).attr(&quot;disabled&quot;, false);
+    }
+    for (var i = 1 ; i &lt;= 4 ; i++){
+        if (i == this.currentStep){
+            $(&#039;#step-&#039; + i).addClass(&#039;active-step&#039;);
+        }
+    }
+};
+
+/**
+* Loads a Ext.panel.panel constaining a Ext.panel.Panel that will render the steps inside and sets the click events for the buttons
+*
+* @method getPanel
+* @return 
+*/
+PrepareMainView.prototype.getPanel = function() {
+    var _this = this;
+
+    /** Main container where the steps are rendered */
+    this.container = Ext.create(&#039;Ext.panel.Panel&#039; , {
+        layout: {
+            type: &#039;hbox&#039;,
+            pack: &#039;center&#039;
+        }, 
+        height : this.height,
+        width : this.width,
+        cls : &#039;border-grid&#039;,
+        items : []}
+    );
+
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+        layout: {
+            type: &#039;vbox&#039;,
+            align: &#039;center&#039;
+        },
+        width : 100,
+        height : this.height + 200,
+        // cls : &#039;border-grid&#039;,
+        items : [
+                    this.getToolBar(), this.container,  this.getButtons()
+        ]
+	});
+
+    this.panel.on(&#039;boxready&#039;, function() {
+        $(&#039;#next-button&#039;).unbind(&#039;click&#039;).click(function (sender){
+            if (_this.currentStep &lt; 4) {
+                _this.changeStep(1);
+            }
+        });
+        $(&#039;#previous-button&#039;).unbind(&#039;click&#039;).click(function (sender){
+            if (_this.currentStep &gt; 0) {
+                _this.changeStep(-1);             
+            }
+        });
+        $(&#039;.step-btn&#039;).unbind(&#039;click&#039;).click(function (sender){
+            if(sender.target.getAttribute(&quot;disabled&quot;) != &quot;disabled&quot;){
+                if (_this.loadSampleChangerView.sampleChangerWidget){
+                    _this.storeSampleChangerWidget(_this.loadSampleChangerView.sampleChangerWidget);
+                }
+                var direction = Number(sender.target.innerHTML) - _this.currentStep;
+                _this.changeStep(direction);
+            }
+        });
+        _this.manageStepButtons();
+        _this.manageButtons();
+    });
+        
+
+    return this.panel;
+};
+
+/**
+* Returns the toolbar containing the steps of the prepare experiment process.
+*
+* @method getToolBar
+* @return The toolbar html containing the steps of the prepare experiment process
+*/
+PrepareMainView.prototype.getToolBar = function () {
+    var html = &quot;&quot;;
+	dust.render(&quot;toolbar.prepare.template&quot;, [], function(err, out){
+		html = out;
+	});
+
+    return {html : html};
+};
+
+/**
+* Returns the buttons next and previous of the prepare experiment process.
+*
+* @method getButtons
+* @return The buttons html of the prepare experiment process.
+*/
+PrepareMainView.prototype.getButtons = function () {
+    var html = &quot;&quot;;
+	dust.render(&quot;buttons.prepare.template&quot;, [], function(err, out){
+		html = out;
+	});
+
+    return {html : html, margin : 10};
+}
+
+/**
+* Loads the container according to the current step.
+*
+* @method load
+* @return 
+*/
+PrepareMainView.prototype.load = function() {
+    var _this = this; 
+    $(&#039;.notifyjs-corner&#039;).empty();    
+    this.panel.setTitle(&quot;Prepare Experiment&quot;);
+    this.container.removeAll();
+
+    if (this.currentStep == 1) {
+        _this.container.add(_this.dewarListSelector.getPanel());
+        _this.dewarListSelector.panel.setLoading();
+        var onSuccessProposal = function(sender, containers) {        
+            _this.containers = containers;
+            _this.dewarListSelector.load(containers);
+            _this.dewarListSelector.panel.setLoading(false);
+        };
+
+        var onError = function(sender, error) {        
+            EXI.setError(&quot;Ops, there was an error&quot;);
+            _this.dewarListSelector.panel.setLoading(false);
+        };
+        
+        EXI.getDataAdapter({onSuccess : onSuccessProposal, onError:onError}).proposal.dewar.getDewarsByProposal();
+    } else if (this.currentStep == 2){
+        this.container.add(this.sampleChangerSelector.getPanel());
+        this.sampleChangerSelector.panel.setLoading();
+
+        var onSuccessProposal = function(sender, containers) { 
+            _this.containers = containers;
+            var beamlinesSelected = _.uniq(_.map(_.filter(_this.containers, function(e){return e.shippingStatus == &quot;processing&quot;;}),&#039;beamlineName&#039;));
+
+            if (beamlinesSelected.length &gt; 1) {
+                $.notify(&quot;Warning: Multiple beamlines selected&quot;, &quot;warn&quot;);
+            } else if (beamlinesSelected.length == 1) {
+                if (EXI.credentialManager.getBeamlineNames().indexOf(beamlinesSelected[0]) &gt;= 0){
+                    _this.sampleChangerSelector.selectRowByBeamlineName(beamlinesSelected[0]);
+                } else {
+                    $.notify(&quot;Warning: Unknown beamline&quot;, &quot;warn&quot;);
+                }
+            }
+
+            _this.sampleChangerSelector.panel.setLoading(false);
+        };
+
+        var onError = function(sender, error) {        
+            EXI.setError(&quot;Ops, there was an error&quot;);
+            _this.sampleChangerSelector.panel.setLoading(false);
+        };
+        
+        EXI.getDataAdapter({onSuccess : onSuccessProposal, onError:onError}).proposal.dewar.getDewarsByProposal();
+    } else if (this.currentStep == 3) {
+        this.container.add(this.loadSampleChangerView.getPanel());
+        this.loadSampleChangerView.load();
+    }
+};
+
+/**
+* Saves a key-value pair on the session storage
+*
+* @method save
+* @param {String} key The key of the key-value pair
+* @param {String} value The value of the key-value pair
+* @return 
+*/
+PrepareMainView.prototype.save = function (key, value) {
+    if (typeof(Storage) != &#039;undefined&#039;) {
+        sessionStorage.setItem(key,value);
+    }
+}
+
+/**
+* Saves the puck data of a given sampleChangerWidget
+*
+* @method storeSampleChangerWidget
+* @param sampleChangerWidget The sample changer to be stored
+* @return 
+*/
+PrepareMainView.prototype.storeSampleChangerWidget = function (sampleChangerWidget) {
+    var puckData = sampleChangerWidget.getPuckData();
+    this.save(&#039;puckData&#039;,JSON.stringify(puckData));
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

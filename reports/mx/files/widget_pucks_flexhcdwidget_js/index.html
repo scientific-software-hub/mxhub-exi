@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/pucks/flexhcdwidget.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/pucks/flexhcdwidget.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">91.67</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">114</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">65.85</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.84</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This class extends the SampleChangerWidget class for a FlexHCD
+*
+* @class FlexHCDWidget
+* @constructor
+*/
+function FlexHCDWidget (args) {
+	
+	SampleChangerWidget.call(this,args);
+	
+	this.name = &#039;FlexHCD&#039;;
+	this.sampleChangerCapacity = 24;
+	this.initAlpha = -7*2*Math.PI/16;
+	this.data = {
+		radius : this.radius,
+		cells : 8,
+		lines : [],
+		text :[]
+	};
+	
+	this.createStructure();
+	this.createPucks(&quot;Unipuck&quot;, this.data.cells/2, -7*Math.PI/8, this.data.radius/2, 0.5, {dAlpha : Math.PI/16, dist : 3*this.data.radius/4});
+	this.createPucks(&quot;Spinepuck&quot;, this.data.cells/2, -5*Math.PI/8, this.data.radius/2, 0.5, {dAlpha : Math.PI/16, dist : 3*this.data.radius/4});
+};
+
+FlexHCDWidget.prototype.getPuckIndexFromAngle = SampleChangerWidget.prototype.getPuckIndexFromAngle;
+FlexHCDWidget.prototype.createPucks = SampleChangerWidget.prototype.createPucks;
+FlexHCDWidget.prototype.getPanel = SampleChangerWidget.prototype.getPanel;
+FlexHCDWidget.prototype.load = SampleChangerWidget.prototype.load;
+FlexHCDWidget.prototype.getStructure = SampleChangerWidget.prototype.getStructure;
+FlexHCDWidget.prototype.findPuckById = SampleChangerWidget.prototype.findPuckById;
+FlexHCDWidget.prototype.getAllPucks = SampleChangerWidget.prototype.getAllPucks;
+FlexHCDWidget.prototype.render = SampleChangerWidget.prototype.render;
+FlexHCDWidget.prototype.setClickListeners = SampleChangerWidget.prototype.setClickListeners;
+FlexHCDWidget.prototype.disablePucksOfDifferentCapacity = SampleChangerWidget.prototype.disablePucksOfDifferentCapacity;
+FlexHCDWidget.prototype.allowAllPucks = SampleChangerWidget.prototype.allowAllPucks;
+FlexHCDWidget.prototype.getPuckData = SampleChangerWidget.prototype.getPuckData;
+FlexHCDWidget.prototype.getAllFilledPucks = SampleChangerWidget.prototype.getAllFilledPucks;
+FlexHCDWidget.prototype.loadSamples = SampleChangerWidget.prototype.loadSamples;
+FlexHCDWidget.prototype.emptyAllPucks = SampleChangerWidget.prototype.emptyAllPucks;
+
+/**
+* Creates the particular structure of the FlexHCD
+*
+* @method createStructure
+*/
+FlexHCDWidget.prototype.createStructure = function () {
+	for (var i = 0 ; i &lt; this.data.cells/2 ; i++){
+		var ang = i*2*Math.PI/this.data.cells;
+		var line = {
+			x1 : this.data.radius*Math.sin(ang) + this.data.radius,
+			y1 : this.data.radius*Math.cos(ang) + this.data.radius,
+			x2 : -this.data.radius*Math.sin(ang) + this.data.radius,
+			y2 : -this.data.radius*Math.cos(ang) + this.data.radius
+		};
+		this.data.lines.push(line);
+	}
+	
+	var textR = this.data.radius*0.31;
+	var textRBig = this.data.radius*0.94;
+	var dAlpha = Math.PI/16;
+	var currentNumber = 1;
+	var textSize = Math.round((15-7)*(this.data.radius-100)/(200-100) + 7);
+	for (var i = 0 ; i &lt; this.data.cells ; i++){
+		var ang = i*2*Math.PI/this.data.cells;
+		this.data.text.push({
+			text : currentNumber,
+			x : textRBig*Math.sin(this.initAlpha + ang - dAlpha) + this.data.radius,
+			y : -textRBig*Math.cos(this.initAlpha + ang - dAlpha) + this.data.radius,
+			textSize : textSize
+		});
+		currentNumber++;
+		this.data.text.push({
+			text : currentNumber,
+			x : textRBig*Math.sin(this.initAlpha + ang + dAlpha) + this.data.radius,
+			y : -textRBig*Math.cos(this.initAlpha + ang + dAlpha) + this.data.radius,
+			textSize : textSize
+		});
+		currentNumber++;
+		this.data.text.push({
+			text : currentNumber,
+			x : textR*Math.sin(this.initAlpha + ang) + this.data.radius,
+			y : -textR*Math.cos(this.initAlpha + ang) + this.data.radius,
+			textSize : textSize
+		});
+		currentNumber++;
+	}
+};
+
+/**
+* Converts the idLocation to the corresponding location in the FlexHCD by convention
+*
+* @method convertIdToSampleChangerLocation
+* @return The corresponding location in the FlexHCD by convention
+*/
+FlexHCDWidget.prototype.convertIdToSampleChangerLocation = function (idLocation) {
+	var n = Number(idLocation.split(&quot;-&quot;)[1]);
+	var i = Number(idLocation.split(&quot;-&quot;)[2]);
+	return (n-1)*3 + i;
+};
+
+/**
+* Converts the sample changer location in a FlexHCD to the id of the puck
+*
+* @method convertSampleChangerLocationToId
+* @return The corresponding id of the puck in the given location
+*/
+FlexHCDWidget.prototype.convertSampleChangerLocationToId = function (sampleChangerLocation) {
+	if (sampleChangerLocation &lt;= 24 &amp;&amp; sampleChangerLocation &gt; 0) {
+		var n = Math.floor(sampleChangerLocation/3) + 1;
+		var i = sampleChangerLocation % 3;
+		if (i == 0){
+			n--;
+			i = 3;
+		}
+		return this.id + &quot;-&quot; + n + &quot;-&quot; + i;
+	} else {
+		return null;
+	}
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

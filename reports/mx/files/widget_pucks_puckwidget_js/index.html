@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/pucks/puckwidget.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/pucks/puckwidget.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">99.39</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">344</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">88.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.23</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* Abstract class for creating a puck widget
+*
+* @class PuckWidget
+* @constructor
+*/
+function PuckWidget(args){
+	this.id = BUI.id();
+	
+	this.mainRadius = 150;
+	this.dataCollectionIds = {};
+	this.containerId = 0;
+	this.containerCode = &quot;&quot;;
+	this.enableMouseOver = false;
+	this.enableClick = false;
+	this.initSelected = {};
+	this.isLoading = true;
+	this.capacity = 10;
+	
+	this.isUnipuck = false;
+	this.isEmpty = true;
+	
+	if (args){
+		if (args.id) {
+			this.id = args.id;
+		}
+		if (args.mainRadius){
+			this.mainRadius = args.mainRadius;
+		}
+		if (args.isUnipuck){
+			this.isUnipuck = args.isUnipuck;			
+		}
+		if (args.dataCollectionIds){
+			this.dataCollectionIds = args.dataCollectionIds;
+		}
+		if (args.containerIds){
+			this.containerIds = args.containerIds;
+		}
+		if (args.enableMouseOver != null){
+			this.enableMouseOver = args.enableMouseOver;
+		}
+		if (args.enableClick != null){
+			this.enableClick = args.enableClick;
+		}
+		if (args.initSelected){
+			this.initSelected = args.initSelected;
+		}
+		if (args.isLoading != null){
+			this.isLoading = args.isLoading;
+		}
+	}
+	
+	this.shapeRadiusX = this.mainRadius/10;
+	this.shapeRadiusY = this.mainRadius/20;
+	
+	this.data = {
+				mainRadius : this.mainRadius,
+				cells : [],
+				id : this.id,
+				isUnipuck : this.isUnipuck,
+				shapeRadiusX : this.shapeRadiusX,
+				shapeRadiusY : this.shapeRadiusY,
+				containerId : this.containerId,
+				containerCode : this.containerCode,
+				enableClick : this.enableClick,
+				enableMouseOver : this.enableMouseOver,
+				dataCollectionIds : this.dataCollectionIds,
+				isLoading : this.isLoading
+	};
+	
+	this.onClick = new Event(this);
+	this.onMouseOver = new Event(this);
+	this.onMouseOut = new Event(this);
+};
+
+/**
+* Add a certain number of cell objects to the data following a circle.
+*
+* @method addCirclePathCells
+* @param {Object} data The data of the puck
+* @param {Integer} n The number of cells to add
+* @param {Double} marginPercent Factor to control the separation between cells
+* @param {Double} dist The distance to the center of the puck where the cells are positioned
+*/
+PuckWidget.prototype.addCirclePathCells = function (data, n, marginPercent, dist) {
+	var rad = Math.min(dist*Math.sin((Math.PI/n)*marginPercent), 
+						(data.mainRadius - dist)*marginPercent);
+	
+	for (var i = 0 ; i &lt; n ; i++){
+		var ang = i*2*Math.PI/n;
+		var newCell = 		{
+								x :-dist*Math.sin(ang) + data.mainRadius,
+								y :-dist*Math.cos(ang) + data.mainRadius,
+								color :&#039;#FFFFFF&#039;, 
+								radius : rad,								
+								id : this.id + &quot;-&quot; + Number(data.cells.length + 1),
+								state : &quot;EMPTY&quot;,
+								location : Number(data.cells.length + 1),
+								selected : false,
+								dataCollectionIds : data.dataCollectionIds[Number(data.cells.length + 1)]
+							};
+		data.cells.push(newCell);
+	}
+	return data;
+};
+
+PuckWidget.prototype.getPanel = function () {
+	var html = &quot;&quot;;
+	dust.render(&quot;puck.template&quot;, this.data, function(err, out){
+		html = out;
+	});
+	
+	return html;
+};
+
+/**
+* Set all the cells of the puck as EMPTY
+*
+* @method load
+*/
+PuckWidget.prototype.emptyAll = function () {
+	for (cellIndex in this.data.cells) {
+		this.data.cells[cellIndex].state = &quot;EMPTY&quot;;
+		this.render(this.data.cells[cellIndex].location,true);
+	}
+	this.isEmpty = true;
+	this.containerId = 0;
+	$(&quot;#&quot; + this.id).removeClass(&quot;puck-error&quot;);
+};
+
+/**
+* Load sample data to the puck given the result of sample query by containerId
+*
+* @method loadSamples
+* @param {Object} samples Result of the sample query by containerId
+* @param {Integer} selectedLocation Optional parameter for having a selected cell
+*/
+PuckWidget.prototype.loadSamples = function (samples, selectedLocation) {
+	var cells = [];
+	for (var i = 0; i &lt; samples.length; i++) {
+		var sample = samples[i];
+		var dataCollectionIds = this.dataCollectionIds[sample.BLSample_location];
+		var state = &quot;FILLED&quot;;
+		if (dataCollectionIds != null &amp;&amp; dataCollectionIds.length &gt; 0){
+			state = &quot;COLLECTED&quot;;
+		}
+		var selected = false;
+		if (selectedLocation != null){
+			selected = sample.BLSample_location == selectedLocation;
+		}
+		
+		// Parse data
+		cells.push({
+			location : sample.BLSample_location,
+			state : state,
+			selected : selected,
+			sample_name : sample.BLSample_name,
+			protein_acronym : sample.Protein_acronym,
+			protein_name : sample.Protein_name,
+			dataCollectionIds : dataCollectionIds,
+			containerId : sample.Container_containerId,
+			containerCode : sample.Container_code
+		});
+	}
+	this.load(cells);
+};
+
+/**
+* Load sample data to the puck given that the data is correctly parsed
+*
+* @method load
+* @param {Object} data Data correctly parsed
+*/
+PuckWidget.prototype.load = function (data) {
+	var _this = this;
+	$(&quot;#&quot; + _this.data.id + &quot;-loading-text&quot;).remove();
+
+	for (sampleIndex in data){
+		var sample = data[sampleIndex];
+		var id = this.id + &quot;-&quot; + sample.location;
+		var cellIndex = this.findCellIndexById(id);
+		this.data.cells[cellIndex].state = sample.state;
+		this.data.cells[cellIndex].selected = sample.selected;
+		this.data.cells[cellIndex].sample_name = sample.sample_name;
+		this.data.cells[cellIndex].protein_acronym = sample.protein_acronym;
+		this.data.cells[cellIndex].protein_name = sample.protein_name;
+		this.data.cells[cellIndex].containerId = sample.containerId;
+		this.data.cells[cellIndex].containerCode = sample.containerCode;
+		if (sample.state != &quot;EMPTY&quot;){
+			this.containerId = sample.containerId;
+			this.containerCode = sample.containerCode;
+			this.data.containerId = this.containerId;
+			this.data.containerCode = this.containerCode;
+			this.isEmpty = false;
+		}
+	}
+
+	for (i in this.data.cells){
+		var currentId = this.id + &quot;-&quot; + Number(Number(i) + 1);
+
+		if (this.enableMouseOver){
+			$(&quot;#&quot; + currentId).unbind(&#039;mouseover&#039;).mouseover(function(sender){
+				var cellIndex = _this.findCellIndexById(sender.target.id);
+				
+				_this.onMouseOver.notify(sender.target.id.split(&quot;-&quot;)[1]);
+				_this.focus(sender.target.id.split(&quot;-&quot;)[1],true);
+				
+				// TOOLTIP
+				if (_this.data.cells[cellIndex].sample_name){
+	
+					var tooltipHtml = &quot;&quot;;
+					dust.render(&quot;plates.tooltip.mxdatacollectiongrid.template&quot;, _this.data.cells[cellIndex], function(err, out) {
+						tooltipHtml = out;
+					});
+					$(&#039;body&#039;).append(tooltipHtml);
+					$(&#039;#hoveringTooltipDiv&#039;).css({
+						&quot;top&quot; : $(this).offset().top - 3*_this.data.cells[i].radius,
+						&quot;left&quot; : $(this).offset().left + 1.5*_this.data.cells[i].radius
+					});
+					if (_this.data.cells[cellIndex].y - _this.data.mainRadius &lt; 0) {
+						$(&#039;#hoveringTooltipDiv&#039;).css({
+							&quot;top&quot; : $(this).offset().top + 2*_this.data.cells[i].radius,
+							&quot;left&quot; : $(this).offset().left + _this.data.cells[i].radius
+						});
+					}
+				}
+
+			});
+			
+			$(&quot;#&quot; + currentId).unbind(&#039;mouseout&#039;).mouseout(function(sender){
+				_this.onMouseOut.notify();
+				_this.focus(sender.target.id.split(&quot;-&quot;)[1],false);
+
+				// TOOLTIP
+				$(&#039;#hoveringTooltipDiv&#039;).remove();
+				
+			});
+
+		}
+		
+		if (this.enableClick) {
+			$(&quot;#&quot; + currentId).unbind(&#039;click&#039;).click(function(sender){
+				var cellIndex = _this.findCellIndexById(sender.target.id);
+				_this.render(_this.data.cells[cellIndex].location,true);
+				// TOOLTIP
+				$(&#039;#hoveringTooltipDiv&#039;).remove();
+			});
+		}
+		
+		this.render(this.data.cells[i].location,true);
+	}
+};
+
+/**
+* Focus or unfocus one cell according to a boolean and its location 
+*
+* @method focus
+* @param {Integer} location The location of the cell on the puck
+* @param {Boolean} bool Whether or not to focus the cell
+*/
+PuckWidget.prototype.focus = function (location, bool) {
+	if (bool){
+		$(&quot;#&quot; + this.id + &quot;-&quot; + location).attr(&quot;class&quot;, &quot;cell_focus&quot;);
+		$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).attr(&quot;class&quot;, &quot;cell_inner_hidden&quot;);		
+	} else {
+		this.render(location,true);
+	}
+};
+
+/**
+* Sets the style classes of the cell on a given location
+*
+* @method render
+* @param {Integer} location The location of the cell on the puck
+*/
+PuckWidget.prototype.render = function (location) {
+	var cellIndex = this.findCellIndexById(this.id + &quot;-&quot; + location);
+        
+	switch (this.data.cells[cellIndex].state) {
+		case &quot;FILLED&quot;:
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location).attr(&quot;class&quot;,&quot;cell_filled&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-label&quot;).attr(&quot;fill&quot;, &quot;white&quot;);		
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).attr(&quot;class&quot;, &quot;cell_inner_filled&quot;);
+			break;
+		case &quot;COLLECTED&quot;:
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location).attr(&quot;class&quot;,&quot;cell_collected&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-label&quot;).attr(&quot;fill&quot;, &quot;white&quot;);		
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).attr(&quot;class&quot;,&quot;cell_inner_filled&quot;);
+			break;
+		case &quot;RESULTS&quot;:
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location).attr(&quot;class&quot;,&quot;cell_results&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-label&quot;).attr(&quot;fill&quot;, &quot;white&quot;);		
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).attr(&quot;class&quot;,&quot;cell_inner_filled&quot;);
+			break;
+		case &quot;ERROR&quot;:
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location).attr(&quot;class&quot;,&quot;cell_error&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).attr(&quot;class&quot;, &quot;cell_inner_filled&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-label&quot;).attr(&quot;fill&quot;, &quot;white&quot;);		
+			break;
+		case &quot;EMPTY&quot;:
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location).attr(&quot;class&quot;, &quot;cell_empty&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).attr(&quot;class&quot;, &quot;cell_inner_hidden&quot;);
+			$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-label&quot;).attr(&quot;fill&quot;, &quot;black&quot;);
+			break;
+	}
+	if (this.data.cells[cellIndex].selected) {
+		$(&quot;#&quot; + this.id + &quot;-&quot; + location + &quot;-inner&quot;).addClass(&quot;cell_selected&quot;);
+	}
+};
+
+/**
+* Returns the cell Index in the data of the puck given its id
+*
+* @method findCellIndexById
+* @param {Integer} id The id of the cell
+* @return The cell Index in the data of the puck
+*/
+PuckWidget.prototype.findCellIndexById = function (id) {
+	for (cellIndex in this.data.cells) {
+		if (this.data.cells[cellIndex].id == id){
+			return cellIndex;
+		}
+	}
+};
+
+/**
+* Adds the disabled class to each cell
+*
+* @method disableAllCells
+* @return
+*/
+PuckWidget.prototype.disableAllCells = function () {
+	for (var i = 0 ; i &lt; this.data.cells.length ; i++) {
+		var cell = this.data.cells[i];
+		$(&quot;#&quot; + cell.id).addClass(&quot;cell-disabled&quot;);
+	}
+};
+
+/**
+* Removes the disabled class to each cell
+*
+* @method allowAllCells
+* @return
+*/
+PuckWidget.prototype.allowAllCells = function () {
+	for (var i = 0 ; i &lt; this.data.cells.length ; i++) {
+		var cell = this.data.cells[i];
+		$(&quot;#&quot; + cell.id).removeClass(&quot;cell-disabled&quot;);
+	}
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

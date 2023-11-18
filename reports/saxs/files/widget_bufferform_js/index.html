@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/bufferform.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/bufferform.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">101.78</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">166</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">25.80</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.57</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Edit the information of a buffer
+ * 
+ * #onRemoveAdditive
+ */
+function BufferForm(args) {
+	this.id = BUI.id();
+	this.height = 500;
+	this.width = 500;
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+	}
+
+//	this.onSaved = new Event(this);
+	this.onRemoveAdditive = new Event(this);
+}
+
+BufferForm.prototype.getBuffer = function() {
+	if (this.buffer == null){
+		this.buffer = {};
+	}
+	this.buffer[&quot;name&quot;] = Ext.getCmp(this.id + &quot;buffer_name&quot;).getValue();
+	this.buffer[&quot;acronym&quot;] = Ext.getCmp(this.id + &quot;buffer_acronym&quot;).getValue();
+	this.buffer[&quot;comments&quot;] = Ext.getCmp(this.id + &quot;buffer_comments&quot;).getValue();
+	this.buffer[&quot;ph&quot;] = Ext.getCmp(this.id + &quot;buffer_ph&quot;).getValue();
+	this.buffer[&quot;composition&quot;] = Ext.getCmp(this.id + &quot;buffer_composition&quot;).getValue();
+	this.buffer[&quot;proposalId&quot;] = Ext.getCmp(this.id + &quot;proposalIdCombo&quot;).getValue();
+	return this.buffer;
+};
+
+BufferForm.prototype.load = function(buffer) {
+	this.buffer = buffer;
+	
+	if (buffer != null){
+		Ext.getCmp(this.id + &quot;buffer_name&quot;).setValue(this.buffer.name);
+		Ext.getCmp(this.id + &quot;buffer_acronym&quot;).setValue(this.buffer.acronym);
+		Ext.getCmp(this.id + &quot;buffer_comments&quot;).setValue(this.buffer.comments);
+		Ext.getCmp(this.id + &quot;buffer_ph&quot;).setValue(this.buffer.ph);
+		Ext.getCmp(this.id + &quot;buffer_composition&quot;).setValue(this.buffer.composition);
+	}
+	
+		if (this.buffer != null){
+			if (this.buffer.proposalId != null){
+				          
+				Ext.getCmp(this.id + &quot;proposalIdCombo&quot;).setValue(this.buffer.proposalId);
+				Ext.getCmp(this.id + &quot;proposalIdCombo&quot;).disable();
+			}
+		}
+};
+
+BufferForm.prototype._getTopPanel = function() {
+	return {
+		xtype : &#039;container&#039;,
+		layout : &#039;hbox&#039;,
+		border : 0,
+		margin : &#039;40 0 0 0&#039;,
+		frame : true,
+		items : [ {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			items : [ {
+				xtype : &#039;container&#039;,
+				flex : 1,
+				border : false,
+				layout : &#039;anchor&#039;,
+//				defaultType : &#039;textfield&#039;,
+				items : [ {
+					xtype: &#039;requiredtextfield&#039;,
+					id : this.id + &#039;buffer_name&#039;,
+					fieldLabel : &#039;Name&#039;,
+					name : &#039;name&#039;,
+					width : 300
+//					value : this.buffer.name 
+					}, {
+						xtype: &#039;requiredtextfield&#039;,
+					id : this.id + &#039;buffer_acronym&#039;,
+					fieldLabel : &#039;Acronym&#039;,
+					maskRe:/[a-zA-Z0-9]+/,
+					name : &#039;acronym&#039;,
+					width : 300
+//					value : this.buffer.acronym
+				} ] } ] }, {
+			xtype : &#039;container&#039;,
+			flex : 1,
+			layout : &#039;anchor&#039;,
+			defaultType : &#039;textfield&#039;,
+			margin : &#039;0 0 0 10&#039;,
+			items : [ {
+				id : this.id + &#039;buffer_ph&#039;,
+				fieldLabel : &#039;pH&#039;,
+				name : &#039;ph&#039;,
+//				value : this.buffer.ph,
+				xtype : &#039;numberfield&#039;,
+				width : 300,
+				minValue : 0,
+				maxValue : 15 }, 
+				
+//				{
+//					//					xtype : &#039;requiredtext&#039;,
+//					xtype : &#039;Ext.Extended.SearchField&#039;,
+//					id : &#039;buffer_composition&#039;,
+//					fieldLabel : &#039;Composition&#039;,
+//					name : &#039;composition&#039;,
+//					width : 300
+//				}
+				{
+//					              xtype: &#039;searchfield&#039;,
+					              fieldLabel: &#039;Composition&#039;,
+					              id : this.id + &#039;buffer_composition&#039;,
+					              name: &#039;composition&#039;,
+					              width : 300
+					          }
+				
+				
+				] } ] };
+};
+
+
+BufferForm.prototype.getToolBar = function() {
+	var _this = this;
+	return [
+	        {
+	            text: &#039;Save&#039;,
+	            width : 100,
+	            handler : function(){
+	            	_this.panel.setLoading();
+	            	var onSuccess = (function(sender){
+	            		_this.panel.setLoading(false);
+	            		EXI.getDataAdapter().proposal.proposal.update();
+	            	});
+	            	EXI.getDataAdapter({ onSuccess : onSuccess}).saxs.buffer.saveBuffer(_this.getBuffer());
+	            }
+	        }
+	];
+};
+
+BufferForm.prototype.getPanel = function() {
+	var _this =this;
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		layout : &#039;vbox&#039;,
+		buttons : this.getToolBar(),
+		cls : &#039;border-grid&#039;,
+		items : [ 
+		         {
+						xtype : &#039;container&#039;,
+						margin : &#039;10 0 0 20&#039;,
+						layout : &#039;vbox&#039;,
+						items : [ 
+										BIOSAXS_COMBOMANAGER.getComboProposal({id : _this.id + &quot;proposalIdCombo&quot; ,labelWidth : 100}), 
+										this._getTopPanel(), 
+		          						{
+											id : this.id + &#039;buffer_comments&#039;,
+											xtype : &#039;textareafield&#039;,
+											name : &#039;comments&#039;,
+											fieldLabel : &#039;Comments&#039;,
+											width : 600 ,
+											height : 80
+										}
+						]
+		         }
+		
+		         ] 
+		}
+	);
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

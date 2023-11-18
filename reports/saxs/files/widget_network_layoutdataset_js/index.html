@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/network/layoutdataset.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/network/layoutdataset.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">113.15</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">248</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">65.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.46</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function LayoutDataset(){
+	this.dataset = null;
+	this.vertices = new Object();
+	this.changed = new Event(this);
+	
+	
+	this.args = new Object();
+	
+	//RANDOM, CIRCLE
+	this.args.type = &quot;CIRCLE&quot;;
+};
+
+LayoutDataset.prototype.loadFromJSON = function(dataset, json){
+	var _this = this;
+	this.vertices = new Object();
+	this.dataset = dataset; //new GraphDataset();
+	for ( var vertex in json) {
+		this.vertices[vertex] = new NodeLayout(vertex, json[vertex].x, json[vertex].y);
+		this.vertices[vertex].changed.attach(function (sender, item){
+			_this.changed.notify(item);
+		});
+	}
+	this._attachDatasetEvents();
+};
+
+
+LayoutDataset.prototype.toJSON = function(){
+	var serialize = new Object();
+	for ( var vertex in this.vertices) {
+		serialize[vertex] = new Object();
+		serialize[vertex].x = this.vertices[vertex].x;  
+		serialize[vertex].y = this.vertices[vertex].y;  
+	}
+	serialize.dataset = new Object();
+	serialize.dataset =this.dataset.toJSON();
+	return serialize;
+};
+
+LayoutDataset.prototype.dataBind = function(graphDataset){
+	this.dataset = graphDataset;
+	this._attachDatasetEvents();
+	this._calculateLayout();
+};
+
+LayoutDataset.prototype._removeVertex = function(vertexId){
+	delete this.vertices[vertexId];
+};
+
+LayoutDataset.prototype._attachDatasetEvents = function(){
+	var _this = this;
+	
+	this.dataset.vertexDeleted.attach(function (sender, item){
+		_this._removeVertex(item.getId());
+	});
+	
+	this.dataset.newVertex.attach(function (sender, item){
+		_this.vertices[item.getId()] = new NodeLayout(item.getId(), 0.5, 0.5);
+		_this.vertices[item.getId()].changed.attach(function (sender, item){
+			_this.changed.notify(item);
+		});
+	});
+};
+
+LayoutDataset.prototype.getType = function(){
+	return this.args.type;
+};
+
+LayoutDataset.prototype._calculateLayoutVertices = function(type, count){
+	
+	if (type == &quot;CIRCLE&quot;){
+			var radius = 0.4;
+			var centerX = 0.5;
+			var centerY = 0.5;
+			var verticesCoordinates = new Array();
+			for(var i = 0; i &lt; count; i++){
+				x = centerX + radius * Math.sin(i * 2 * Math.PI/count);
+				y = centerY + radius * Math.cos(i * 2 * Math.PI/count);
+				verticesCoordinates.push({&#039;x&#039;:x,&#039;y&#039;:y});
+			}
+			return verticesCoordinates;
+	}
+};
+
+
+LayoutDataset.prototype._calculateLayout = function(){
+	var _this = this;
+	if (this.getType() == &quot;RANDOM&quot;){
+		for ( var vertex in this.dataset.getVertices()) {
+			if (this.vertices[vertex] == null){
+				this.vertices[vertex] = new NodeLayout(vertex, 0, 0);
+			}
+			this.vertices[vertex].setCoordinates(Math.random(), Math.random());
+			this.vertices[vertex].changed.attach(function (sender, item){
+				_this.changed.notify(item);
+			});
+		}
+	}
+	
+	if ( this.getType() == &quot;CIRCLE&quot;){
+		
+		var count = this.dataset._getVerticesCount();
+		var verticesCoordinates = this._calculateLayoutVertices(this.getType(), count);
+		
+		var aux = 0;
+		for ( var vertex in this.dataset.getVertices()) {
+			if (this.vertices[vertex] == null){
+				this.vertices[vertex] = new NodeLayout(vertex, 0, 0);
+			}
+			this.vertices[vertex].setCoordinates(verticesCoordinates[aux].x, verticesCoordinates[aux].y);//{&quot;x&quot;:, &quot;y&quot;:};
+			aux++;
+			this.vertices[vertex].changed.attach(function (sender, item){
+				_this.changed.notify(item);
+			});
+		}
+	}
+	
+	
+	if (this.getType() == &quot;SQUARE&quot;){
+		
+		var count = this.dataset._getVerticesCount();
+		var xMin = 0.1;
+		var xMax = 0.9;
+		var yMin = 0.1;
+		var yMax = 0.9;
+		
+		var rows = Math.sqrt(count);
+		var step = (xMax - xMin) / rows;
+		
+		var verticesCoordinates = new Array();
+		for(var i = 0; i &lt; rows; i ++){
+			for ( var j = 0; j &lt; rows; j++) {
+				x = i * step + xMin;
+				y = j * step + yMin;
+				verticesCoordinates.push({&#039;x&#039;:x,&#039;y&#039;:y});
+			}
+		}
+		
+		var aux = 0;
+		for ( var vertex in this.dataset.getVertices()) {
+			if (this.vertices[vertex] == null){
+				this.vertices[vertex] = new NodeLayout(vertex, 0, 0);
+			}
+			this.vertices[vertex].setCoordinates(verticesCoordinates[aux].x, verticesCoordinates[aux].y);//{&quot;x&quot;:, &quot;y&quot;:};
+			aux++;
+			this.vertices[vertex].changed.attach(function (sender, item){
+				_this.changed.notify(item);
+			});
+		}
+	}
+	
+};
+
+LayoutDataset.prototype.getNodeById = function(id){
+	return this.vertices[id];
+};
+
+LayoutDataset.prototype.getVerticesByArea = function(x1, y1, x2, y2){
+	var vertices = new Array();
+	for ( var vertex in this.dataset.getVertices()) {
+		if ((this.vertices[vertex].x &gt;= x1)&amp;&amp;(this.vertices[vertex].x &lt;= x2)){
+			if ((this.vertices[vertex].y &gt;= y1)&amp;&amp;(this.vertices[vertex].y &lt;= y2)){
+				vertices.push(this.vertices[vertex]);
+			}
+		}
+	}
+	return vertices;
+};
+
+
+
+
+LayoutDataset.prototype.getLayout = function(type){
+	
+	if (type == &quot;CIRCLE&quot;){
+		this.args.type = &quot;CIRCLE&quot;;
+		this._calculateLayout();
+		return;
+	}
+	
+	if (type == &quot;SQUARE&quot;){
+		this.args.type = &quot;SQUARE&quot;;
+		this._calculateLayout();
+		return;
+	}
+	
+	if (type == &quot;RANDOM&quot;){
+		this.args.type = &quot;RANDOM&quot;;
+		this._calculateLayout();
+		return;
+	}
+	
+	
+	var dotText = this.dataset.toDOTID();
+	var url = &quot;http://bioinfo.cipf.es/utils/ws/rest/network/layout/&quot;+type+&quot;.coords&quot;;
+	var _this = this;
+	
+	 $.ajax({
+         async: true,
+         type: &quot;POST&quot;,
+         url: url,
+         dataType: &quot;text&quot;,
+         data: {
+                 dot :dotText
+                 },  
+         cache: false,
+         success: function(data){ 
+                         var response = JSON.parse(data);
+                         for ( var vertexId in response) {
+                                 _this.vertices[vertexId].setCoordinates(response[vertexId].x, response[vertexId].y);
+                         }   
+                 }   
+	 });
+	 
+//	$.ajax({
+//		async: true,
+//		type: &quot;POST&quot;,
+//		url: url,
+//		dataType: &quot;script&quot;,
+//		data: {
+//			dot :dotText
+//			},
+//		cache: false,
+//		success: function(data){ 
+//				var response = JSON.parse(data);
+//				for ( var vertexId in response) {
+//					_this.vertices[vertexId].setCoordinates(response[vertexId].x, response[vertexId].y);
+//				}
+//			}
+//	});
+	
+};
+
+function NodeLayout(id, x, y, args){
+	this.id = id;
+	this.x = x;
+	this.y = y;
+	this.changed = new Event(this);
+};
+
+NodeLayout.prototype.getId = function(id){
+	return this.id;
+};
+
+NodeLayout.prototype.setCoordinates = function(x, y){
+	this.x = x;
+	this.y = y;
+	this.changed.notify(this);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

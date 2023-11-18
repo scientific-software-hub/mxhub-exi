@@ -1,0 +1,31 @@
+.mainMenu{
+	background-color: #207a7a;
+	border-color: #207a7a;
+	color : #fff;
+}
+
+.ExiSAXSMenuToolBar{
+	background-color: #207a7a;
+	border-color: #207a7a;
+	color : #fff;
+}
+
+.ExiSAXSMenuToolBar:hover{
+	border: 1px solid gray;
+}
+
+.button_log_out  {
+	border-color: #207a7a;
+	background-color: #207a7a;
+}
+
+.button_log_out:hover  {
+	 #background-color: gray;
+	 border: 1px solid gray;
+}
+
+.mxMainMenu{
+	background-color: #207a7a;
+	border-color: #207a7a;
+	color : #fff;
+}

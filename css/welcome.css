@@ -1,0 +1,55 @@
+.title {
+	margin-left: 15px;
+	position: absolute;
+	top: 15px;
+}
+
+
+.toolbarPanel{
+	background-color: #207a7a;
+}
+
+.titlePanel {
+	background-color: #333;
+	color: white;
+	font-weight: bold;
+	font-size: 25px;
+}
+
+.subtitle {
+	font-size: 15px;
+	margin-left: 15px;
+	font-style: italic;
+	font-weight: normal;
+}
+
+.titleImage {
+	width: 60px;
+	height: 30px
+}
+
+.browsers {
+	font-style: italic;
+	margin-left: 15px;
+}
+
+.bottom {
+	background-color: #333;
+	text-align: right;
+	color: white;
+	font-size: 15px;
+}
+
+.login-panel { 
+	border-left: 1px solid #333;
+	border: 1px solid #333;
+	width : 900px;
+	height :300px;
+	text-align: center;
+}
+
+.welcome-panel {
+	background-color: #E8E8E8;
+	width: 800px;
+	height: 20000px;
+}

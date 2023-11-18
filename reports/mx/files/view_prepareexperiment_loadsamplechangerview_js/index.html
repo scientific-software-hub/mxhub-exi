@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/prepareexperiment/loadsamplechangerview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/prepareexperiment/loadsamplechangerview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">105.69</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">351</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">49.37</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.97</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This class renders a panel containing a ContainerPrepareSpreadSheetTest, a PreviewPanelView and a sampleChangerWidget
+* @class LoadSampleChangerView
+* @constructor
+*/
+function LoadSampleChangerView (args) {
+    var _this = this;
+
+    this.height = 600;
+    this.width = 600;
+    this.widgetRadius = 185;
+    if (args != null){
+        if (args.height){
+            this.height = args.height;
+        }
+        if (args.width){
+            this.width = args.width;
+        }
+    };
+
+    this.warningRows = [];
+    this.selectedContainerId = null;
+    this.selectedContainerCapacity = null;
+    this.selectedPuck = null;
+    this.sampleChangerName = null;
+
+    this.containerListEditor = new ContainerPrepareSpreadSheet({height : 480,width : 600});
+    this.previewPanelView = new PreviewPanelView({
+                                                        height : 100
+                                                    });
+    this.sampleChangerName = &quot;&quot;;
+    
+    if (typeof(Storage) != &quot;undefined&quot;){
+        var sampleChangerName = sessionStorage.getItem(&quot;sampleChangerName&quot;);
+        if (sampleChangerName){
+            this.sampleChangerName = sampleChangerName;
+        }
+    }
+
+    this.containerListEditor.onSelectRow.attach(function(sender, row){
+        if (row) {
+            if (_this.selectedPuck){
+                _this.deselectPuck();
+            }
+            if (_this.selectedContainerId) {
+                if (_this.selectedContainerId == row.get(&#039;containerId&#039;)){
+                    _this.deselectRow();
+                    _this.cleanPreviewPanel();
+                } else {
+                    _this.deselectRow();
+                    _this.setSelectedRow(row);
+                }
+            } else {
+                _this.setSelectedRow(row);
+            }
+        }
+	});
+
+    this.containerListEditor.onLoaded.attach(function(sender, containers){
+        $(&#039;.notifyjs-corner&#039;).empty();        
+        _this.load(containers);
+    });
+
+    this.previewPanelView.onEmptyButtonClicked.attach(function(sender){
+        if (_this.selectedPuck){
+            _this.selectedPuck.emptyAll();
+            _this.previewPuck(_this.selectedPuck.containerId, _this.selectedPuck.capacity, {
+                info : [{
+                    text : &#039;SC Location&#039;,
+                    value : _this.sampleChangerWidget.convertIdToSampleChangerLocation(_this.selectedPuck.id)
+                }]
+            }, &quot;&quot;);
+        }
+        _this.containerListEditor.updateSampleChangerLocation(_this.selectedContainerId,&quot; &quot;);
+        _this.returnToSelectionStatus();
+    });
+};
+
+LoadSampleChangerView.prototype.setSelectedRow = function (row) {
+    this.containerListEditor.panel.getSelectionModel().select(row);
+    this.selectedContainerId = row.get(&#039;containerId&#039;);
+    this.selectedContainerCapacity = row.get(&#039;capacity&#039;);
+    this.sampleChangerWidget.disablePucksOfDifferentCapacity(this.selectedContainerCapacity);
+
+    if (!this.selectedPuck) {
+        var puckId = this.sampleChangerWidget.convertSampleChangerLocationToId(Number(row.get(&#039;sampleChangerLocation&#039;)));
+        if (puckId){
+            var puck = this.sampleChangerWidget.findPuckById(puckId);
+            this.setSelectedPuck(puck);
+        }
+    }
+
+    this.previewPuck(row.get(&#039;containerId&#039;), 
+                        row.get(&#039;capacity&#039;), {
+                                info : [{
+                                    text : &#039;Container&#039;,
+                                    value : row.get(&#039;containerCode&#039;)
+                                },{
+                                    text : &#039;SC Location&#039;,
+                                    value : row.get(&#039;sampleChangerLocation&#039;)
+                                }]
+        }, &quot;EMPTY&quot;);
+};
+
+/**
+* Method executed once a puck from the sample changer widget is clicked.
+*
+* @method setSelectedPuck
+* @return 
+*/
+LoadSampleChangerView.prototype.setSelectedPuck = function (puck) {
+    this.selectedPuck = puck;
+    $(&quot;#&quot; + puck.id).addClass(&quot;puck-selected&quot;);
+    if (puck.isEmpty){
+        this.previewPuck(puck.containerId, puck.capacity, {
+        info : [{
+            text : &#039;SC Location&#039;,
+            value : this.sampleChangerWidget.convertIdToSampleChangerLocation(puck.id)
+        }]
+    }, &quot;EMPTY&quot;);
+    } else if (!this.selectedContainerId) {
+        var rowsByContainerId = this.containerListEditor.getRowsByContainerId(puck.containerId);
+        this.setSelectedRow(rowsByContainerId[0]);
+    }
+};
+
+/**
+* Takes care of deselecting a row in the loading step.
+*
+* @method deselectRow
+* @return 
+*/
+LoadSampleChangerView.prototype.deselectRow = function () {
+    this.containerListEditor.panel.getSelectionModel().deselectAll();
+    this.selectedContainerId = null;
+    this.selectedSampleCount = null;
+    this.sampleChangerWidget.allowAllPucks();
+}
+
+/**
+* Takes care of deselecting a puck in the loading step
+*
+* @method deselectPuck
+* @return 
+*/
+LoadSampleChangerView.prototype.deselectPuck = function () {
+    $(&quot;#&quot; + this.selectedPuck.id).removeClass(&quot;puck-selected&quot;);
+    this.selectedPuck = null; 
+};
+
+/**
+* Returns to the initial state
+*
+* @method returnToSelectionStatus
+* @return 
+*/
+LoadSampleChangerView.prototype.returnToSelectionStatus = function () {
+    this.deselectRow();
+    if (this.selectedPuck) {
+        this.deselectPuck();        
+    }
+    this.cleanPreviewPanel();
+};
+
+/**
+* Takes care of the process when a puck is selected after clicking a row, loading that puck with the selected container
+*
+* @method loadSampleChangerPuck
+* @param {PuckWidget} puck The puck of the sample changer widget to be loaded
+* @param {Integer} containerId The container Id of the container to be loaded
+* @return 
+*/
+LoadSampleChangerView.prototype.loadSampleChangerPuck = function (puck, containerId) {
+    if (puck.isEmpty){
+        this.returnToSelectionStatus();
+        var location = this.sampleChangerWidget.convertIdToSampleChangerLocation(puck.id);
+        this.containerListEditor.updateSampleChangerLocation(containerId,location);
+    } else {
+        $.notify(&quot;Error: choose an empty puck&quot;, &quot;error&quot;);
+    }
+};
+
+/**
+* Generates a sampleChangerWidget given its name. It also checks for puck data on the sessionStorage
+*
+* @method getSampleChangerWidget
+* @param {String} sampleChangerName The name of the sampleChangerWidget to be generated
+* @return A sampleChangerWidget
+*/
+LoadSampleChangerView.prototype.getSampleChangerWidget = function (sampleChangerName) {
+    var _this = this;
+    var data = {
+        radius : this.widgetRadius,
+        isLoading : false
+    };
+    var sampleChangerWidget = new FlexHCDWidget(data);
+    if (sampleChangerName == &quot;SC3&quot;) {
+        sampleChangerWidget = new SC3Widget(data);
+    } else if (sampleChangerName == &quot;RoboDiff&quot;) {
+        sampleChangerWidget = new RoboDiffWidget(data);
+    }
+
+    return sampleChangerWidget;
+};
+
+/**
+* Loads the sampleChangerWidget
+*
+* @method load
+* @return 
+*/
+LoadSampleChangerView.prototype.load = function (containers) {
+    var _this = this;
+
+    this.sampleChangerWidget.emptyAllPucks();
+    this.warningRows = [];
+    var filledContainers = {};
+
+    if (containers) {
+        for (var i = 0 ; i &lt; containers.length ; i++){
+            var container = containers[i];
+            if (container.sampleCount &gt; 0){
+                if (container.sampleChangerLocation != &quot; &quot;){
+                    var puckId = this.sampleChangerWidget.convertSampleChangerLocationToId(Number(container.sampleChangerLocation));
+                    if (puckId) {
+                        filledContainers[container.containerId] = puckId;
+                        var puck = this.sampleChangerWidget.findPuckById(puckId);
+                        if (puck.capacity != container.capacity){
+                            this.warningRows.push(container.containerId);
+                        }
+                    } else {
+                        this.warningRows.push(container.containerId);
+                    }
+                } else {
+                    this.warningRows.push(container.containerId);
+                }
+            }
+        }
+        
+        
+        if (!_.isEmpty(filledContainers)){
+            var onSuccess = function (sender, samples) {
+                var errorPucks = _this.sampleChangerWidget.loadSamples(samples,filledContainers);
+                if (errorPucks.length &gt; 0){
+                    for (index in errorPucks) {
+                        var puck = errorPucks[index];
+                        $(&quot;#&quot; + puck.id).addClass(&quot;puck-error&quot;);
+                    }
+                }
+            }
+
+            EXI.getDataAdapter({onSuccess : onSuccess}).mx.sample.getSamplesByContainerId(_.keys(filledContainers));
+        }
+    } else {
+        this.containerListEditor.loadProcessingDewars(this.sampleChangerWidget);
+    }
+};
+
+/**
+* Returns a panel containing a ContainerPrepareSpreadSheetTest, a PreviewPanelView and a sampleChangerWidget
+*
+* @method getPanel
+* @return A panel containing a ContainerPrepareSpreadSheetTest, a PreviewPanelView and a sampleChangerWidget
+*/
+LoadSampleChangerView.prototype.getPanel = function () {
+    var _this = this;
+
+    this.sampleChangerWidget = this.getSampleChangerWidget(this.sampleChangerName);
+
+    this.widgetContainer = Ext.create(&#039;Ext.panel.Panel&#039;, {
+        width : 400,
+        height : 2*this.widgetRadius,
+        margin : 8,
+        layout: {
+            type: &#039;hbox&#039;,
+            pack: &#039;center&#039;
+        },  
+        items : [this.sampleChangerWidget.getPanel()]
+    });
+
+    this.verticalPanel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+        // layout : &#039;hbox&#039;,
+            items : [
+                        this.widgetContainer    
+            ]
+    });
+
+    this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+        // title : &#039;Load the sample changer&#039;,
+        layout : &#039;hbox&#039;,
+        height : this.height,
+        width : this.width,
+        margin : 5,
+        items : [
+                    this.containerListEditor.getPanel(),
+                    this.verticalPanel  
+        ]
+    });
+
+    this.panel.on(&#039;boxready&#039;, function() {
+        _this.sampleChangerWidget.setClickListeners();
+        _this.sampleChangerWidget.onPuckSelected.attach(function(sender, puck){
+            if (_this.selectedContainerId) {
+                if (_this.selectedPuck) {
+                    if (_this.selectedPuck == puck) {
+                        _this.returnToSelectionStatus();
+                    } else {
+                        _this.loadSampleChangerPuck(puck, _this.selectedContainerId);
+                    }
+                } else {
+                    _this.loadSampleChangerPuck(puck, _this.selectedContainerId);
+                }
+            } else {
+                if (_this.selectedPuck) {
+                    if (_this.selectedPuck == puck) {
+                        _this.returnToSelectionStatus();
+                    } else {
+                        _this.deselectRow();
+                        _this.deselectPuck();
+                        _this.setSelectedPuck(puck);
+                    }
+                } else {
+                    _this.setSelectedPuck(puck);
+                }
+            }
+        });
+        _this.sampleChangerWidget.render();
+    });
+
+    return this.panel;
+};
+
+/**
+* Cleans and removes the previewPanelView
+*
+* @method cleanPreviewPanel
+* @return
+*/
+LoadSampleChangerView.prototype.cleanPreviewPanel = function () {
+    this.previewPanelView.clean();
+    this.verticalPanel.remove(this.previewPanelView.panel);
+};
+
+/**
+* Cleans and removes the previewPanelView
+*
+* @method cleanPreviewPanel
+* @return
+*/
+LoadSampleChangerView.prototype.previewPuck = function (containerId, capacity, data, instructionsButtonText) {
+    if (this.previewPanelView.previewPanel){
+        this.cleanPreviewPanel();
+    }
+    this.verticalPanel.add(this.previewPanelView.getPanel());
+    this.previewPanelView.load(containerId, capacity, data, instructionsButtonText);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/grid/sessiongrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/grid/sessiongrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">104.31</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">283</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">28.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.63</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function SessionGrid(args) {
+	this.height = 500;
+	this.tbar = false;
+	this.id = BUI.id();
+	this.width = null;
+
+	this.title = null;
+	this.margin = 10;
+
+
+	this.hiddenGoColumn = true;
+    this.isHiddenTitle = true;
+    this.isHiddenNumberOfShifts = true;
+    
+    this.isHiddenPI = true;
+    this.isHiddenLocalContact = true;
+    
+    this.layout = &#039;fit&#039;;
+    
+	if (args != null) {
+         if (args.isHiddenLocalContact != null) {
+			this.isHiddenLocalContact = args.isHiddenLocalContact;
+		}
+        
+        if (args.isHiddenTitle != null) {
+			this.isHiddenTitle = args.isHiddenTitle;
+		}
+        if (args.isHiddenNumberOfShifts != null) {
+			this.isHiddenNumberOfShifts = args.isHiddenNumberOfShifts;
+		}
+        if (args.width != null) {
+			this.width = args.width;
+		}
+        if (args.isHiddenTitle != null) {
+			this.isHiddenTitle = args.isHiddenTitle;
+		}
+        if (args.isHiddenPI != null) {
+			this.isHiddenPI = args.isHiddenPI;
+		}
+        
+		if (args.title != null) {
+			this.title = args.title;
+		}
+		if (args.margin != null) {
+			this.margin = args.margin;
+		}
+
+		if (args.height != null) {
+			this.height = args.height;
+		}
+
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+
+		if (args.width != null) {
+			this.width = args.width;
+            this.layout = null;
+		}
+		if (args.hiddenGoColumn != null) {
+			this.hiddenGoColumn = args.hiddenGoColumn;
+		}
+	}
+
+	this.onSelected = new Event(this);
+
+};
+
+
+SessionGrid.prototype.load = function(sessions) {
+	this.store.loadData(sessions, false);
+};
+
+SessionGrid.prototype.getPanel = function() {
+	var _this = this;
+   
+    this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [&#039;beamLineOperator&#039;, &#039;Proposal_title&#039;, &#039;Person_emailAddress&#039;, &#039;Person_familyName&#039;, &#039;Person_givenName&#039;, &#039;nbShifts&#039;, &#039;comments&#039;],
+		emptyText : &quot;No sessions&quot;,
+		data : []
+	});
+    
+
+
+
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [&#039;beamLineOperator&#039;, &#039;Proposal_title&#039;, &#039;Person_emailAddress&#039;, &#039;Person_familyName&#039;, &#039;Person_givenName&#039;, &#039;nbShifts&#039;, &#039;comments&#039;],
+		emptyText : &quot;No sessions&quot;,
+		data : []
+	});
+
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : this.title,
+		store : this.store,		
+		icon : &#039;../images/icon/sessions.png&#039;,
+		cls : &#039;border-grid&#039;,
+		minHeight: 300,
+        width : this.width,
+        height : this.height,
+		margin : this.margin,
+		layout : this.layout,
+		columns : [
+              {
+                    text              : &#039;&#039;,
+                    dataIndex         : &#039;BLSession_startDate&#039;,
+                    flex             : 1,
+                    hidden              : true,
+                    renderer          : function(grid, a, record){                                    
+                                               var html = &quot;&quot;;
+                                               if (record.data.BLSession_startDate){
+                                                    record.data.start =  moment(record.data.BLSession_startDate, &#039;MMMM Do YYYY, h:mm:ss a&#039;).format(&#039;MMMM Do YYYY&#039;);
+                                                    record.data.day =  moment(record.data.BLSession_startDate, &#039;MMMM Do YYYY, h:mm:ss a&#039;).format(&#039;Do&#039;);
+                                                    record.data.month =  moment(record.data.BLSession_startDate, &#039;MMMM Do YYYY, h:mm:ss a&#039;).format(&#039;MMMM&#039;);
+                                                    record.data.year =  moment(record.data.BLSession_startDate, &#039;MMMM Do YYYY, h:mm:ss a&#039;).format(&#039;YYYY&#039;);
+                                               }
+                                               dust.render(&quot;session.grid&quot;, record.data, function(err, out){
+                                                    html = html + out;
+                                               });
+                                               return html;
+                    }
+              },
+              {
+                            text              : &#039;Start&#039;,
+                            dataIndex         : &#039;BLSession_startDate&#039;,
+                            flex              : 2,
+                            hidden            : false,
+                            renderer          : function(grid, a, record){                                 
+                                                     
+                                                    var location = &quot;#&quot;;
+                                                    if (EXI.credentialManager.getTechniqueByBeamline(record.data.beamLineName) == &quot;SAXS&quot;){
+                                                        location = &quot;#/session/nav/&quot; + record.data.sessionId + &quot;/session&quot;;
+                                                    }
+                                                    else{
+                                                        location = &quot;#/mx/datacollection/session/&quot; + record.data.sessionId + &quot;/main&quot;;
+                                                    }
+                                                    if (record.data.BLSession_startDate){                 
+                                                         return &quot;&lt;a href=&#039;&quot; +  location +&quot;&#039;&gt;&quot; + moment(record.data.BLSession_startDate, &#039;MMMM Do YYYY, h:mm:ss a&#039;).format(&#039;MMMM Do YYYY&#039;) + &quot;&lt;/a&gt;&quot;; 
+                                                    }
+                            }
+		     },
+             {
+                    text : &#039;Beamline&#039;,
+                    dataIndex : &#039;Proposal_code&#039;,
+                    width : 125,
+                    hidden : false,
+                    renderer : function(grid, a, record){
+                            var location = &quot;#&quot;;
+                            if (EXI.credentialManager.getTechniqueByBeamline(record.data.beamLineName) == &quot;SAXS&quot;){
+                                location = &quot;#/session/nav/&quot; + record.data.sessionId + &quot;/session&quot;;
+                            }
+                            else{
+                                location = &quot;#/mx/datacollection/session/&quot; + record.data.sessionId + &quot;/main&quot;;
+                            }
+                        return &quot;&lt;a href=&#039;&quot; +  location +&quot;&#039;&gt;&quot; + record.data.beamLineName + &quot;&lt;/a&gt;&quot;; 
+                    }
+		    }, 
+            {
+                text : &#039;Proposal&#039;,
+                dataIndex : &#039;beamlineName&#039;,
+                flex : 1,
+                hidden : false,
+                renderer : function(grid, a, record){
+                    var proposal = record.data.Proposal_proposalCode + record.data.Proposal_ProposalNumber;
+                    return &quot;&lt;a href=&#039;#/session/nav&#039; data-toggle=&#039;tooltip&#039; title=&#039;Open proposal &quot; + proposal +&quot;&#039;&gt;&quot; + proposal + &quot;&lt;/a&gt;&quot;; 
+                }
+          },       
+          {
+			    text                : &#039;Shifts&#039;,
+			    dataIndex           : &#039;nbShifts&#039;,
+                hidden              : this.isHiddenNumberOfShifts,
+                flex                : 1
+		    },
+           {
+			    text                : &#039;Local Contact&#039;,
+			    dataIndex           : &#039;beamLineOperator&#039;,
+			    width               : 200,
+                hidden              : this.isHiddenLocalContact,
+                flex                : 1
+		    },
+            {
+			    text                : &#039;Title&#039;,
+			    dataIndex           : &#039;Proposal_title&#039;,
+			    width               : 200,
+                hidden              : this.isHiddenTitle,
+                flex               : 4
+		    },
+            {
+			    text                : &#039;PI&#039;,
+			    dataIndex           : &#039;Proposal_title&#039;,
+			    width               : 200,
+              
+                 hidden              : this.isHiddenPI,
+                renderer : function(grid, a, record){                        
+                        return record.data.Person_familyName + &quot;, &quot; + record.data.Person_givenName;
+                    }
+		    },
+             {
+			    text                : &#039;e-mail&#039;,
+			    dataIndex           : &#039;Person_emailAddress&#039;,
+			    width               : 200,
+                hidden              : true,
+                flex               : 1
+		    },
+           {
+                text                : &#039;Data Collections&#039;,
+			    dataIndex           : &#039;Person_emailAddress&#039;,
+                 width               : 200,
+                renderer : function(grid, a, record){ 
+                    function getBadge(title, count) {
+                        if (count){
+                            if (count != 0){
+                                return &#039;&lt;tr&gt;&lt;td style=&quot;width:50px;&quot;&gt;&#039; + title + &#039;&lt;/td&gt;&lt;td&gt; &lt;span style=&quot;margin-left:10px;margin-top:2px;background-color:#207a7a;&quot; class=&quot;badge&quot;&gt;&#039; + count +&#039;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&#039;;
+                            }
+                        }
+                        return &quot;&quot;;
+                    };
+                    function getTable(record){
+                        var html = &quot;&lt;table&gt;&quot;;
+                        html =   html = html + getBadge(&quot;Energy&quot;, record.data.energyScanCount);
+                        html = html + getBadge(&quot;XRF&quot;, record.data.xrfSpectrumCount);
+                        html = html + getBadge(&quot;Samples&quot;, record.data.sampleCount);
+                        html = html + getBadge(&quot;Test&quot;, record.data.testDataCollectionGroupCount);
+                        html = html + getBadge(&quot;Collects&quot;, record.data.dataCollectionGroupCount);
+                        return html + &quot;&lt;/table&gt;&quot;;  
+                    }                                                          
+                    return getTable(record);
+                 }
+               
+           },
+     
+            {
+                text              : &#039;End&#039;,
+                dataIndex         : &#039;BLSession_endDate&#039;,
+                hidden              : true,
+                flex             : 1,                
+                renderer          : function(grid, a, record){                    
+                                        return record.data.BLSession_endDate;
+                }
+		   },
+           {
+			    text                : &#039;Comments&#039;,
+			    dataIndex           : &#039;comments&#039;,
+                hidden              : false,
+                flex                : 3,
+                renderer            : function(grid, a, record){    
+                                        if (record.data.comments){                
+                                            return &quot;&lt;div style=&#039;width:50px; wordWrap: break-word;&#039;&gt;&quot; + record.data.comments + &quot;&lt;/div&gt;&quot;;
+                                        }
+                }
+                
+
+
+		    },
+           ], 
+      	   viewConfig : {
+                stripeRows : true,
+                getRowClass : function(record, rowIndex, rowParams, store){
+                    /*
+                    if (record.data.beamLineName != null){
+                        
+                        if (EXI.credentialManager.getTechniqueByBeamline(record.data.beamLineName) == &quot;SAXS&quot;){
+                            return ((rowIndex % 2) == 0) ? &quot;saxs-grid-row-light&quot; : &quot;saxs-grid-row-dark&quot;;
+                        }
+                        if (EXI.credentialManager.getTechniqueByBeamline(record.data.beamLineName) == &quot;MX&quot;){
+                            return ((rowIndex % 2) == 0) ? &quot;mx-grid-row-light&quot; : &quot;mx-grid-row-dark&quot;;
+                        }
+                    }
+                    return &quot;mx-grid-row-dark&quot;;*/
+                }
+	    	},
+            listeners : {
+				&#039;cellclick&#039; : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {                    
+					_this.onSelected.notify({
+                       proposalCode   : record.data.Proposal_proposalCode,
+                       proposalNumber : record.data.Proposal_ProposalNumber
+                        
+                    });
+				}			
+			}				
+	});	
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+.workflow_step_main_summary_item{
+	color : black;
+	
+}
+
+.workflow_step_main_summary_item_selected{
+	font-weight : bold;
+	background-color : #C0C0C0;
+}
+
+.workflow_step_main_summary_item:hover{
+	color : black;
+	font-weight : bold;
+	cursor : pointer;
+	background-color : #C0C0C0;
+	
+}
+

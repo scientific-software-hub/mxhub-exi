@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/stocksolutiongrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/stocksolutiongrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">105.25</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">439</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">38.29</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.88</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Shows a list of stock solutions with macromolecule, buffer, storage temperature, concentration, shipment and comments
+ * 
+ * @multiselect allows multiple selection
+ * @height 
+ * @minHeight
+ * @width
+ * @tbar
+ * @showTitle
+ * @isPackedVisible shows is stock solution is in a box
+ * @btnEditVisible shows edit button
+ * @btnAddVisible
+ * @btnAddExisting
+ * @btnUnpackVisible allows to unpack a stock solution
+ * @btnRemoveVisible allow to remove a stock solution
+ */
+
+function StockSolutionGrid(args) {
+	this.id = BUI.id();
+//	this.height = 100;
+//	this.width = null;
+//	this.minHeight = null;
+	this.tbar = true;
+
+	this.title = &quot;Stock Solutions&quot;;
+
+	/** Visible buttons and actions **/
+	this.btnEditVisible = true;
+	this.btnRemoveVisible = true;
+	this.btnAddVisible = true;
+	this.btnAddExisting = false;
+	this.isPackedVisible = true;
+	this.btnUnpackVisible = false;
+
+	/** Selectors **/
+	this.multiselect = false;
+	this.selectedStockSolutions = [];
+
+	if (args != null) {
+		if (args.btnUnpackVisible != null) {
+			this.btnUnpackVisible = args.btnUnpackVisible;
+		}
+		if (args.multiselect != null) {
+			this.multiselect = args.multiselect;
+		}
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.btnEditVisible != null) {
+			this.btnEditVisible = args.btnEditVisible;
+		}
+		if (args.btnAddVisible != null) {
+			this.btnAddVisible = args.btnAddVisible;
+		}
+		if (args.btnAddExisting != null) {
+			this.btnAddExisting = args.btnAddExisting;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+		if (args.minHeight != null) {
+			this.minHeight = args.minHeight;
+		}
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+		if (args.btnRemoveVisible != null) {
+			this.btnRemoveVisible = args.btnRemoveVisible;
+		}
+		if (args.isPackedVisible != null) {
+			this.isPackedVisible = args.isPackedVisible;
+		}
+		if (args.showTitle != null) {
+			this.showTitle = args.showTitle;
+			if (this.showTitle == false) {
+				this.title = null;
+			}
+		}
+
+	}
+
+	/** Events **/
+//	this.onProposalChanged = new Event(this);
+//	this.onStockSolutionSelected = new Event(this);
+	this.onSaved = new Event(this);
+	this.onUnpack = new Event(this);
+	this.onPack = new Event(this);
+}
+
+StockSolutionGrid.prototype._getColumns = function() {
+	var _this = this;
+	var columns = [
+	{
+		header : &#039;Proposal&#039;,
+		dataIndex : &#039;proposal&#039;,
+		name : &#039;proposalId&#039;,
+	//	type : &#039;string&#039;,
+		flex : 1,
+		hidden : false
+	}, 
+	{
+		header : &#039;Macromolecule&#039;,
+		dataIndex : &#039;macromolecule&#039;,
+		id : _this.id + &#039;macromolecule&#039;,
+		type : &#039;string&#039;,
+		renderer : function(val, y, specimen) {
+			if (val != null){
+				return &#039;&lt;span style=&quot;color:blue;&quot;&gt;&#039; + val + &#039;&lt;/span&gt;&#039;;
+			}
+		},
+		hidden : false,
+		flex : 1
+	}, {
+		header : &#039;Buffer&#039;,
+		dataIndex : &#039;buffer&#039;,
+		name : &#039;buffer&#039;,
+		hidden : false,
+		renderer : function(val, y, specimen) {
+			return &#039;&lt;span style=&quot;color:green;&quot;&gt;&#039; + val + &#039;&lt;/span&gt;&#039;;
+		},
+		type : &#039;string&#039;,
+		flex : 1
+	}, {
+		header : &#039;Acronym&#039;,
+		dataIndex : &#039;name&#039;,
+		name : &#039;name&#039;,
+		flex : 1,
+		hidden : true
+	},{
+		header : &#039;Storage Temp. (C)&#039;,
+		dataIndex : &#039;storageTemperature&#039;,
+		name : &#039;storageTemperature&#039;,
+		flex : 1,
+		hidden : false
+	}, {
+		header : &#039;Volume (&amp;#181l)&#039;,
+		name : &#039;volume&#039;,
+		dataIndex : &#039;volume&#039;,
+		flex : 1,
+		hidden : false
+	}, {
+			header : &#039;Concentration (mg/ml)&#039;,
+			dataIndex : &#039;concentration&#039;,
+			name : &#039;concentration&#039;,			
+			flex : 1
+	}, 
+	{
+		header : &#039;Packed&#039;,
+		dataIndex : &#039;comments&#039;,
+		id : _this.id + &quot;box&quot;,
+		type : &#039;string&#039;,
+		width : 50,
+		hidden : !this.isPackedVisible,
+		renderer : function(val, cmp, a) {
+			if (a.raw.boxId != null) {
+				return &quot;&lt;div style=&#039;cursor: pointer;&#039;&gt;&lt;img height=&#039;15px&#039; src=&#039;../images/plane.gif&#039;&gt;&lt;/div&gt;&quot;;
+			}
+
+		}
+	}, 
+	{
+		header : &#039;Comments&#039;,
+		dataIndex : &#039;comments&#039;,
+		type : &#039;string&#039;,
+		flex : 1
+	} ];
+
+	if (this.btnEditVisible) {
+//		columns.push({
+//			id : _this.id + &#039;buttonEdit&#039;,
+//			width : 85,
+//			sortable : false,
+//			renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+//				if (_this.btnEditVisible) {
+//					return BUI.getGreenButton(&#039;EDIT&#039;);
+//				}
+//			}
+//		});
+		columns.push({
+            xtype:&#039;actioncolumn&#039;,
+            width:40,
+            text : &#039;Edit&#039;,
+            items: [{
+                icon: &#039;../images/icon/edit.png&#039;,  // Use a URL in the icon config
+                tooltip: &#039;Edit&#039;,
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    _this.edit(rec.get(&#039;stockSolutionId&#039;));
+                }
+            }]
+        });
+	}
+
+	if (this.btnRemoveVisible) {
+		columns.push({
+			id : _this.id + &#039;buttonRemove&#039;,
+			width : 85,
+			sortable : false,
+			renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+				if (_this.btnRemoveVisible) {
+					return BUI.getRedButton(&#039;REMOVE&#039;);
+				}
+			}
+		});
+	}
+
+	if (this.btnUnpackVisible) {
+//		unpack
+		columns.push({
+            xtype:&#039;actioncolumn&#039;,
+            width:40,
+            text : &#039;Unpack&#039;,
+            items: [{
+                icon: &#039;../images/icon/ic_highlight_remove_black_24dp.png&#039;,  // Use a URL in the icon config
+                tooltip: &#039;Unpack&#039;,
+                handler: function(grid, rowIndex, colIndex) {
+                    var stockSolution = grid.getStore().getAt(rowIndex).data;
+                    _this.unpack(stockSolution);
+                }
+            }]
+        });
+	}
+	return columns;
+};
+
+StockSolutionGrid.prototype._getTopButtons = function() {
+	var _this = this;
+	/** Actions buttons **/
+	var actions = [];
+
+	/** ADD BUTTON **/
+	if (this.btnAddVisible) {
+		actions.push(Ext.create(&#039;Ext.Action&#039;, {
+			icon: &#039;../images/icon/add.png&#039;,
+			text : &#039;Add&#039;,
+			tooltip : &#039;Will create a new stock solution&#039;,
+			disabled : false,
+			alwaysEnabled : true,
+			handler : function(widget, event) {
+				_this.edit();
+			}
+		}));
+	}
+
+	if (this.btnAddExisting) {
+		actions.push(Ext.create(&#039;Ext.Action&#039;, {
+			icon: &#039;images/icon/add.png&#039;,
+			text : &#039;Add Existing&#039;,
+			tooltip : &#039;Allows to select upacked stock solutions&#039;,
+			disabled : false,
+			alwaysEnabled : true,
+			handler : function(widget, event) {
+				var stockSolutionGrid = new StockSolutionGrid({
+					btnAddVisible : false,
+					btnEditVisible : false,
+					btnRemoveVisible : false,
+					btnAddExisting : false,
+					isPackedVisible : false,
+					multiselect : true
+				});
+
+				var window = Ext.create(&#039;Ext.window.Window&#039;, {
+					title : &#039;Select&#039;,
+					height : 800,
+					width : 900,
+					layout : &#039;fit&#039;,
+					items : [ stockSolutionGrid.getPanel() ],
+					buttons : [ {
+						text : &#039;Pack&#039;,
+						handler : function() {
+							if (stockSolutionGrid.selectedStockSolutions.length &gt; 0){
+								_this.onPack.notify(stockSolutionGrid.selectedStockSolutions[0]);
+							}
+							window.close();
+						}
+					}, {
+						text : &#039;Cancel&#039;,
+						handler : function() {
+							window.close();
+						}
+					} ]
+
+				}).show();
+
+				stockSolutionGrid.load(EXI.proposalManager.getUnpackedStockSolutions());
+			}
+		}));
+	}
+
+	return actions;
+};
+
+StockSolutionGrid.prototype.load = function(stockSolutions) {
+	var data = [];
+	for ( var i = 0; i &lt; stockSolutions.length; i++) {
+		var stockSolution = stockSolutions[i];
+		if (EXI.proposalManager.getBufferById(stockSolution.bufferId) != null){
+			stockSolution.buffer = EXI.proposalManager.getBufferById(stockSolution.bufferId).acronym;
+		}
+		stockSolution.proposal = EXI.proposalManager.getProposalById(stockSolution.proposalId).code + EXI.proposalManager.getProposalById(stockSolution.proposalId).number;
+		if (EXI.proposalManager.getMacromoleculeById(stockSolution.macromoleculeId) != null){
+			stockSolution.macromolecule = EXI.proposalManager.getMacromoleculeById(stockSolution.macromoleculeId).acronym;
+		}
+		data.push(stockSolution);
+	}
+	
+	
+	this.store.loadData(data, false);
+};
+
+StockSolutionGrid.prototype.getPanel = function() {
+	return this._renderGrid();
+};
+
+StockSolutionGrid.prototype.edit = function(stockSolutionId) {
+	var _this = this;
+	var stockSolutionWindow = new StockSolutionWindow();
+	/** On stock solution SAVED **/
+	stockSolutionWindow.onSaved.attach(function(sender, stockSolution) {
+		_this.onSaved.notify(stockSolution);
+	});
+	stockSolutionWindow.draw(EXI.proposalManager.getStockSolutionById(stockSolutionId));
+};
+
+StockSolutionGrid.prototype.unpack = function(stockSolution) {
+	this.onUnpack.notify(stockSolution);
+};
+
+StockSolutionGrid.prototype._renderGrid = function() {
+	var _this = this;
+
+	/** Store **/
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields :  [&#039;proposalId&#039;,  &#039;name&#039;, &#039;stockSolutionId&#039;, &#039;macromolecule&#039;, &#039;buffer&#039;, &#039;storageTemperature&#039;, &#039;volume&#039;, &#039;concentration&#039;, &#039;buffer&#039;, &#039;comments&#039;],
+		autoload : true
+	});
+
+	var filters = {
+		ftype : &#039;filters&#039;,
+		local : true,
+		filters : this.filters
+	};
+
+	var selModel = null;
+
+	if (this.multiselect) {
+		selModel = Ext.create(&#039;Ext.selection.CheckboxModel&#039;, {
+			mode : &#039;SINGLE&#039;,
+			listeners : {
+				selectionchange : function(sm, selections) {
+					_this.selectedStockSolutions = [];
+					for ( var i = 0; i &lt; selections.length; i++) {
+						_this.selectedStockSolutions.push(selections[i].data);
+					}
+				}
+			}
+		});
+	} else {
+		selModel = {
+			mode : &#039;SINGLE&#039;
+		};
+	}
+
+	this.store.sort(&quot;stockSolutionId&quot;, &quot;desc&quot;);
+
+	this.grid = Ext.create(&#039;Ext.grid.Panel&#039;, {
+//		style : {
+//			padding : 5
+//		},
+		margin : 10,
+		cls : &#039;defaultGridPanel&#039;,
+		title : this.title,
+//		height : this.height,
+//		width : this.width,
+//		minWidth : this.minWidth,
+		selModel : selModel,
+		store : this.store,
+		columns : this._getColumns(),
+		viewConfig : {
+			stripeRows : true,
+			listeners : {
+				itemdblclick : function(dataview, record, item, e) {
+					_this.edit(record.data.stockSolutionId);
+				},
+				cellclick : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+					var adapter = null;
+//					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonUnpack&#039;) {
+//						_this.grid.setLoading(&quot;ISPyB: Unpacking stock solution&quot;);
+//						adapter = new DataAdapter();
+//						adapter.onSuccess.attach(function(sender) {
+//							_this.onProposalChanged.notify();
+//							_this.grid.setLoading(false);
+//						});
+//						adapter.onError.attach(function(sender) {
+//							_this.onProposalChanged.notify();
+//							_this.grid.setLoading(false);
+//						});
+//						record.raw.boxId = null;
+//						adapter.saveStockSolution(record.raw);
+//					}
+
+					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &quot;box&quot;) {
+						window.location = BUI.getShippingURL(BIOSAXS.proposal.getShipmentByDewarId(record.raw.boxId).shippingId);
+					}
+//					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonEdit&#039;) {
+//						_this.edit(record.data.stockSolutionId);
+//					}
+
+					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonRemove&#039;) {
+						_this.grid.setLoading(&quot;ISPyB: Removing stock solution&quot;);
+						adapter = new BiosaxsDataAdapter();
+						adapter.onSuccess.attach(function(sender) {
+							_this.onProposalChanged.notify();
+							_this.grid.setLoading(false);
+						});
+						adapter.onError.attach(function(sender) {
+							_this.onProposalChanged.notify();
+							_this.grid.setLoading(false);
+						});
+						adapter.removeStockSolution(record.data.stockSolutionId);
+					}
+				}
+			}
+		}
+
+	});
+
+	var actions = _this._getTopButtons();
+//	this.grid.addDocked({
+//		xtype : &#039;toolbar&#039;,
+//		height : 50,
+//		items : actions
+//	});
+
+	var i = null;
+	this.grid.getSelectionModel().on({
+		selectionchange : function(sm, selections) {
+			if (selections.length) {
+				for ( i = 0; i &lt; actions.length; i++) {
+					if (actions[i].enable) {
+						actions[i].enable();
+					}
+				}
+			} else {
+				for ( i = 0; i &lt; actions.length; i++) {
+					if (actions[i].alwaysEnabled == false) {
+						if (actions[i].disable) {
+							actions[i].disable();
+						}
+					}
+				}
+			}
+		}
+	});
+	return this.grid;
+};
+
+//StockSolutionGrid.prototype.input = function() {
+//	return {
+//		proposal : DATADOC.getProposal_10()
+//	};
+//};
+//
+//StockSolutionGrid.prototype.test = function(targetId) {
+//	var stockSolutionGrid = new StockSolutionGrid({
+//		height : 300,
+//		width : 900
+//	});
+//	BIOSAXS.proposal = new Proposal(stockSolutionGrid.input().proposal);
+//	var panel = stockSolutionGrid.getPanel();
+//	stockSolutionGrid.load(BIOSAXS.proposal.getStockSolutions());
+//	panel.render(targetId);
+//};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/sessionmainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/sessionmainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">115.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">160</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">27.13</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.75</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function SessionMainView(args) {
+	this.icon = &#039;images/icon/ic_satellite_black_18dp.png&#039;;
+	MainView.call(this, args);
+	var _this = this;
+	
+	this.sessionGrid = new SessionGrid({
+         width : 700,
+         height: 598,
+         margin : &#039;0 0 0 20&#039;,
+        title : &quot;Click on calendar to see the sessions&quot;
+    });
+}
+
+SessionMainView.prototype.getPanel = MainView.prototype.getPanel;
+
+SessionMainView.prototype.getContainer = function() {
+    _this = this;
+    
+    
+    this.subpanel =  Ext.create(&#039;Ext.container.Container&#039;, {
+         layout:  &#039;fit&#039;,  
+         border : 0,  
+        items : [
+         
+        ]
+    });
+	this.panel = Ext.create(&#039;Ext.container.Container&#039;, {
+        layout:  &#039;hbox&#039;,    
+        margin : 10,        
+        items: [            
+                    {
+                        html: &#039;&lt;div style=&quot;height:600px&quot; id=&quot;&#039; + this.id +&#039;&quot;&gt;&lt;/div&gt;&#039;,
+                        height :600,
+                        border :0 ,
+                        width : 600,                                         
+                    } ,
+                    this.subpanel                               
+                    
+            ],
+        listeners: {
+            afterrender: function() {
+                _this.showCalendar([]);
+            }
+        }
+    }
+    );
+	return this.panel;	
+};
+
+SessionMainView.prototype.showCalendar = function(data) {
+     var _this = this;
+     $(&#039;#&#039; + _this.id).empty();
+     function editEvent(event) {
+                         _this.loadByDate(moment(new Date(event.startDate)).format(&quot;YYYYMMDD&quot;));
+      }
+        $(&#039;#&#039; + this.id).calendar({
+            enableContextMenu: true,
+            enableRangeSelection: true,
+            selectRange: function(e) {
+                editEvent({ startDate: e.startDate, endDate: e.endDate });
+            },
+            mouseOnDay: function(e) {
+                if(e.events.length &gt; 0) {
+                    var content = &#039;&#039;;
+                    
+                    for(var i in e.events) {
+                        content += &quot;&lt;div class=&#039;event-tooltip-content&#039;&gt;&lt;div class=&#039;event-name&#039; style=&#039;color:&quot; + e.events[i].color + &quot;&#039;&gt;&quot; + e.events[i].name + &quot;&lt;/div&gt;&lt;div class=&#039;event-location&#039;&gt;&quot; + e.events[i].location + &quot;&lt;/div&gt;&lt;/div&gt;&quot;;
+                    }
+                
+                    $(e.element).popover({ 
+                        trigger: &#039;manual&#039;,
+                        container: &#039;body&#039;,
+                        html:true,
+                        content: content
+                    });
+                    
+                    $(e.element).popover(&#039;show&#039;);
+                }
+            },
+            mouseOutDay: function(e) {
+                if(e.events.length &gt; 0) {
+                    $(e.element).popover(&#039;hide&#039;);
+                }
+            },
+            dayContextMenu: function(e) {
+                $(e.element).popover(&#039;hide&#039;);
+            },
+            dataSource: data
+            
+        });
+};
+
+SessionMainView.prototype.getBadge = function(title, count) {
+    if (count){
+        if (count != 0){
+            return &#039;&lt;span&gt;&#039; + title + &#039;  &lt;span class=&quot;badge&quot;&gt;&#039; + count +&#039;&lt;/span&gt;&lt;/span&gt;&lt;br /&gt;&#039;;
+        }
+    }
+    return &quot;&quot;;
+};
+SessionMainView.prototype.getLocation = function(session) {
+    var html = this.getBadge(&quot;Collect&quot;, session.dataCollectionGroupCount);
+    html = html + this.getBadge(&quot;Images&quot;, session.imagesCount);
+    html = html + this.getBadge(&quot;XRF&quot;, session.xrfSpectrumCount);
+    html = html + this.getBadge(&quot;Energy&quot;, session.energyScanCount);
+    return html + this.getBadge(&quot;Sample&quot;, session.sampleCount);
+}; 
+
+SessionMainView.prototype.load = function(sessions) {
+	var sessionForCalendar = [];
+    for(var i = 0; i &lt; sessions.length; i++){
+        sessionForCalendar.push({
+           id : sessions[i].sessionId,
+           name : sessions[i].Proposal_proposalCode + sessions[i].Proposal_ProposalNumber + &quot;( &quot; + sessions[i].beamLineName + &quot; )&quot;,
+           location : this.getLocation(sessions[i]),
+           startDate : new Date(sessions[i].BLSession_startDate), 
+           endDate : new Date(sessions[i].BLSession_endDate)
+        });
+        
+    }
+    
+    this.showCalendar(sessionForCalendar);
+    this.subpanel.insert( this.sessionGrid.getPanel());
+    //this.sessionGrid.load(sessions);
+    
+    var _this = this;
+    /** Rendering proposal Header */
+    if ($(&quot;#&quot; + this.id + &quot;_header&quot;)){
+        if (EXI.proposalManager.getProposals().length &gt; 0){
+            var proposal = EXI.proposalManager.getProposals()[0];
+            proposal.sessionCount = sessions.length; 
+            dust.render(&#039;welcomemainviewproposalheader&#039;, proposal, function(err, out) {
+                
+                $(&quot;#&quot; + _this.id + &quot;_header&quot;).html(out);
+                _this.panel.insert(0,
+                    {
+                        html  :   out,
+                        border : 0,
+                        margin : &#039;10 0 0 10&#039;,
+                        width : 600
+                        
+                    });
+            });
+        }        
+    }    
+};
+
+SessionMainView.prototype.loadByDate = function(start) {
+          var _this = this;
+          this.panel.setLoading(true);
+          function onSuccess(sender, sessions){              
+        	  //_this.displaySessions(data, data.length + &quot; sessions scheduled on &quot; + moment(start, &#039;YYYYMMDD&#039;).format(&#039;MMMM Do YYYY&#039;));
+             _this.sessionGrid.load(sessions);
+        	  _this.panel.setLoading(false);
+          }
+          /** Increasing one day */
+         var username = EXI.credentialManager.getCredentials()[0].activeProposals[0];
+         var end = moment(start, &quot;YYYYMMDD&quot;).format(&quot;YYYYMMDD&quot;);                    
+         EXI.getDataAdapter({onSuccess:onSuccess}).proposal.session.getSessionsByProposalAndDate(start, end, username);          
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

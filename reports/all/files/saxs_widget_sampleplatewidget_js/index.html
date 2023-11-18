@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/sampleplatewidget.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/sampleplatewidget.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">97.26</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">494</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">66.47</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">6.90</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * 
+ * @nodeSize
+ * @fontSize
+ * @strokeWidth
+ * @showTooltip
+ * @showBorderLabels
+ * @showFullName
+ * @showLabels
+ * @backgroundColor
+ * 
+ **/
+
+function SamplePlateWidget(args) {
+	this.actions = [];
+
+	this.width = &quot;1&quot;;
+	this.height = &quot;1&quot;;
+
+	this.legendFontSize = 7;
+
+	this.backgroundColor = &quot;#E6E6E6&quot;;
+	this.wellColor = &quot;#FFFFFF &quot;;
+
+	this.id = BUI.id();
+	this.notSupportedMessage = &quot;IE doesn&#039;t support HTML5 features&quot;;
+
+	this.nodeSize = 14;
+	this.fontSize = 10;
+	this.strokeWidth = 2;
+	this.showTooltip = true;
+	this.showBorderLabels = true;
+	this.showFullName = false;
+	this.showLabels = false;
+
+	if (args != null) {
+		if (args.showBorderLabels != null) {
+			this.showBorderLabels = args.showBorderLabels;
+		}
+		if (args.showLabels != null) {
+			this.showLabels = args.showLabels;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.nodeSize != null) {
+			this.nodeSize = args.nodeSize;
+		}
+		if (args.notSupportedMessage != null) {
+			this.notSupportedMessage = args.notSupportedMessage;
+		}
+		if (args.fontSize != null) {
+			this.fontSize = args.fontSize;
+		}
+		if (args.showFullName != null) {
+			this.showFullName = args.showFullName;
+		}
+		if (args.showTooltip != null) {
+			this.showTooltip = args.showTooltip;
+		}
+		if (args.backgroundColor != null) {
+			this.backgroundColor = args.backgroundColor;
+		}
+		if (args.strokeWidth != null) {
+			this.strokeWidth = args.strokeWidth;
+		}
+	}
+
+	/** this is the ids[specimenId] = nodeId **/
+	this.ids = {};
+	this.onVertexUp = new Event(this);
+	this.selectedSVGNodes = [];
+	this.markedSpecimenId = {};
+}
+
+SamplePlateWidget.prototype.clear = function(experiment, samplePlate, targetId) {
+	if (document.getElementById(this.targetId) != null) {
+		document.getElementById(this.targetId).innerHTML = &quot;&quot;;
+	}
+};
+
+SamplePlateWidget.prototype.draw = function(experiment, samplePlate, targetId, windowContainerId) {
+	var _this = this;
+
+	/** This is the id of the window where the sampleplateform is just to position correctly the tooltips **/
+	this.windowContainerId = windowContainerId;
+	if (Ext.isIE6 || Ext.isIE7 || Ext.isIE8) {
+		document.getElementById(targetId).innerHTML = BUI.getWarningHTML(this.notSupportedMessage);
+		return;
+	}
+
+	this.onVertexUp = new Event(this);
+	this.samplePlate = samplePlate;
+	this.experiment = experiment;
+
+	this.targetId = targetId;
+
+	var rows = this.samplePlate.platetype3VO.rowCount;
+	var columns = this.samplePlate.platetype3VO.columnCount;
+
+	this.network = new NetworkWidget({
+		targetId : targetId
+	});
+	var dataset = new GraphDataset();
+	var formatter = new NetworkDataSetFormatter({
+		defaultFormat : {
+			type : &quot;LineEdgeNetworkFormatter&quot;,
+			&#039;fill-opacity&#039; : 1,
+			fill : this.wellColor,
+			&#039;stroke-width&#039; : this.strokeWidth,
+			&#039;stroke-opacity&#039; : 1,
+           
+			stroke : &quot;#000000&quot;,
+			size : this.nodeSize,
+			title : {
+				fontSize : this.fontSize,
+				fill : &quot;#000000&quot;
+			}
+		}
+	}, null, {
+		labeled : false,
+		height : this.height,
+		width : this.width,
+       
+		right : this.width,
+		backgroundColor : this.backgroundColor,
+		balanceNodes : false,
+		nodesMaxSize : 12,
+		nodesMinSize : 2
+	});
+
+	formatter.dataBind(dataset);
+	var layout = new LayoutDataset();
+	layout.dataBind(dataset);
+	this.network.draw(dataset, formatter, layout);
+
+	for ( var i = 1; i &lt;= rows; i++) {
+		for ( var j = 1; j &lt;= columns; j++) {
+			this.network.getDataset().addNode(&quot;&quot;, {
+				row : i,
+				column : j
+			});
+
+			if (this.samplePlate.platetype3VO.name == &quot; 4 x ( 8 + 3 ) Block&quot;) {
+				if (j &lt; 9) {
+					this.network.getFormatter().vertices[this.network.getDataset().getVerticesCount() - 1].getDefault().setSize(this.nodeSize * 0.8);
+				} else {
+					this.network.getFormatter().vertices[this.network.getDataset().getVerticesCount() - 1].getDefault().setSize(this.nodeSize * 1.4);
+				}
+			}
+
+		}
+	}
+
+	/** EVENT WHEN USER CLICK ON A WELL **/
+	this.network.graphCanvas.onVertexUp.attach(function(sender, nodeId) {
+		_this.onVertexUp.notify({
+			samplePlate : _this.samplePlate,
+			row : _this.network.getDataset().getVertexById(nodeId).args.row,
+			column : _this.network.getDataset().getVertexById(nodeId).args.column
+
+		});
+	});
+
+	this.network.graphCanvas.onVertexOver.attach(function(sender, nodeId) {
+	});
+
+	this.relayout(this.network, rows, columns);
+	this.fillSimulator(this.experiment.getSamples());
+
+	if (this.showBorderLabels) {
+		this.drawBorders();
+	}
+
+};
+
+SamplePlateWidget.prototype.drawBorders = function() {
+	var xArray = {};
+	var yArray = {};
+
+	var xValues = [];
+	var yValues = [];
+
+	var verticesLayout = this.network.graphCanvas.getLayout().vertices;
+	for ( var vertice in verticesLayout) {
+		var verticeX = verticesLayout[vertice].x;
+		if (xArray[verticeX] == null) {
+			xArray[verticeX] = true;
+			xValues.push(verticeX);
+		}
+
+		var verticeY = verticesLayout[vertice].y;
+		if (yArray[verticeY] == null) {
+			yArray[verticeY] = true;
+			yValues.push(verticeY);
+		}
+	}
+
+	/** LEGENG **/
+	var letters = BUI.getSamplePlateLetters();
+	for ( var i = 1; i &lt;= xValues.length; i++) {
+		SVG.drawText(xValues[i - 1] * this.network.graphCanvas.getWidth() - 5, this.network.graphCanvas.getHeight(), i, this.network.graphCanvas._svg,
+				[ [ &#039;font-size&#039;, this.legendFontSize + &#039;px&#039; ], [ &#039;font-weight&#039;, &#039;bold&#039; ], [ &#039;fill&#039;, &#039;black&#039; ] ]);
+	}
+
+	for ( var i = 1; i &lt;= yValues.length; i++) {
+		SVG.drawText(5, yValues[i - 1] * this.network.graphCanvas.getHeight() + 5, letters[i - 1], this.network.graphCanvas._svg, 
+				[ [ &#039;font-size&#039;, this.legendFontSize + &#039;px&#039; ], [ &#039;font-weight&#039;, &#039;bold&#039; ], [ &#039;fill&#039;, &#039;black&#039; ] ]);
+	}
+
+};
+
+SamplePlateWidget.prototype.addOkIcon = function(x, y, id, specimen) {
+	var svg = this.network.graphCanvas._svg;
+	var _this = this;
+
+	var id = id + &quot;_marked&quot;;
+	if (this.markedSpecimenId[id] == null) {
+		SVG.drawRectangle(x - 10, y - 10, 22, 22, svg, [ [ &quot;id&quot;, id ], [ &quot;fill&quot;, &quot;gray&quot; ],[&quot;stroke-opacity&quot;, &quot;0.5&quot;], [ &quot;fill-opacity&quot;, &quot;0.2&quot; ], [ &#039;stroke&#039;, &#039;black&#039; ] ]);
+//		$(&#039;#&#039; + id).qtip({
+//			content : {
+//				text : _this._getToolTipContent(specimen)
+//			},
+//			position : {
+//				adjust : {
+//					x : 0,
+//					y : 20
+//				}
+//			},
+//			style : {
+//				width : true,
+//				classes : &#039;ui-tooltip-shadow&#039;
+//			}
+//		});
+		this.markedSpecimenId[id] = true;
+	}
+};
+
+SamplePlateWidget.prototype.selectSpecimen = function(specimen) {
+	var vertex = this.getVertexByPosition(specimen.sampleplateposition3VO.rowNumber, specimen.sampleplateposition3VO.columnNumber);
+	var x = this.network.getLayout().vertices[vertex.id].x * this.width;
+	var y = this.network.getLayout().vertices[vertex.id].y * this.height;
+	var svg = this.network.graphCanvas._svg;
+	this.selectedSVGNodes.push(SVG.drawRectangle(x - 9, y - 9, 20, 20, svg, [[&quot;fill&quot;, &quot;red&quot;], [&quot;fill-opacity&quot;, &quot;0&quot;], [&#039;stroke&#039;, &#039;blue&#039; ], [ &#039;stroke-width&#039;, &#039;2&#039; ] ]));
+};
+
+SamplePlateWidget.prototype.clearSelection = function() {
+	var svg = this.network.graphCanvas._svg;
+	for ( var i = 0; i &lt; this.selectedSVGNodes.length; i++) {
+		svg.removeChild(this.selectedSVGNodes[i]);
+	}
+	this.selectedSVGNodes = [];
+};
+
+SamplePlateWidget.prototype.getVertexByPosition = function(row, column) {
+	var vertices = this.network.getDataset().getVertices();
+	for ( var vertexId in vertices) {
+		if ((vertices[vertexId].args.row == row) &amp;&amp; (vertices[vertexId].args.column == column)) {
+			return vertices[vertexId];
+		}
+	}
+	return null;
+};
+
+//SamplePlateWidget.prototype.getOpacity = function(specimen) {
+//	var concentrations = this.experiment.getConcentrationsBysample(specimen);
+//	var normalized = Normalizer.normalizeArray(concentrations);
+//	for ( var i = 0; i &lt; concentrations.length; i++) {
+//		if (concentrations[i] == specimen.concentration) {
+//			if (normalized[i] == 0)
+//				return 0.2;
+//			return 0.2 + normalized[i] * 0.6;
+//		}
+//	}
+//	return 1;
+//
+//};
+
+SamplePlateWidget.prototype.showLabel = function(row, column, specimen) {
+	if (specimen != null) {
+		var vertex = this.getVertexByPosition(row, column);
+		if (this.fontSize != 0) {
+			if (specimen.macromolecule3VO != null) {
+				if (this.showFullName) {
+					vertex.setName(specimen.code);
+				} else {
+					vertex.setName(specimen.macromolecule3VO.acronym);
+				}
+			} else {
+				if (this.showFullName) {
+					vertex.setName(specimen.code);
+				} else {
+					vertex.setName(specimen.macromolecule3VO.acronym);
+				}
+			}
+		}
+	}
+};
+
+SamplePlateWidget.prototype.getNodeIdBySpecimenId = function(specimenId) {
+	var nodeId = this.ids[specimenId];
+};
+
+SamplePlateWidget.prototype.markSpecimenAsOk = function(specimen, x, y, id) {
+	if (specimen.measurements != null) {
+		for ( var j = 0; j &lt; specimen.measurements.length; j++) {
+			if (specimen.measurements[j].merge3VOs != null) {
+				if (specimen.measurements[j].merge3VOs.length &gt; 0) {
+					this.addOkIcon((x * this.network.graphCanvas.getWidth()), y * this.network.graphCanvas.getHeight(), id, specimen);
+				}
+			}
+		}
+	}
+};
+/**
+ * Input: specimenId of the sample containing a macromolecule
+ * Ouput: color of the specimen buffer associated
+ */
+SamplePlateWidget.prototype.getSpecimenBufferColorFromSampleSpecimenId = function(specimenId) {
+	var dcs = this.experiment.getDataCollectionsBySpecimenId(specimenId);
+	if (dcs.length &gt; 0){
+		var dataCollection = dcs[0];
+		for (var i = 0; i &lt; dataCollection.measurementtodatacollection3VOs.length; i++) {
+			var measurementToDc = dataCollection.measurementtodatacollection3VOs[i];
+			if (measurementToDc.dataCollectionOrder == 1){
+				var measurement = this.experiment.getMeasurementById(measurementToDc.measurementId);
+				if (measurement != null){
+					return this.experiment.getSpecimenColorByBufferId(measurement.specimenId);
+				}
+				return &#039;pink&#039;;
+			}
+		}
+	}
+	return &#039;orange&#039;;
+};
+
+SamplePlateWidget.prototype.fillWell = function(row, column, specimen) {
+	var _this = this;
+	if (specimen != null) {
+		var vertex = this.getVertexByPosition(row, column);
+		if (vertex == null) {
+			console.log(row + &quot;, &quot; + column + &quot; not found&quot;);
+			return;
+		}
+		var id = this.network.getGraphCanvas().getSVGNodeId(vertex.id);
+
+		this.showLabel(row, column, specimen);
+		this.ids[specimen.specimenId] = vertex.id;
+		var x = this.network.getLayout().vertices[vertex.id].x;
+		var y = this.network.getLayout().vertices[vertex.id].y;
+		this.markSpecimenAsOk(specimen, x, y, id);
+
+		if (specimen.macromolecule3VO == null) {
+			/** BUFFER * */
+			var color = this.experiment.getSpecimenColorByBufferId(specimen.specimenId);
+			this.network.getFormatter().getVertexById(vertex.id).getDefault().setFill(color);
+//			this.network.getFormatter().getVertexById(vertex.id).getDefault().setStroke(this.experiment.getSpecimenColorByBufferId(specimen.specimenId));
+			this.network.getFormatter().getVertexById(vertex.id).getDefault().setStroke(&#039;blue&#039;);
+			this.network.getFormatter().getVertexById(vertex.id).getDefault().setStrokeWidth(2);
+
+		} else {
+			this.network.getFormatter().getVertexById(vertex.id).getDefault().setFill(this.experiment.macromoleculeColors[specimen.macromolecule3VO.macromoleculeId]);
+//			this.network.getFormatter().getVertexById(vertex.id).getDefault().setStroke(this.getSpecimenBufferColorFromSampleSpecimenId(specimen.specimenId));
+			this.network.getFormatter().getVertexById(vertex.id).getDefault().setStroke(&#039;black&#039;);
+			this.network.getFormatter().getVertexById(vertex.id).getDefault().setStrokeWidth(1);
+		}
+
+		if (this.showLabels) {
+			x = this.network.getLayout().vertices[vertex.id].x;
+			y = this.network.getLayout().vertices[vertex.id].y;
+			if (specimen.macromolecule3VO != null) {
+				var acronym = specimen.macromolecule3VO.acronym;
+				if (acronym.length &gt; 10) {
+					acronym = acronym.slice(0, 10) + &quot;...&quot;;
+				}
+
+				SVG.drawText((x * this.network.graphCanvas.getWidth()) - this.nodeSize - 10, y * this.network.graphCanvas.getHeight() + (this.nodeSize * 3) + 20, acronym, this.network.graphCanvas._svg, [
+					[ &#039;font-size&#039;, &#039;xx-small&#039; ], [ &#039;fill&#039;, &#039;black&#039; ] ]);
+
+				SVG.drawText((x * this.network.graphCanvas.getWidth()) - this.nodeSize - 10, y * this.network.graphCanvas.getHeight() + (this.nodeSize * 3) + 35, Number(specimen.concentration).toFixed(2) + &quot; mg/ml&quot;, this.network.graphCanvas._svg, [
+					[ &#039;font-size&#039;, &#039;xx-small&#039; ], [ &#039;fill&#039;, &#039;black&#039; ] ]);
+			}
+
+			var bufferName = this.experiment.getBufferById(specimen.bufferId).acronym;
+			if (bufferName.length &gt; 10) {
+				bufferName = bufferName.slice(0, 10) + &quot;...&quot;;
+			}
+
+			SVG.drawText((x * this.network.graphCanvas.getWidth()) - this.nodeSize - 10, y * this.network.graphCanvas.getHeight() + (this.nodeSize * 3) + 5, this.experiment.getBufferById(specimen.bufferId).acronym, this.network.graphCanvas._svg, [
+				[ &#039;font-size&#039;, &#039;xx-small&#039; ], [ &#039;fill&#039;, &#039;blue&#039; ] ]);
+		}
+
+		if (this.showTooltip) {
+			var id = this.network.getGraphCanvas().getSVGNodeId(vertex.id);
+//			if (_this.windowContainerId != null) {
+//				$(&#039;#&#039; + id).qtip({
+//					content : {
+//						text : _this._getToolTipContent(specimen)
+//					},
+//					position : {
+//						adjust : {
+//							x : 0,
+//							y : 20
+//						}
+//					}
+//				});
+//			} else {
+//				$(&#039;#&#039; + id).qtip({
+//					content : {
+//						text : _this._getToolTipContent(specimen)
+//					},
+//					position : {
+//						adjust : {
+//							x : 0,
+//							y : 20
+//						}
+//					}
+//				});
+//
+//			}
+		}
+	}
+};
+
+SamplePlateWidget.prototype._getToolTipContent = function(specimen) {
+	var content = &quot;&lt;table style=&#039;font-size:11px;&#039;&gt;&quot;;
+	content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Specimen &quot; + &quot;&lt;/TD&gt;&lt;TD style=&#039;color:black; font-weight:bold;&#039;&gt;&quot; + specimen.code + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+	content = content + &quot;&lt;TR style=&#039;height:20px&#039;&gt;&lt;TD&gt;&quot; + &quot;&quot; + &quot;&lt;/TD&gt;&lt;TD style=&#039;color:black; font-weight:bold;&#039;&gt;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+	content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Buffer: &quot; + &quot;&lt;/TD&gt;&lt;TD style=&#039;color:blue; font-weight:bold;&#039;&gt;&quot; + this.experiment.getBufferById(specimen.bufferId).name + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+	if (specimen.macromolecule3VO != null) {
+		content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Macromolecule: &quot; + &quot;&lt;/TD&gt;&lt;TD  style=&#039;color:green; font-weight:bold;&#039;&gt;&quot; + specimen.macromolecule3VO.acronym + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+		content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Concentration: &quot; + &quot;&lt;/TD&gt;&lt;TD &gt;&quot; + specimen.concentration + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+	}
+	//	content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Temperature: &quot;+ &quot;&lt;/TD&gt;&lt;TD&gt;&quot; + specimen.exposureTemperature + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+	content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Volume: &quot; + &quot;&lt;/TD&gt;&lt;TD&gt;&quot; + specimen.volume + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+
+	if (specimen.viscosity != null) {
+		content = content + &quot;&lt;TR&gt;&lt;TD&gt;&quot; + &quot;Viscosity: &quot; + &quot;&lt;/TD&gt;&lt;TD&gt;&quot; + specimen.viscosity + &quot;&lt;/TD&gt;&lt;/TR&gt;&quot;;
+	}
+
+	content = content + &quot;&lt;/table&gt;&quot;;
+	return content;
+};
+
+SamplePlateWidget.prototype.fillSimulator = function(samples) {
+	for ( var i = 0; i &lt; samples.length; i++) {
+		var sample = samples[i];
+		if (sample.sampleplateposition3VO != null) {
+			if (sample.sampleplateposition3VO.samplePlateId == this.samplePlate.samplePlateId) {
+				var position = sample.sampleplateposition3VO;
+				this.fillWell(position.rowNumber, position.columnNumber, sample);
+			}
+		}
+	}
+
+};
+
+SamplePlateWidget.prototype.relayout = function(network, rows, columns) {
+	if (this.samplePlate.platetype3VO.shape == &quot;REC&quot;) {
+		this.squareRelayout(network, rows, columns);
+	}
+	if (this.samplePlate.platetype3VO.shape == &quot;CIR&quot;) {
+		this.circleRelayout(network, rows, columns);
+	}
+};
+
+SamplePlateWidget.prototype.squareRelayout = function(network, rows, columns) {
+	var count = network.getDataset()._getVerticesCount();
+	var yMin = 0.07;
+	var yMax = 0.9;
+	var xMin = 0.075;
+	var xMax = 0.95;
+	var stepY = (yMax - yMin) / (rows - 1);
+	var stepX = (xMax - xMin) / (columns - 1);
+
+	var verticesCoordinates = [];
+	for ( var i = 0; i &lt; rows; i++) {
+		for ( var j = 0; j &lt; columns; j++) {
+			y = i * stepY + yMin;
+			x = j * stepX + xMin;
+
+			verticesCoordinates.push({
+				&#039;x&#039; : x,
+				&#039;y&#039; : y
+			});
+
+		}
+	}
+	var aux = 0;
+	for ( var vertex in network.getDataset().getVertices()) {
+		if (network.getLayout().vertices[vertex] == null) {
+			this.vertices[vertex] = new NodeLayout(vertex, 0, 0);
+		}
+		network.getLayout().vertices[vertex].setCoordinates(verticesCoordinates[aux].x, verticesCoordinates[aux].y);
+		aux++;
+		network.getLayout().vertices[vertex].changed.attach(function(sender, item) {
+			_this.changed.notify(item);
+		});
+	}
+};
+
+SamplePlateWidget.prototype.circleRelayout = function(network, rows, columns) {
+	network.getLayout().getLayout(&quot;CIRCLE&quot;);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+.BM29_session_box{
+}
+
+.ID23-2_session_box{
+}
+
+.local_contact{
+	font-weight : bold;
+}
+
+.shifts_count{
+	font-size : 9px;
+	color :gray;
+	padding-left:10px; 
+}
+
+.beamline_name{
+	font-weight : bold;
+	font-size : 12px;
+}
+
+.proposal_title{
+	color : gray;
+	font-size : 9px;
+}

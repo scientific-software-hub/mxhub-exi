@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+    <title>EXI</title> 
+        <script type="text/javascript" src="../dependency/ext/build/bootstrap.js"></script>
+        <script type="text/javascript" src="../dependency/ext/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+
+        <!--
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        ->            
+        <!-- CSS-->
+        <link rel="stylesheet" type="text/css" href='../bower_components/bootstrap/dist/css/bootstrap.min.css'>
+        <link rel="stylesheet" type="text/css" href='../dependency/ext/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css'>
+        <link rel="stylesheet" type="text/css" href="../bower_components/bootstrap-year-calendar/css/bootstrap-year-calendar.min.css">         
+        <link rel="stylesheet" type="text/css" href="../min/exi.min.css">
+    
+    
+        
+        <!-- LODASH -->    
+        <script src="../bower_components/lodash/dist/lodash.min.js"></script>
+                                      
+		<!-- bower:css -->
+        <!-- endbower -->
+
+
+        <!-- bower:js -->
+        <!-- endbower -->
+
+
+        <script src="../bower_components/bootstrap-year-calendar/js/bootstrap-year-calendar.min.js"></script>
+    
+    
+	
+        <!-- EXI-UI-UTILS -->
+        <!-- include: "type": "js", "files": "bower_components/exi-ui-utils/js/*.js" -->
+	
+	  
+        <!-- ISPYB-JS-API -->	
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/*.js" -->
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/exi/*.js" -->
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/security/*.js" -->
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/proposal/*.js" -->
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/mx/*.js" -->
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/saxs/*.js" -->
+        <!-- include: "type": "js", "files": "bower_components/ispyb-js-api/js/tracking/*.js" -->
+		  
+        <!-- DUST -->  
+		<!-- include: "type": "js", "files": "js/dust/**/*.js" -->
+	   
+        <!-- SECURITY -->
+	    <!-- include: "type": "js", "files": "js/core/security/**/*.js" -->
+       
+        <!-- APP -->
+        <!-- include: "type": "js", "files": "js/core/app/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/mx/*.js" -->
+        <!-- include: "type": "js", "files": "js/tracking/*.js" -->
+        
+        <!-- WIDGET -->
+        <!-- include: "type": "js", "files": "js/core/widget/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/mx/widget/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/tracking/widget/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/test/widget/**/*.js" -->
+         
+        
+        <!-- UTILS -->
+        
+        <!-- include: "type": "js", "files": "js/mx/utils/**/*.js" -->
+        
+        
+        <!-- CONTROLLER -->
+        <!-- include: "type": "js", "files": "js/core/controller/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/mx/controller/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/tracking/controller/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/test/controller/**/*.js" -->
+        
+        <!-- NAVIGATION -->
+        <!-- include: "type": "js", "files": "js/core/navigation/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/mx/navigation/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/tracking/navigation/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/test/navigation/**/*.js" -->
+        
+        <!-- MENU -->
+        <!-- include: "type": "js", "files": "js/core/menu/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/mx/menu/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/tracking/menu/**/*.js" -->
+        
+        <!-- VIEW -->
+        <!-- include: "type": "js", "files": "js/core/view/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/mx/view/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/tracking/view/**/*.js" -->
+        <!-- include: "type": "js", "files": "js/test/view/**/*.js" -->
+        
+        
+	    <script src="config.js"></script>
+            
+		<!-- Precompiled templates -->
+		<script type="text/javascript" src="../min/precompiled.templates.min.js"></script>
+              	
+    </head>
+
+
+
+
+    <script>
+        function isNumber(value) {
+            if (value=="") return false;
+
+            var d = parseInt(value);
+            if (!isNaN(d)) return true; else return false;		
+
+        } 
+        
+        var exitracking;
+        //google.load("visualization", "1");
+        Ext.onReady(function(){
+
+            Ext.Loader.setConfig({
+                enabled: true
+            });
+
+            Ext.Loader.setPath('Ext.ux', '../dependency/ext/examples/ux/');
+            Ext.Loader.setPath('Ext.Extended', '../dependency/extended/');
+        
+            Ext.require([
+                'Ext.ux.statusbar.StatusBar',
+                'Ext.Extended.RequiredTextField',
+                'Ext.Extended.RequiredNumberField'
+            ]);
+
+            if (location.href.indexOf("tracking") != -1){
+                EXI = new ExiTracking();
+            }
+            else{
+                EXI = new ExiMX();
+            }
+                        
+            EXI.show();
+
+            EXI.onAfterRender.attach(function(){
+                Path.listen();                        
+            });
+        });
+    </script>
+  <body>    
+  </body>
+  
+<script type="text/javascript" src="../min/lightbox.js"></script> 
+                                          
+</html>

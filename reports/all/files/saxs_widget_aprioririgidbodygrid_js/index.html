@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/aprioririgidbodygrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/aprioririgidbodygrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">111.13</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">241</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">23.80</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.09</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Rigid body grid to show PDB, symmetry and multiplicity
+ * 
+ * 
+ * #onUploadFile click on upload file
+ */
+function AprioriRigidBodyGrid(args) {
+
+	this.height = 250;
+	this.btnEditVisible = true;
+	this.btnRemoveVisible = true;
+
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.btnEditVisible != null) {
+			this.btnEditVisible = args.btnEditVisible;
+		}
+		if (args.btnRemoveVisible != null) {
+			this.btnRemoveVisible = args.btnRemoveVisible;
+		}
+	}
+
+	/** Events **/
+	this.onUploadFile = new Event(this);
+	this.onRemove = new Event(this);
+}
+
+AprioriRigidBodyGrid.prototype._getColumns = function() {
+};
+
+AprioriRigidBodyGrid.prototype._getTopButtons = function() {
+	var _this = this;
+	/** Actions buttons **/
+	var actions = [];
+
+	/** ADD BUTTON **/
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		icon : &#039;../images/add.png&#039;,
+		text : &#039;Add&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+			_this.onAddButtonClicked.notify();
+		}
+	}));
+
+	return actions;
+};
+
+AprioriRigidBodyGrid.prototype.load = function(macromolecule) {
+	this.macromolecule = macromolecule;
+	if (macromolecule != null){
+		this.pdbStore.loadData(macromolecule.structure3VOs);
+	}
+};
+
+AprioriRigidBodyGrid.prototype._prepareData = function() {
+	var data = [];
+	for ( var i = 0; i &lt; this.features.length; i++) {
+		data.push(this.features[i]);
+	}
+	return data;
+};
+
+
+
+AprioriRigidBodyGrid.prototype._updateProposalInformation = function() {
+	
+	EXI.proposalManager.get(true);
+	this.load(EXI.proposalManager.getMacromoleculeById(this.macromolecule.macromoleculeId));
+	this.panel.setLoading(false);
+	
+};
+
+AprioriRigidBodyGrid.prototype._getPlugins = function() {
+	var _this = this;
+	var plugins = [];
+	plugins.push(Ext.create(&#039;Ext.grid.plugin.RowEditing&#039;, {
+		clicksToEdit : 1,
+		listeners : {
+			validateedit : function(grid, e) {
+				/** Comments are always updatable* */
+				var multiplicity = e.newValues.multiplicity;
+				var symmetry = e.newValues.symmetry;
+				var macromoleculeId = e.record.data.macromoleculeId;
+				var structureId = e.record.data.structureId;
+				
+				_this.panel.setLoading();
+				var onSuccess = function (){
+					_this._updateProposalInformation();
+				};
+				
+				var onError = function (error){
+					BUI.showError(&quot;Ops, there was a problem&quot;);
+					_this._updateProposalInformation();
+				};
+
+				_this.panel.setLoading();
+				EXI.getDataAdapter({
+					onSuccess : onSuccess,
+					onError : onError
+				}).saxs.macromolecule.saveStructure(macromoleculeId, structureId, multiplicity, symmetry);
+			}
+		}
+	}));
+	return plugins;
+};
+
+AprioriRigidBodyGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.pdbStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;filePath&#039;, &#039;structureId&#039;, &#039;structureType&#039;, &#039;symmetry&#039;, &#039;structureId&#039;, &#039;name&#039;, &#039;multiplicity&#039; ],
+		groupField : &#039;structureType&#039;,
+		sorters : {
+			property : &#039;structureId&#039;,
+			direction : &#039;DESC&#039;
+		}
+	});
+
+
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		margin : &quot;15 10 0 10&quot;,
+		height : this.height,
+		store : this.pdbStore,
+		plugins : _this._getPlugins(),
+		cls : &#039;border-grid&#039;,
+		tbar : [ {
+			text : &#039;Add Modeling Option (PDB)&#039;,
+			icon : &#039;../images/icon/add.png&#039;,
+			handler : function() {
+				_this.onUploadFile.notify(&#039;PDB&#039;, &#039;Upload PDB File&#039;);
+			}
+		}
+		],
+		columns : [
+				{
+					text : &quot;structureId&quot;,
+					flex : 0.2,
+					hidden : true,
+					dataIndex : &#039;structureId&#039;,
+					sortable : true
+				},
+				{
+					text : &quot;File&quot;,
+					flex : 1,
+					dataIndex : &#039;filePath&#039;,
+					sortable : true,
+					hidden : true
+				},
+				{
+					text : &quot;PDB&quot;,
+					flex : 0.4,
+					dataIndex : &#039;name&#039;,
+					sortable : true
+				},
+				{
+					text : &quot;Symmetry&quot;,
+					flex : 0.2,
+					dataIndex : &#039;symmetry&#039;,
+					sortable : true,
+					editor : {
+						xtype : &#039;combobox&#039;,
+						typeAhead : true,
+						triggerAction : &#039;all&#039;,
+						selectOnTab : true,
+						store : [ [ &quot;P1&quot;, &quot;P1&quot; ], [ &quot;P2&quot;, &quot;P2&quot; ], [ &quot;P3&quot;, &quot;P3&quot; ], [ &quot;P4&quot;, &quot;P4&quot; ], [ &quot;P5&quot;, &quot;P5&quot; ], [ &quot;P6&quot;, &quot;P6&quot; ], [ &quot;P32&quot;, &quot;P32&quot; ], [ &quot;P42&quot;, &quot;P42&quot; ],
+								[ &quot;P52&quot;, &quot;P52&quot; ], [ &quot;P62&quot;, &quot;P62&quot; ], [ &quot;P222&quot;, &quot;P222&quot; ] ],
+					}
+				}, {
+					text : &quot;Multiplicity&quot;,
+					flex : 0.2,
+					dataIndex : &#039;multiplicity&#039;,
+					sortable : true,
+					editor : {
+						xtype : &#039;textfield&#039;
+					}
+
+				}, {
+					text : &quot;Subunit&quot;,
+					flex : 0.2,
+					dataIndex : &#039;isSubunit&#039;,
+					sortable : true,
+					hidden : true
+				}, {
+					text : &quot;Type&quot;,
+					flex : 0.2,
+					dataIndex : &#039;structureType&#039;,
+					sortable : true,
+					hidden : true
+				},
+				{
+		            xtype:&#039;actioncolumn&#039;,
+		            flex : 0.1,
+		            text : &#039;Remove&#039;,
+		            editor : {
+						xtype : &#039;textfield&#039;
+					},
+
+		            items: [{
+		                icon: &#039;../images/icon/ic_delete_black_24dp.png&#039;,  // Use a URL in the icon config
+		                tooltip: &#039;Remove&#039;,
+		                handler: function(grid, rowIndex, colIndex) {
+		                	var rec = grid.getStore().getAt(rowIndex);
+		                	
+		                	var structureId = rec.data.structureId;
+		                	var macromoleculeId = rec.data.macromoleculeId;
+		                	function showResult(btn){
+		                	       if (btn == &#039;yes&#039;){
+		                	    	   var onSuccess = function(){
+		                	    		   _this._updateProposalInformation();
+		                	    	   };
+		                	    	   
+		                	    	    var onError = function onSuccess(){
+		                	    		   BUI.showWarning(&quot;ISPyB could not remove this structure. Have it been already used?&quot;);
+		                	    		   _this._updateProposalInformation();
+		           						};
+		           						_this.panel.setLoading();
+			                	    	EXI.getDataAdapter({
+			               					onSuccess : onSuccess,
+			               					onError : onError
+			               				}).saxs.macromolecule.removeStructure(macromoleculeId, structureId);
+		                	       }
+		                	};
+		                	    
+		                    Ext.MessageBox.show({
+		                        title:&#039;Warning&#039;,
+		                        fn: showResult,
+		                        msg: &#039;You are removing a PDB structure option. &lt;br /&gt;Sure?&#039;,
+		                        buttons: Ext.MessageBox.YESNO,
+		                        icon: Ext.MessageBox.QUESTION
+		                    });
+		                }
+		            }]
+		        }
+		],
+		listeners: { 
+		     beforeedit: function (grid, e, eOpts) { 
+		    	 	return e.column.xtype != &#039;actioncolumn&#039;; 
+		       } 
+		 }  
+				
+	});
+
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

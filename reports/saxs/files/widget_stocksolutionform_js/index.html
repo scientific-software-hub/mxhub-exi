@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/stocksolutionform.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/stocksolutionform.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">102.53</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">246</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">28.70</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.52</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * #onSaved
+ */
+function StockSolutionForm(args) {
+	this.id = BUI.id();
+	this.actions = [];
+
+	this.height = 500;
+	if (args != null) {
+		if (args.actions != null) {
+			this.actions = args.actions;
+		}
+		if (args.height != null) {
+			this.height = args.height;
+		}
+	}
+	this.onSaved = new Event(this);
+}
+
+
+StockSolutionForm.prototype._getButtons = function() {
+	var _this = this;
+	return [ {
+		text : &#039;Save&#039;,
+		handler : function() {
+			var onSuccess = function(sender, stockSolution){
+					_this.panel.setLoading(false);
+					_this.onSaved.notify();
+			};
+			if (_this.getStockSolution().bufferId == null){
+				BUI.showError(&quot;Buffer field is mandatory&quot;);
+				return;
+			}
+			
+			if (_this.getStockSolution().name == &quot;&quot;){
+				BUI.showError(&quot;Acronym field is mandatory&quot;);
+				return;
+			}
+			
+			if (_this.getStockSolution().concentration == &quot;&quot;){
+				BUI.showError(&quot;Concentration field is mandatory&quot;);
+				return;
+			}
+			
+			if (_this.getStockSolution().volume == &quot;&quot;){
+				BUI.showError(&quot;Volume field is mandatory&quot;);
+				return;
+			}
+			
+			_this.panel.setLoading(&quot;ISPyB: saving stock solution&quot;);
+			EXI.getDataAdapter({onSuccess : onSuccess}).saxs.stockSolution.saveStockSolution(_this.getStockSolution());
+			
+			
+		}
+	}
+	];
+};
+
+StockSolutionForm.prototype.getStockSolution = function() {
+	if (this.stockSolution != null) {
+		this.stockSolution.concentration = Ext.getCmp(this.id + &quot;stockSolution_concentration&quot;).getValue();
+//		this.stockSolution.storageTemperature = Ext.getCmp(this.id + &quot;stockSolution_storageTemperature&quot;).getValue();
+		this.stockSolution.storageTemperature =  this.storageLocationComboBox.getValue();
+		
+		
+		this.stockSolution.volume = Ext.getCmp(this.id + &quot;stockSolution_volume&quot;).getValue();
+		this.stockSolution.comments = Ext.getCmp(this.id + &quot;stockSolution_comments&quot;).getValue();
+		this.stockSolution.name = Ext.getCmp(this.id + &quot;stockSolution_name&quot;).getValue();
+		this.stockSolution.proposalId = Ext.getCmp(&quot;proposalIdCombo&quot;).getValue();
+		this.stockSolution.bufferId = this.bufferCombo.getValue();
+
+		if (this.macromoleculeCombo.getValue() != null) {
+			this.stockSolution.macromoleculeId = this.macromoleculeCombo.getValue();
+		} else {
+			this.stockSolution.macromolecule3VO = null;
+		}
+		
+
+	} else {
+		return {
+			concentration : Ext.getCmp(this.id + &quot;stockSolution_concentration&quot;).getValue(),
+//			storageTemperature : Ext.getCmp(this.id + &quot;stockSolution_storageTemperature&quot;).getValue(),
+			storageTemperature : this.storageLocationComboBox.getValue(),
+			volume : Ext.getCmp(this.id + &quot;stockSolution_volume&quot;).getValue(),
+			comments : Ext.getCmp(this.id + &quot;stockSolution_comments&quot;).getValue(),
+			name : Ext.getCmp(this.id + &quot;stockSolution_name&quot;).getValue(),
+			bufferId : this.bufferCombo.getValue(),
+			macromoleculeId : this.macromoleculeCombo.getValue(),
+			proposalId :  Ext.getCmp(&quot;proposalIdCombo&quot;).getValue()
+		};
+	}
+	return this.stockSolution;
+};
+
+StockSolutionForm.prototype.load = function(stockSolution) {
+	this.stockSolution = stockSolution;
+	if (stockSolution != null) {
+		if (stockSolution.macromoleculeId != null) {
+			this.macromoleculeCombo.setValue(stockSolution.macromoleculeId);
+		}
+		this.bufferCombo.setValue(stockSolution.bufferId);
+		Ext.getCmp(this.id + &quot;stockSolution_concentration&quot;).setValue(this.stockSolution.concentration);
+//		Ext.getCmp(this.id + &quot;stockSolution_storageTemperature&quot;).setValue(this.stockSolution.storageTemperature);
+		this.storageLocationComboBox.setValue(this.stockSolution.storageTemperature);
+		Ext.getCmp(this.id + &quot;stockSolution_volume&quot;).setValue(this.stockSolution.volume);
+		Ext.getCmp(this.id + &quot;stockSolution_name&quot;).setValue(this.stockSolution.name);
+		Ext.getCmp(this.id + &quot;stockSolution_comments&quot;).setValue(this.stockSolution.comments);
+		
+		if (stockSolution != null){
+			if (stockSolution.proposalId != null){
+				Ext.getCmp(&quot;proposalIdCombo&quot;).setValue(stockSolution.proposalId);
+				Ext.getCmp(&quot;proposalIdCombo&quot;).disable();
+			}
+		}
+		
+	}
+};
+
+StockSolutionForm.prototype.getBufferCombo = function() {
+	this.bufferCombo = BIOSAXS_COMBOMANAGER.getComboBuffers(EXI.proposalManager.getBuffers(), {
+		labelWidth : 150,
+		margin : &#039;0 0 10 0&#039;,
+		width : 400
+
+	});
+	return this.bufferCombo;
+};
+
+StockSolutionForm.prototype.getMacromoleculeCombo = function() {
+	this.macromoleculeCombo = BIOSAXS_COMBOMANAGER.getComboMacromoleculeByMacromolecules(EXI.proposalManager.getMacromolecules(), {
+		labelWidth : 150,
+		margin : &#039;0 0 10 0&#039;,
+		width : 400
+
+	});
+	return this.macromoleculeCombo;
+};
+
+StockSolutionForm.prototype.refresh = function() {
+};
+
+StockSolutionForm.prototype._getTopPanel = function() {
+	
+	this.storageLocationComboBox =  BIOSAXS_COMBOMANAGER.getComboStorageTemperature({labelWidth : 150, width : 400});
+	return {
+		xtype : &#039;container&#039;,
+		layout : &#039;hbox&#039;,
+		border : 0,
+		buttons : this._getButtons(),
+		items : [ {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			items : [ {
+				xtype : &#039;container&#039;,
+				flex : 1,
+				border : false,
+				layout : &#039;anchor&#039;,
+				defaultType : &#039;textfield&#039;,
+				items : [
+				BIOSAXS_COMBOMANAGER.getComboProposal({labelWidth : 150, width : 400}),
+				this.getMacromoleculeCombo(), 
+				this.getBufferCombo(),
+				{
+					xtype: &#039;requiredtextfield&#039;,
+					id : this.id + &#039;stockSolution_name&#039;,
+					fieldLabel : &#039;Acronym&#039;,
+					labelWidth : 150,
+					width : 400
+				}, {
+					xtype: &#039;requiredtextfield&#039;,
+					id : this.id + &#039;stockSolution_concentration&#039;,
+					fieldLabel : &#039;Conc. (mg/ml)&#039;,
+					labelWidth : 150,
+					width : 400
+				},
+				this.storageLocationComboBox,
+//				{
+//					id : this.id + &#039;stockSolution_storageTemperature&#039;,
+//					fieldLabel : &#039;Storage Temp.(C)&#039;,
+//					labelWidth : 150,
+//					width : 250
+//				}, 
+				{
+					xtype: &#039;requiredtextfield&#039;,
+					id : this.id + &#039;stockSolution_volume&#039;,
+					fieldLabel : &#039;Volume (&amp;#181l)&#039;,
+					labelWidth : 150,
+					width : 400
+				} ]
+			} ]
+		} ]
+	};
+
+};
+
+
+StockSolutionForm.prototype.getPanel = function() {
+	this.panel =  Ext.create(&#039;Ext.panel.Panel&#039;, {
+		padding : 0,
+		buttons : this._getButtons(),
+		cls : &#039;border-grid&#039;,
+		items : [
+		         {
+		        	 	 xtype : &#039;container&#039;,
+		        	 	 padding : 20,
+				         items : [
+							         this._getTopPanel(), 
+							         {
+							        	 id : this.id + &#039;stockSolution_comments&#039;,
+							        	 xtype : &#039;textareafield&#039;,
+							        	 name : &#039;comments&#039;,
+							        	 fieldLabel : &#039;Comments&#039;,
+							        	 labelWidth : 150,
+							        	 width : &#039;100%&#039;,
+							        	 height : 100
+							         }]
+		         }]
+	});
+	return this.panel;
+};
+
+StockSolutionForm.prototype.input = function() {
+	return {
+		stock : {
+			&quot;stockSolutionId&quot; : 6,
+			&quot;proposalId&quot; : 3124,
+			&quot;macromoleculeId&quot; : 5933,
+			&quot;bufferId&quot; : 811,
+			&quot;instructionSet3VO&quot; : null,
+			&quot;boxId&quot; : 305861,
+			&quot;storageTemperature&quot; : &quot;20&quot;,
+			&quot;volume&quot; : &quot;300&quot;,
+			&quot;concentration&quot; : &quot;1.2&quot;,
+			&quot;comments&quot; : &quot;Buffer EDTA with A&quot;,
+			&quot;name&quot; : &quot;A_EDTA_1.2&quot;,
+			&quot;samples&quot; : [],
+			&quot;buffer&quot; : &quot;EDTA&quot;,
+			&quot;macromolecule&quot; : &quot;A&quot;
+		},
+		proposal : new MeasurementGrid().input().proposal
+	};
+};
+
+StockSolutionForm.prototype.test = function(targetId) {
+	var stockSolutionForm = new StockSolutionForm();
+	BIOSAXS.proposal = new Proposal(stockSolutionForm.input().proposal);
+	var panel = stockSolutionForm.getPanel(new Shipment(stockSolutionForm.input().stock));
+	panel.render(targetId);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

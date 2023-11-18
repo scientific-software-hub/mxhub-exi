@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>EXI CSV Scatter Viewer</title>
+  <meta charset="utf-8">
+  
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+      .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+      }
+
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+  </style>
+
+</head>
+
+<body>
+    <div id="viewerScatter">
+      <div id='loadingDiv' style="position: absolute;
+    top: 30%;
+    left: 45%;
+    height: 70%;
+    width: 70%;
+    margin: 0% 0 0 0%;"><div class="loader"></div></div>
+      <div id="plotDiv" class="plotDivScatter" style="position: absolute;
+    top: 45%;
+    left: 40%;
+    height: 70%;
+    width: 70%;
+    margin: -15% 0 0 -25%;"></div>
+    </div>
+  </div>
+  <script>
+    function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    Plotly.d3.csv(getParameterByName("url"), function(rows){
+      var xValues = getParameterByName("x").split(",");
+      var yValues = [];
+      var row = rows[0];
+      for (var i=0 ; i < xValues.length ; i++) {
+        yValues[i] = row[xValues[i]];
+      }
+      var data = [
+        {
+          x: xValues,
+          y: yValues,
+          type: 'bar'
+        }
+      ];
+      var yTitle = "";
+      if (xValues.length == 1) {
+        yTitle =  xValues[0];
+      }
+      var layout = {
+        title : getParameterByName("title"),
+        yaxis : {title : yTitle},
+        hovermode:'closest',
+        margin: {                           // update the left, bottom, right, top margin
+          l: 70, b: 200, r: 100, t:50
+        },
+      };
+      Plotly.newPlot("plotDiv", data, layout);
+      document.getElementById("loadingDiv").innerHTML = "";
+  });
+
+  </script>
+</body>
+</html>

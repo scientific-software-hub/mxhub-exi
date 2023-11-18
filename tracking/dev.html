@@ -1,0 +1,358 @@
+<!doctype html>
+<html>
+  <head>
+    <title>EXI</title> 
+        <script type="text/javascript" src="../dependency/ext/build/bootstrap.js"></script>
+        <script type="text/javascript" src="../dependency/ext/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+
+        <!--
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        ->            
+        <!-- CSS-->
+        <link rel="stylesheet" type="text/css" href='../bower_components/bootstrap/dist/css/bootstrap.min.css'>
+        <link rel="stylesheet" type="text/css" href='../dependency/ext/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css'>
+        <link rel="stylesheet" type="text/css" href="../bower_components/bootstrap-year-calendar/css/bootstrap-year-calendar.min.css">         
+        <link rel="stylesheet" type="text/css" href="../min/exi.min.css?v=1645196247039">
+    
+    
+        
+        <!-- LODASH -->    
+        <script src="../bower_components/lodash/dist/lodash.min.js"></script>
+                                      
+		<!-- bower:css -->
+		<link rel="stylesheet" href="../bower_components/pikaday/css/pikaday.css" />
+		<link rel="stylesheet" href="../bower_components/handsontable/dist/handsontable.css" />
+		<link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css" />
+		<link rel="stylesheet" href="../bower_components/vis/dist/vis.css" />
+		<link rel="stylesheet" href="../bower_components/lightbox2/dist/css/lightbox.css" />
+		<link rel="stylesheet" href="../bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css" />
+		<link rel="stylesheet" href="../bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+		<!-- endbower -->
+
+
+        <!-- bower:js -->
+        <script src="../bower_components/jquery/dist/jquery.js"></script>
+        <script src="../bower_components/moment/moment.js"></script>
+        <script src="../bower_components/pikaday/pikaday.js"></script>
+        <script src="../bower_components/handsontable/dist/handsontable.js"></script>
+        <script src="../bower_components/jquery-lazy/jquery.lazy.min.js"></script>
+        <script src="../bower_components/dygraphs/dygraph-combined.js"></script>
+        <script src="../bower_components/qunit/qunit/qunit.js"></script>
+        <script src="../bower_components/vis/dist/vis.js"></script>
+        <script src="../bower_components/Snap.svg/dist/snap.svg-min.js"></script>
+        <script src="../bower_components/pathjs-amd/dist/path.js"></script>
+        <script src="../bower_components/dustjs-linkedin/dist/dust-full.min.js"></script>
+        <script src="../bower_components/dustjs-helpers/dist/dust-helpers.min.js"></script>
+        <script src="../bower_components/lightbox2/dist/js/lightbox.js"></script>
+        <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="../bower_components/notifyjs/dist/notify.js"></script>
+        <script src="../bower_components/lodash/lodash.js"></script>
+        <script src="../bower_components/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+        <script src="../bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="../bower_components/html-docx-js/dist/html-docx.js"></script>
+        <!-- endbower -->
+
+
+        <script src="../bower_components/bootstrap-year-calendar/js/bootstrap-year-calendar.min.js"></script>
+    
+    
+	
+        <!-- EXI-UI-UTILS -->
+        
+	
+	  
+        <!-- ISPYB-JS-API -->	
+        <script src="../bower_components/ispyb-js-api/js/dataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/event.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/exi/exidataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/exi/exidataadaptergroup.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/security/authenticationdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/dataadapterfactory.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/dewardataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/labcontactdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/proposaldataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/proposaldataadaptergroup.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/sessiondataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/proposal/shippingdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/autoprocintegrationdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/crystaldataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/datacollectiondataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/datacollectiongroupdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/energyscandataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/mxdataadapterfactory.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/mxdataadaptergroup.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/phasingdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/proteindataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/sampledataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/statisticsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/workflowdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/workflowstepdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/mx/xfescandataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/buffersaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/datacollectionsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/experiment.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/experimentlist.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/experimentsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/framesaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/hplcsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/macromoleculesaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/measurementsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/modelsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/saxsdataadapterfactory.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/saxsdataadaptergroup.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/specimensaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/stocksolutionsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/subtractionsaxsdataadapter.js"></script>
+        <script src="../bower_components/ispyb-js-api/js/saxs/templatesaxsdataadapter.js"></script>
+        
+		  
+        <!-- DUST -->  
+		<script src="../js/dust/helpers.js"></script>
+	   
+        <!-- SECURITY -->
+	    <script src="../js/core/security/credential.js?v=1645196247039"></script>
+	    <script src="../js/core/security/credentialmanager.js?v=1645196247039"></script>
+       
+        <!-- APP -->
+        <script src="../js/core/app/appcontroller.js?v=1645196247039"></script>
+        <script src="../js/core/app/exi.js?v=1645196247039"></script>
+        <script src="../js/core/app/mainstatusbar.js?v=1645196247039"></script>
+        <script src="../js/core/app/proposalmanager.js?v=1645196247039"></script>
+        <script src="../js/mx/eximx.js?v=1645196247039"></script>
+        <script src="../js/tracking/existracking.js?v=1645196247039"></script>
+        
+        <!-- WIDGET -->
+        <script src="../js/core/widget/addresseditform.js?v=1645196247039"></script>
+        <script src="../js/core/widget/addressform.js?v=1645196247039"></script>
+        <script src="../js/core/widget/authenticationform.js?v=1645196247039"></script>
+        <script src="../js/core/widget/containerparcelpanel.js?v=1645196247039"></script>
+        <script src="../js/core/widget/containertypecombobox.js?v=1645196247039"></script>
+        <script src="../js/core/widget/containerwidget.js?v=1645196247039"></script>
+        <script src="../js/core/widget/curveplotter.js?v=1645196247039"></script>
+        <script src="../js/core/widget/parcelpanel.js?v=1645196247039"></script>
+        <script src="../js/core/widget/proposalgrid.js?v=1645196247039"></script>
+        <script src="../js/core/widget/proteineditform.js?v=1645196247039"></script>
+        <script src="../js/core/widget/puckstatisticscontainer.js?v=1645196247039"></script>
+        <script src="../js/core/widget/sessiongrid.js?v=1645196247039"></script>
+        <script src="../js/core/widget/stocksolutioncontainer.js?v=1645196247039"></script>
+        <script src="../js/core/widget/stocksolutionsgrid.js?v=1645196247039"></script>
+        <script src="../js/core/widget/uploaderwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/autoprocintegrationgridfileexplorer.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/curveviewer.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/electrondensityviewer.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/energyscangrid.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/a_samplechangerwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/flexhcddualwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/flexhcdunipuckplacewidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/flexhcdwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/isarawidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/pucklegend.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/puckwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/puckwidgetcontainer.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/robodiffHCDSC3widget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/robodiffwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/sc3widget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/spinepuckwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/pucks/unipuckwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/widget/xfescangrid.js?v=1645196247039"></script>
+        
+        
+         
+        
+        <!-- UTILS -->
+        
+        <script src="../js/mx/utils/autoprocessingsorter.js?v=1645196247039"></script>
+        
+        
+        <!-- CONTROLLER -->
+        <script src="../js/core/controller/a_exigenericcontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/a_mainview.js?v=1645196247039"></script>
+        <script src="../js/core/controller/authenticationcontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/exicontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/exigenericcontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/labcontactexicontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/offlineexicontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/proposalexicontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/sessioncontroller.js?v=1645196247039"></script>
+        <script src="../js/core/controller/shippingexicontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/autoprocintegrationcontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/beamlineparametercontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/crystalcontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/imagecontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/mxdatacollectioncontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/mxprepare.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/phasingcontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/proteincontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/puckcontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/workflowcontroller.js?v=1645196247039"></script>
+        <script src="../js/mx/controller/xfecontroller.js?v=1645196247039"></script>
+        <script src="../js/tracking/controller/trackingexicontroller.js?v=1645196247039"></script>
+        <script src="../js/test/controller/testcontroller.js?v=1645196247039"></script>
+        
+        <!-- NAVIGATION -->
+        <script src="../js/core/navigation/a_listview.js?v=1645196247039"></script>
+        <script src="../js/core/navigation/addresslistview.js?v=1645196247039"></script>
+        <script src="../js/core/navigation/runlistview.js?v=1645196247039"></script>
+        <script src="../js/core/navigation/sessionlistview.js?v=1645196247039"></script>
+        <script src="../js/core/navigation/shippinglistview.js?v=1645196247039"></script>
+        <script src="../js/core/navigation/workspacelistview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/autoprocintegration.listview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/crystallistview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/dewarlistview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/phasinglistview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/proteinlistview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/pucklistview.js?v=1645196247039"></script>
+        <script src="../js/mx/navigation/workflowsteplistview.js?v=1645196247039"></script>
+        
+        <script src="../js/test/navigation/testcontainer.js?v=1645196247039"></script>
+        <script src="../js/test/navigation/testlistview.js?v=1645196247039"></script>
+        <script src="../js/test/navigation/testmainpanel.js?v=1645196247039"></script>
+        <script src="../js/test/navigation/testmainwidgetpanel.js?v=1645196247039"></script>
+        
+        <!-- MENU -->
+        <script src="../js/core/menu/bootstrapgrid.js?v=1645196247039"></script>
+        <script src="../js/core/menu/mainmenu.js?v=1645196247039"></script>
+        <script src="../js/core/menu/managermenu.js?v=1645196247039"></script>
+        <script src="../js/core/menu/selectionmenu.js?v=1645196247039"></script>
+        <script src="../js/mx/menu/mxmainmenu.js?v=1645196247039"></script>
+        <script src="../js/mx/menu/mxmanagermenu.js?v=1645196247039"></script>
+        <script src="../js/tracking/menu/trackingmainmenu.js?v=1645196247039"></script>
+        
+        <!-- VIEW -->
+        <script src="../js/core/view/a_mainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/addressmainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/datacollectionform.js?v=1645196247039"></script>
+        <script src="../js/core/view/daterangepicker.js?v=1645196247039"></script>
+        <script src="../js/core/view/managerwelcomemainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/run/runmainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/run/x_dimplerunmainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/scatteringform.js?v=1645196247039"></script>
+        <script src="../js/core/view/sessionmainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/a_puckformview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/a_spreadsheet.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/addcontainerform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/addcrystalformview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/caseform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/containerspreadsheet.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/crystalformview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/csvcontainerspreadsheet.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/csvpuckformview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/dewartrackinggrid.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/dewartrackingview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/editcrystalformview.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/editcrystalstructure.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/editligands.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/exportpdfform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/genericcontainerspreadsheet.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/othercontainerform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/parcelgrid.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/puckvalidator.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/reimbursementform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/sendshipmentform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/shipmenteditform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/shipmentform.js?v=1645196247039"></script>
+        <script src="../js/core/view/shipping/shippingmainview.js?v=1645196247039"></script>
+        <script src="../js/core/view/welcomemainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/autoprocintegration/autoprocintegrationattachmentsgrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/autoprocintegration/autoprocintegrationcurveplotter.js?v=1645196247039"></script>
+        <script src="../js/mx/view/autoprocintegration/autoprocintegrationgrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/autoprocintegration/autoprocintegrationplots.js?v=1645196247039"></script>
+        <script src="../js/mx/view/autoprocintegrationmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/beamlineparameter/beamlineparametermainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/beamlineparameter/imagemainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/beamlineparameter/resolutionscatteringimageviewer.js?v=1645196247039"></script>
+        <script src="../js/mx/view/beamlineparameter/scatteringimageviewer.js?v=1645196247039"></script>
+        <script src="../js/mx/view/crystalmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/autoprocessingfilemanager.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/datacollectiongrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/datacollectionmxmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/collapseddatacollectiongrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/commenteditform.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/containersdatacollectiongrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/customsectiondatacollection.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/genericdatacollectionpanel.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/mxdatacollectiongrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/onlineresultsectiondatacollection.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/thumbnailsectiondatacollection.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/uncollapseddatacollectiongrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/grid/workflowsectiondatacollection.js?v=1645196247039"></script>
+        <script src="../js/mx/view/datacollection/reportsform.js?v=1645196247039"></script>
+        <script src="../js/mx/view/ligandsmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/filemanagerphasinggrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/phasinggrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/phasinggridmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/phasinggridview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/phasingnetworkwidget.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/phasingviewermainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/phasingview/summaryphasinggrid.js?v=1645196247039"></script>
+        <script src="../js/mx/view/prepareexperiment/confirmshipmentview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/prepareexperiment/containerspreparepreadsheet.js?v=1645196247039"></script>
+        <script src="../js/mx/view/prepareexperiment/dewarlistselector.js?v=1645196247039"></script>
+        <script src="../js/mx/view/prepareexperiment/loadsamplechangerview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/prepareexperiment/preparemainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/prepareexperiment/previewpanelview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/proteinlistmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/workflowstepmainview.js?v=1645196247039"></script>
+        <script src="../js/mx/view/xfe/xfeviewermainview.js?v=1645196247039"></script>
+        
+        <script src="../js/test/view/electrondensityviewer.js?v=1645196247039"></script>
+        <script src="../js/test/view/puckwidgetview.js?v=1645196247039"></script>
+        <script src="../js/test/view/testmainview.js?v=1645196247039"></script>
+        
+        
+	    <script src="config.js?v=1645196247039"></script>
+            
+		<!-- Precompiled templates -->
+		<script type="text/javascript" src="../min/precompiled.templates.min.js?v=1645196247039"></script>
+              	
+    </head>
+
+
+
+
+    <script>
+        function isNumber(value) {
+            if (value=="") return false;
+
+            var d = parseInt(value);
+            if (!isNaN(d)) return true; else return false;		
+
+        } 
+        
+        var exitracking;
+        //google.load("visualization", "1");
+        Ext.onReady(function(){
+
+            Ext.Loader.setConfig({
+                enabled: true
+            });
+
+            Ext.Loader.setPath('Ext.ux', '../dependency/ext/examples/ux/');
+            Ext.Loader.setPath('Ext.Extended', '../dependency/extended/');
+        
+            Ext.require([
+                'Ext.ux.statusbar.StatusBar',
+                'Ext.Extended.RequiredTextField',
+                'Ext.Extended.RequiredNumberField'
+            ]);
+
+            if (location.href.indexOf("tracking") != -1){
+                EXI = new ExiTracking();
+            }
+            else{
+                EXI = new ExiMX();
+            }
+                        
+            EXI.show();
+
+            EXI.onAfterRender.attach(function(){
+                Path.listen();                        
+            });
+        });
+    </script>
+  <body>    
+  </body>
+  
+<script type="text/javascript" src="../min/lightbox.js?v=1645196247039"></script> 
+                                          
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/beamlineparameter/imagemainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/beamlineparameter/imagemainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">106.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">261</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">22.29</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.64</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function ImageMainView() {
+    this.icon = &#039;images/icon/ic_satellite_black_18dp.png&#039;;
+    MainView.call(this);
+    var _this = this;
+
+    this.imageViewer = new ImageResolutionViewer();
+
+    this.detectorResolution = {
+        pixelSize: {
+            x: 1475,
+            y: 1679
+        },
+        sensitiveArea: {
+            x: 253.7,
+            y: 288.8
+        },
+        pixelSizeHorizontal: 0.172
+
+    };
+
+    //this.surfaceScatteringViewer = new SurfaceScatteringViewer();
+
+    this.imageViewer.onImageRendered.attach(function(sender, data) {
+        //_this.surfaceScatteringViewer.load(data);
+
+    });
+    
+    this.imageViewer.onMouseOver.attach(function(sender, point) {
+    
+    });
+    
+}
+
+ImageMainView.prototype.getPanel = MainView.prototype.getPanel;
+
+ImageMainView.prototype.getContainer = function() {
+    return Ext.createWidget(&#039;tabpanel&#039;,
+        {
+            plain: true,
+            margin: &#039;10 30 10 10&#039;,
+            items: [
+
+                {
+                    tabConfig: {
+                        title: &#039;2D&#039;
+                    },
+                    items: [{
+                        xtype: &#039;container&#039;,
+                        layout: &#039;hbox&#039;,
+                        paddding: 5,
+                        style: {
+                            borderColor: &#039;gray&#039;,
+                            borderStyle: &#039;solid&#039;,
+                            borderWidth: &#039;1px&#039;,
+                            &#039;background-color&#039;: &#039;white&#039;
+                        },
+                        items: [
+                            this.imageViewer.getPanel(),
+                            {
+
+                                html: &quot;&lt;div id=&#039;&quot; + this.id + &quot;detector&#039; &gt;&lt;/div&gt;&quot;,
+                                margin: &#039;0 0 0 5&#039;,
+                                height: 800
+                            }
+
+                        ]
+                    }
+                    ]
+                },
+                /*{
+                    tabConfig : {
+                        title : &#039;3D&#039;
+                    },
+                    items : [ {
+                        xtype : &#039;container&#039;,
+                        layout : &#039;hbox&#039;,
+                        style : {
+                            borderColor : &#039;gray&#039;,
+                            borderStyle : &#039;solid&#039;,
+                            borderWidth : &#039;1px&#039;,
+                            &#039;background-color&#039; : &#039;white&#039; 
+                        },
+                        items : [ 
+                            this.surfaceScatteringViewer.getPanel()
+                        	
+                        ]
+                    }
+                    ]
+                    },
+                {
+                    tabConfig : {
+                        title : &#039;Parameters&#039;
+                    },
+                    items : [ {
+                        xtype : &#039;container&#039;,
+                        layout : &#039;fit&#039;,
+                        style : {
+                            borderColor : &#039;gray&#039;,
+                            borderStyle : &#039;solid&#039;,
+                            borderWidth : &#039;1px&#039;,
+                            &#039;background-color&#039; : &#039;white&#039; 
+                        },
+                        items : [ 
+                            this.getParametersGrid()
+                        ]
+                    }
+                    ]
+                    }*/
+
+
+
+
+            ]
+        });
+};
+
+
+
+/*MainView.prototype.getParametersGrid = function(imageId, dataCollectionId) {
+	this.storeParameters = Ext.create(&#039;Ext.data.Store&#039;, {
+	    fields:[&#039;key&#039;, &#039;value&#039;],
+            sorters : &#039;key&#039;
+	});
+
+	this.parametersPanel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+	    title: &#039;Parameters&#039;,
+	    store: this.storeParameters,
+	    columns: [
+		{ text: &#039;Key&#039;,  dataIndex: &#039;key&#039;, flex: 0.2 },
+		{ text: &#039;Value&#039;, dataIndex: &#039;value&#039;, flex: 1 }
+	    ],
+	    height: 800,
+	    viewConfig : {
+			enableTextSelection : true
+	    }
+	});
+	return this.parametersPanel;
+
+};*/
+
+ImageMainView.prototype.loadDetectorPanel = function(detector, dataCollection) {
+    var dataHTML = this.makeHTMLTable(&quot;Detector&quot;, [
+        [&quot;Model&quot;, dataCollection.Detector_detectorModel],
+        [&quot;Manufacturer&quot;, dataCollection.Detector_detectorManufacturer],
+        [&quot;Mode&quot;, dataCollection.Detector_detectorMode],
+        [&quot;Pixel Size&quot;, detector.pixelSize.x + &quot; x &quot; + detector.pixelSize.y],
+        [&quot;sensitive Area&quot;, detector.sensitiveArea.x + &quot; x &quot; + detector.sensitiveArea.y]
+
+    ], null, detector.img);
+
+    var dataColletionHTML = this.makeHTMLTable(&quot;Data Collection&quot;, [
+        [&quot;Collected on&quot;, dataCollection.DataCollectionGroup_endTime],
+        [&quot;Experiment Type&quot;, dataCollection.DataCollectionGroup_experimentType],
+        [&quot;Centering&quot;, dataCollection.DataCollection_centeringMethod],
+        [&quot;Exposure Timee&quot;, dataCollection.DataCollection_exposureTime],
+        [&quot;Directory&quot;, dataCollection.DataCollection_imageDirectory],
+        [&quot;BeamLine&quot;, dataCollection.BLSession_beamLineName],
+        [&quot;Detector Distance&quot;, dataCollection.DataCollection_detectorDistance],
+        [&quot;Flux&quot;, dataCollection.DataCollection_flux],
+        [&quot;Resolution&quot;, dataCollection.DataCollection_resolution],
+        [&quot;Transmission&quot;, dataCollection.DataCollection_transmission],
+        [&quot;WaveLength&quot;, dataCollection.DataCollection_wavelength]
+
+
+    ]);
+
+
+    return &quot;&lt;span style=&#039;color:orange;font-weight:bold;&#039;&gt;WARNING: If image is not displayed please, refresh the page (F5)&lt;/span&gt;&lt;br /&gt;&quot; + dataColletionHTML + dataHTML;
+
+
+
+};
+
+ImageMainView.prototype.makeHTMLTable = function(title, data, args, img) {
+    var width = 800;
+    if (args != null) {
+        if (args.with != null) {
+            width = args.with;
+        }
+    }
+
+
+    var html = &quot;&lt;table&gt;&quot;;
+
+
+
+    if (data != null) {
+        for (var i = 0; i &lt; data.length; i++) {
+            html = html + &quot;&lt;tr&gt;&quot;;
+            for (var j = 0; j &lt; data[i].length; j++) {
+
+                var css = &quot;key_subgrid&quot;;
+                if (j == 1) {
+                    css = &quot;value_subgrid&quot;;
+                }
+                html = html + &quot;&lt;td class=&#039;&quot; + css + &quot;&#039;&gt;&quot; + data[i][j] + &quot;&lt;/td&gt;&quot;;
+
+                if (img != null) {
+                    if (i == 0) {
+                        if (j == data[i].length - 1) {
+                            html = html + &#039;&lt;td rowspan=&quot;&#039; + data.length + &#039;&quot;&gt;&lt;img src=&#039; + img + &#039;/&gt;&lt;/td&gt;&#039;;
+                        }
+
+                    }
+
+                }
+            }
+            html = html + &quot;&lt;/tr&gt;&quot;;
+
+        }
+
+
+    }
+    html = html + &quot;&lt;/table&gt;&quot;;
+
+    if (title != null) {
+        html = &#039;&lt;div  class=&quot;header-component-table&quot; &gt;&#039; + title + &#039;&lt;/div&gt;&lt;div  style=&quot;margin:0px 0px 0px 0px !important;width:&#039; + width + &#039;px;&quot;&gt;&#039; + html + &#039;&lt;/div&gt;&#039;;
+    }
+    return html;
+};
+
+
+ImageMainView.prototype.load = function(imageId, dataCollectionId) {
+
+    var _this = this;
+    this.panel.setTitle(&quot;Image&quot;);
+    var url = EXI.getDataAdapter().mx.dataCollection.getImageById(imageId);
+
+
+    var onSuccess = function(sender, dataCollection) {
+
+        var dc = (dataCollection[0]);
+/*
+        for (var key in dc) {
+            
+            _this.storeParameters.loadData([{ key: key, value: dc[key] }], true);
+        }*/
+        var waveLength = dataCollection[0].DataCollection_wavelength;
+        var detectorDistance = dataCollection[0].DataCollection_detectorDistance;
+        var xBeam = dataCollection[0].DataCollection_xBeam;
+        var yBeam = dataCollection[0].DataCollection_yBeam;
+
+        if (ExtISPyB.detectors[dataCollection[0].detectorModel] != null) {
+            _this.detectorResolution = ExtISPyB.detectors[dataCollection[0].detectorModel];
+        }
+        else {
+            alert(&quot;Not detector loaded&quot;);
+        }
+
+
+        _this.imageViewer.load(url, waveLength, detectorDistance, xBeam, yBeam, _this.detectorResolution);
+
+        document.getElementById(_this.id + &quot;detector&quot;).innerHTML = _this.loadDetectorPanel(_this.detectorResolution, dataCollection[0]);
+
+        //_this.surfaceScatteringViewer.load();
+
+    };
+    EXI.getDataAdapter({ onSuccess: onSuccess }).mx.dataCollection.getByDataCollectionId(dataCollectionId);
+
+
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

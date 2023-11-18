@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/welcomemainview/managerwelcomemainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/welcomemainview/managerwelcomemainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">120.64</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">270</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.25</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.73</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* Class for the manager landing page. It inherits from MainView
+*
+* @class ManagerWelcomeMainView
+* @constructor
+*/
+function ManagerWelcomeMainView() {
+	this.icon = &#039;../images/icon/rsz_ic_home_black_24dp.png&#039;;
+
+	MainView.call(this);
+	this.title = &quot;Home&quot;;
+	this.closable = false;
+
+    this.sessionGrid = new SessionGrid({
+                    width : null,
+                    height:600,
+                    isHiddenTitle : false,
+                    isHiddenNumberOfShifts : false,
+                    isHiddenLocalContact : false,                                        
+                    margin : &#039;10 10 10 10&#039;
+    });
+    
+    this.proposalGrid = new ProposalGrid({
+                                            width: 900,
+                                            height:600,
+                                            margin : &#039;10 10 10 10&#039;
+
+                                    });
+}
+
+ManagerWelcomeMainView.prototype.getPanel = MainView.prototype.getPanel;
+
+/**
+* This sets an active proposal into the credential Manager. It also retrieve all the information about the proposal: shipments, macromolecules, crystals, buffers, etc.. and store 
+* them in a local storage
+*
+* @method activeProposal
+* @param {Object} proposal Proposal object that should container at least: [code, number]
+*/
+ManagerWelcomeMainView.prototype.activeProposal = function(proposal) {
+    
+    EXI.mainStatusBar.showBusy(&quot;Loading proposal &quot; +proposal); 
+    
+	EXI.credentialManager.setActiveProposal(this.username, proposal);
+    EXI.proposalManager.clear();
+	/** I don&#039;t need this to be synchronous **/	
+    EXI.proposalManager.onActiveProposalChanged = new Event();
+    EXI.proposalManager.onActiveProposalChanged.attach(function(){
+        EXI.mainStatusBar.showReady();
+        console.log(EXI.proposalManager.get());
+    });
+	EXI.proposalManager.get();
+};
+
+
+ManagerWelcomeMainView.prototype.getContainer = function() {
+	this.container = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		autoScroll : true,
+        margin : 20,
+        cls : &#039;border-grid&#039;,
+        tbar : this.getToolbar(),
+            items :[
+                this.sessionGrid.getPanel()
+        ]
+	});
+	return this.container;
+};
+
+/**
+* It receives a list of proposals and display them in the main container
+*
+* @param {Object} proposals Arrays of Proposal objects
+* @method displayProposals
+*/
+ManagerWelcomeMainView.prototype.displayProposals = function(proposals) {
+    var _this = this;
+    this.container.removeAll();
+   
+    this.proposalGrid.onSelected.attach(function(sender, proposal){
+            _this.panel.setLoading(true);
+            var proposalCode = proposal.Proposal_proposalCode + proposal.Proposal_proposalNumber;
+            function onSuccess(sender, sessions){
+                _this.displaySessions(sessions, sessions.length + &quot; sessions for proposal &quot; + proposalCode);
+                _this.panel.setLoading(false);
+            }
+            EXI.getDataAdapter({onSuccess:onSuccess}).proposal.session.getSessionsByProposal(proposalCode);
+                            
+            /** Loading Proposal info */                 
+            _this.activeProposal( proposal.Proposal_proposalCode + proposal.Proposal_proposalNumber);
+        
+    });
+    
+    this.container.insert(this.proposalGrid.getPanel());
+    this.proposalGrid.load(proposals);
+};
+
+/**
+* Retrieves a list of sessions based on a start date and end date and loads them on the session grid
+*
+* @param {String} start Date should be in the format of YYYYMMDD
+* @param {String} end Date should be in the format of YYYYMMDD
+* @method loadByDate
+*/
+ManagerWelcomeMainView.prototype.loadByDate = function(username, start, end) {
+          var _this = this;
+          this.panel.setLoading(true);
+          function onSuccess(sender, data){              
+        	  _this.displaySessions(data, data.length + &quot; sessions scheduled on &quot; + moment(start, &#039;YYYYMMDD&#039;).format(&#039;MMMM Do YYYY&#039;));
+        	  _this.panel.setLoading(false);
+          }
+          /** Increasing one day */
+          end = moment(end, &quot;YYYYMMDD&quot;).add(1, &#039;days&#039;).format(&quot;YYYYMMDD&quot;);                    
+          if (this.isUser(username)){
+		        EXI.getDataAdapter({onSuccess:onSuccess}).proposal.session.getSessionsByProposalAndDate(start, end, username);
+          }
+          else{
+                EXI.getDataAdapter({onSuccess:onSuccess}).proposal.session.getSessionsByDate(start, end);
+          }
+};
+
+/**
+* Removes oldest sessions up to get only 500
+*
+* @param {String} sessions List of sessions
+* @method filterSessions
+*/
+ManagerWelcomeMainView.prototype.filterSessions = function(sessions) {    
+        var realLength = sessions.length;
+        data = _.slice(sessions, 0, 500);
+        // Sorting by start date because sessionId does not sort by date
+        _(sessions).forEach(function(value) {
+                value[&#039;ms&#039;] = moment(value.BLSession_startDate, &#039;MMM DD, YYYY h:mm:ss a&#039;).format(&#039;x&#039;);
+        });
+        sessions = _.orderBy(sessions, [&#039;ms&#039;], [&#039;desc&#039;]);
+        return sessions.slice(0, 300);
+        
+};
+        
+ManagerWelcomeMainView.prototype.displaySessions = function(sessions, title) {
+    var _this = this;
+    
+    /** it loads the session panel */
+    this.container.removeAll();   
+    this.container.insert(this.sessionGrid.getPanel());
+
+    /** Handling onSelected **/
+    this.sessionGrid.onSelected.attach(function(sender, args){
+        EXI.proposalManager.clear();
+        _this.activeProposal(args.proposalCode + args.proposalNumber);
+    });
+    
+    this.sessionGrid.load(this.filterSessions(sessions));
+    this.sessionGrid.panel.setTitle(title);
+};
+
+ManagerWelcomeMainView.prototype.getToolbar = function() {
+   var _this = this;
+   var dateMenu = Ext.create(&#039;Ext.menu.DatePicker&#039;, {
+        handler: function(dp, date){            
+            location.href = &quot;#/welcome/manager/&quot; + _this.username +&quot;/date/&quot;+ Ext.Date.format(date, &#039;Ymd&#039;) +&quot;/&quot; + Ext.Date.format(date, &#039;Ymd&#039;) +&quot;/main&quot;;          
+        }
+    });
+
+    return Ext.create(&#039;Ext.toolbar.Toolbar&#039;, {
+        width   : 500,
+        cls 	: &#039;exi-top-bar&#039;,
+        items: [
+            {
+               text: &#039;Choose a Date&#039;,
+               icon : &#039;../images/icon/sessions.png&#039;,
+               menu: dateMenu 
+            },
+            {
+                xtype    : &#039;textfield&#039;,
+                name     : &#039;field1&#039;,
+                width    : 300,
+                emptyText: &#039;enter search term (proposal or title)&#039;,
+    			listeners : {
+    				specialkey : function(field, e) {
+    					if (e.getKey() == e.ENTER) {
+    						var found = _this.searchProposalByTerm(field.getValue());
+    						_this.displayProposals(found);
+    					}
+    				} 
+    			} 
+            }
+        ]
+    });
+};
+
+ManagerWelcomeMainView.prototype.searchProposalByTerm = function(term) {
+	var result = [];
+	if (this.proposals != null){
+		for (var i = 0; i &lt; this.proposals.length; i++) {
+			var proposalId = this.proposals[i][&quot;Proposal_proposalCode&quot;] +  this.proposals[i][&quot;Proposal_proposalNumber&quot;];
+			var title = this.proposals[i][&quot;Proposal_title&quot;];
+			if (title == null){
+				title = &quot;&quot;;
+			}
+			if ((proposalId.toUpperCase().match(term.toUpperCase())) ||(title.toUpperCase().match(term.toUpperCase()))){
+				result.push(this.proposals[i]);
+			}
+		}
+	}
+	return result;
+};
+
+/**
+* Retrieves all proposas on ISPyB and stores them on this.proposal 
+* It is useful for fast search later on
+*
+* @method loadProposals
+*/
+ManagerWelcomeMainView.prototype.loadProposals = function(callback) {
+	var _this = this;
+	var onSuccess = function(sender, proposals){
+		_this.proposals = proposals;
+        if (callback){            
+            callback();
+        }
+	};	
+	EXI.getDataAdapter({onSuccess:onSuccess}).proposal.proposal.getProposals();
+};
+
+ManagerWelcomeMainView.prototype.isUser = function(username) {
+       return (!EXI.credentialManager.getCredentialByUserName(username).isManager() &amp;&amp; (!EXI.credentialManager.getCredentialByUserName(username).isLocalContact()));
+};
+
+ManagerWelcomeMainView.prototype.load = function(username) {      
+  this.username = username;  
+  /** By default for users we load all the sessions and managers only sessions that occurs today */
+  if (this.isUser(username)){
+    this.loadSessionsByProposal(username);  
+    /** set active proposal */
+    this.activeProposal(username);
+  }
+  else{
+    var today = moment().format(&quot;YYYYMMDD&quot;);
+    this.loadSessionsByDate(username, today, today);
+  }    
+};
+
+/**
+* Retrieves all sessions for the proposal
+*
+* @method loadSessions
+*/
+ManagerWelcomeMainView.prototype.loadSessionsByProposal = function(username) {
+    this.username = username;
+    var _this = this;
+    this.panel.setLoading(true);
+    function onSuccess(sender, data){
+       _this.displaySessions(data, &quot;Sessions for proposal &quot; + username);
+       _this.panel.setLoading(false);
+    }
+    EXI.getDataAdapter({onSuccess:onSuccess}).proposal.session.getSessionsByProposal(username);
+};
+
+
+ManagerWelcomeMainView.prototype.loadSessionsByDate = function(username, start, end) { 
+  this.username = username;
+  this.loadByDate(username, start, end);  
+   /** This is need for quick searchs on proposals **/
+  this.loadProposals(); 
+};
+
+ManagerWelcomeMainView.prototype.loadSessionsByTerm = function(username, term) {
+  this.username = username;    
+  /** This is need for quick searchs on proposals **/
+  var _this = this;
+  var onSuccess = function(sender, proposals){
+		_this.proposals = proposals;
+       _this.searchProposalByTerm(term);
+  };
+  EXI.getDataAdapter({onSuccess:onSuccess}).proposal.proposal.getProposals();
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

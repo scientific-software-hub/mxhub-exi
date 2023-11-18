@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/mx/autoprocintegrationmainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/mx/autoprocintegrationmainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">117.97</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">276</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.69</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.79</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* Main view for autoprocessing. It displays a grid with a summary of the information of autoprocessing and phasing
+* On the right it displays a panel with the plots: completeness, rfacor, cc2, etc.. as well as the list of attachments
+*
+* @class AutoProcIntegrationMainView
+* @constructor
+*/
+function AutoProcIntegrationMainView() {
+	this.icon = &#039;images/icon/ic_satellite_black_18dp.png&#039;;
+	MainView.call(this);
+	var _this = this;
+	
+     _this.programAttachments = [];
+     _this.programAttachmentsAutoProcProgramIds = [];
+	
+	this.slaveWidth = 450;
+	
+	this.autoProcIntegrationGrid = new AutoProcIntegrationGrid();
+	
+	this.autoProcIntegrationGrid.onSelected.attach(function(sender, records){
+		var ids = [];        
+		for (var i = 0; i &lt; records.length; i++) {
+			ids.push(records[i].v_datacollection_summary_phasing_autoProcIntegrationId);
+		}		
+		/** Loading plots **/
+		try{
+			_this.loadPlots(ids);
+		}
+		catch(e){
+            console.log(&quot;Error loading plots&quot;);    
+        }	
+        	
+		/** Loading attachments **/
+		if (records.length == 1){                                                                                     
+			var record = _this.getByAutoProcId(records[0].v_datacollection_summary_phasing_autoproc_autoprocId);
+			if (record != null){
+				_this.autoProcIntegrationAttachmentGrid.load(_this.programAttachments[_.findIndex(_this.programAttachmentsAutoProcProgramIds, function(o) { return o == records[0].v_datacollection_summary_phasing_autoProcProgramId; })]);
+			}
+		}		
+		
+		/** Loading phasing network **/
+		var tmp = [].concat.apply([], _this.autoProcIntegrationPhasingViewList);
+		var filtered = [];
+		for ( i = 0; i &lt; tmp.length; i++) {
+			if ( tmp[i].v_datacollection_summary_phasing_autoProcIntegrationId == records[0].v_datacollection_summary_phasing_autoProcIntegrationId){
+				filtered.push( tmp[i]);
+			}
+		}		
+	});
+	
+	this.autoProcIntegrationAttachmentGrid = new AutoProcIntegrationAttachmentGrid({
+																					width : this.slaveWidth, 
+																					margin: 5
+																					
+	});
+	
+	/** Netowkrwidget for phasing **/
+	//this.phasingNetworkWidget = new PhasingNetworkWidget({tbar : &quot;OPEN_VIEWER&quot;});
+	
+	/** Curve completenessPlotter * */
+	this.completenessPlotter = new AutoProcIntegrationCurvePlotter({
+		height : 250,
+		title : &quot;Completeness vs Resolution&quot;,
+		legend : &#039;never&#039;
+	});
+	
+	this.completenessPlotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+	this.rFactorPlotter = new AutoProcIntegrationCurvePlotter({
+		height : 250,
+		title : &quot;Rfactor vs Resolution&quot;,
+		legend : &#039;never&#039;
+	});
+	
+	this.rFactorPlotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+	this.isigmaPlotter = new AutoProcIntegrationCurvePlotter({
+		height :250,
+		title : &quot;I/SigmaI vs Resolution&quot;,
+		legend : &#039;never&#039;
+	});
+
+	this.isigmaPlotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+	this.cc2Plotter = new AutoProcIntegrationCurvePlotter({
+		height : 250,
+		title : &quot;CC/2 vs Resolution&quot;,
+		legend : &#039;never&#039;
+	});
+	
+	this.cc2Plotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+	this.sigmaAnnoPlotter = new AutoProcIntegrationCurvePlotter({
+		height :250,
+		title : &quot;SigAno vs Resolution&quot;,
+		legend : &#039;never&#039;
+	});
+	
+	this.sigmaAnnoPlotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+	this.wilsonPlotter = new AutoProcIntegrationCurvePlotter({
+		height : 250,
+		title : &quot;Wilson Plot&quot;,
+		legend : &#039;never&#039;
+	});
+	
+	this.wilsonPlotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+	this.annoCorrPlotter = new AutoProcIntegrationCurvePlotter({
+		height : 300,
+		title : &quot;Anom Corr vs Resolution&quot;,
+		legend : &#039;never&#039;
+	});
+
+	this.annoCorrPlotter.onPointClickCallback.attach(function(sender, id){
+		_this.onPlotClicked(id);
+	});
+	
+};
+
+AutoProcIntegrationMainView.prototype.getPanel = MainView.prototype.getPanel;
+
+AutoProcIntegrationMainView.prototype.getByAutoProcId = function(autoProcId) {
+	for (var i = 0; i &lt; this.data.length; i++) {
+				if (this.data[i].v_datacollection_summary_phasing_autoproc_autoprocId == autoProcId){
+					return this.data[i];
+				} 
+	}
+};
+
+/**
+* It retrieves the AutoprocIntegrationId of a given autoProcProgramAttachmentId
+* @method getAutoprocIntegrationIdByautoProcProgramAttachmentId
+*/
+AutoProcIntegrationMainView.prototype.getAutoprocIntegrationIdByautoProcProgramAttachmentId = function(autoProcProgramAttachmentId) {
+    var _this = this;
+    var autoProcAttachment = _.find(_.flatten(this.programAttachments), function(o){return o.autoProcProgramAttachmentId == autoProcProgramAttachmentId;});
+     
+    var fnEqualAutoProcProgramAttachmentId = function(o){return o.autoProcProgramAttachmentId == autoProcProgramAttachmentId;};
+    var fnEqualautoProcProgramId = function(o){return o.v_datacollection_summary_phasing_autoProcProgramId == _this.programAttachmentsAutoProcProgramIds[i];};
+    for (var i = 0; i &lt; this.programAttachments.length; i++){
+        var autoprocProgram = _.find(this.programAttachments[i], fnEqualAutoProcProgramAttachmentId);
+        if (autoprocProgram != null){
+               return _.find(this.data, fnEqualautoProcProgramId);
+        }        
+    }
+};
+
+/**
+* It selects the row on the grid which autprocProgramAttachmedId is given
+* @method onPlotClicked
+*/
+AutoProcIntegrationMainView.prototype.onPlotClicked = function(autoProcProgramAttachmentId) {    
+   var autoProcIntegration = this.getAutoprocIntegrationIdByautoProcProgramAttachmentId(autoProcProgramAttachmentId);
+   if (autoProcIntegration){
+        this.autoProcIntegrationGrid.selectRowByAutoProcIntegrationId(autoProcIntegration.v_datacollection_summary_phasing_autoProcIntegrationId);
+   }
+};
+
+AutoProcIntegrationMainView.prototype.getPlotContainer = function(panel) {
+	return {
+            xtype : &#039;container&#039;,
+            margin : 5,
+            layout: &#039;fit&#039;,
+            flex :1,
+            items : [panel]	  
+    };
+};
+
+AutoProcIntegrationMainView.prototype.createContainer = function(item) {
+    return  Ext.create(&#039;Ext.container.Container&#039;, {
+		        	 layout: &#039;hbox&#039;, 
+		        	 margin : &#039;0 50 0 0&#039;,
+		        	 items : [
+		        	          this.getPlotContainer(item)
+		        	         
+		        	 ]
+    });
+};
+
+AutoProcIntegrationMainView.prototype.getAutoProcPanel = function() {
+	return Ext.create(&#039;Ext.container.Container&#039;, {
+		style:{ backgroundColor : &#039;#FAFAFA&#039;},
+		items : [
+                 this.createContainer(this.rFactorPlotter.getPanel()),
+                 this.createContainer(this.isigmaPlotter.getPanel()),
+                 this.createContainer(this.sigmaAnnoPlotter.getPanel()),
+                 this.createContainer(this.completenessPlotter.getPanel()),
+                 this.createContainer(this.annoCorrPlotter.getPanel()),
+                 this.createContainer(this.cc2Plotter.getPanel())                  
+		    ]
+	});
+};
+
+AutoProcIntegrationMainView.prototype.getSlaveTabPanel = function() {
+	return Ext.create(&#039;Ext.tab.Panel&#039;, {
+		margin : &#039;0 5 5 5&#039;,
+		cls : &#039;border-grid&#039;,
+		width : this.slaveWidth,      
+	    items: [{
+	        title: &#039;Autoprocessing Plots&#039;,
+	        items :  this.getAutoProcPanel()
+	     },       
+         {
+	        title: &#039;Files&#039;,
+	        items : this.autoProcIntegrationAttachmentGrid.getPanel()
+	    }	    	    
+	    ]
+	}); 
+};
+
+AutoProcIntegrationMainView.prototype.getContainer = function() {
+	return  Ext.createWidget(&#039;panel&#039;,
+			{
+				plain : true,
+				margin : &#039;10 30 10 10&#039;,
+                 layout: &#039;hbox&#039;,
+				items : [
+                            this.autoProcIntegrationGrid.getPanel(),
+                            this.getSlaveTabPanel()
+				  ]
+		});
+};
+
+
+
+AutoProcIntegrationMainView.prototype.loadPlots = function(autoProcIntegrationsIds) {
+ 	this.completenessPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleCompleteness(autoProcIntegrationsIds.toString()));
+	this.rFactorPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleRfactor(autoProcIntegrationsIds.toString()));
+	this.isigmaPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleISigma(autoProcIntegrationsIds.toString()));
+	this.cc2Plotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleCC2(autoProcIntegrationsIds.toString()));
+	this.sigmaAnnoPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleSigmaAno(autoProcIntegrationsIds.toString()));
+	this.annoCorrPlotter.loadUrl(EXI.getDataAdapter().mx.autoproc.getXScaleAnnoCorrection(autoProcIntegrationsIds.toString()));
+};
+
+/**
+* It loads the list of attachments and stores them into two class variables:
+* _this.programAttachmentsAutoProcProgramIds with the ids of the autoprocprograms
+* _this.programAttachments with a list of attachments
+* @method loadAttachments
+*/
+AutoProcIntegrationMainView.prototype.loadAttachments = function(autoProcessingIntegrationList) {
+    var _this = this;
+    
+     /** Load view for attachments */
+	var onSuccess = function(sender, data){
+        _this.programAttachments = (data);
+	};
+    _this.programAttachmentsAutoProcProgramIds = _.map(autoProcessingIntegrationList, &#039;v_datacollection_summary_phasing_autoProcProgramId&#039;);
+	EXI.getDataAdapter({onSuccess : onSuccess}).mx.autoproc.getAttachmentListByautoProcProgramsIdList(_this.programAttachmentsAutoProcProgramIds);
+};	
+
+/**
+* It loads autoproc.getViewByDataCollectionId from autoprocessingdataadapter and call to loadAttachments
+* @method load
+*/
+AutoProcIntegrationMainView.prototype.load = function(dataCollectionId) {
+	var _this = this;
+	this.panel.setTitle(&quot;Autoprocessing&quot;);
+	this.panel.setLoading(&quot;Generating plots&quot;);
+	
+	
+    /** Load view for autoprocessing */
+	var onSuccess2 = function(sender, data){
+        _this.data = data[0];
+        _this.panel.setLoading(false);
+		_this.autoProcIntegrationGrid.load(_this.data);
+        _this.loadAttachments(_this.data);
+	};
+	EXI.getDataAdapter({onSuccess : onSuccess2}).mx.autoproc.getViewByDataCollectionId(dataCollectionId);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

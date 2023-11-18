@@ -1,0 +1,46 @@
+{
+  "name": "EXI",
+  "version": "5.11.0",
+  "description": "Extended ISPyB",
+  "main": "Gruntfile.js",
+  "dependencies": {
+    "dustjs-helpers": "^1.7.3",
+    "dustjs-linkedin": "^2.7.2",
+    "grunt-asset-cachebuster": "^0.5.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-cssmin": "^0.14.0",
+    "grunt-contrib-jshint": "^0.11.3",
+    "grunt-contrib-uglify": "^0.9.2",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-contrib-yuidoc": "^1.0.0",
+    "grunt-debian-package": "^0.1.11",
+    "grunt-dustjs": "^1.3.0",
+    "grunt-include-source": "^0.7.0",
+    "grunt-plato": "^1.2.1",
+    "grunt-wiredep": "^2.0.0",
+    "html-to-pdf": "^0.1.11",
+    "jshint-stylish": "^2.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ispyb/EXI.git"
+  },
+  "keywords": [
+    "ISPyB",
+    "LIMS"
+  ],
+  "author": "Alejandro de Maria Antolinos",
+  "license": "GPL-3",
+  "bugs": {
+    "url": "https://github.com/ispyb/EXI/issues"
+  },
+  "homepage": "https://github.com/ispyb/EXI",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-asset-cachebuster": "^0.5.0"
+  }
+}

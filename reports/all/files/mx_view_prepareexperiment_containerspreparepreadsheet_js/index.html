@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/prepareexperiment/containerspreparepreadsheet.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/prepareexperiment/containerspreparepreadsheet.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">106.81</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">298</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">39.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.30</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This class renders a grid containing container information
+* @class ContainerPrepareSpreadSheet
+* @constructor
+*/
+function ContainerPrepareSpreadSheet(args){
+    this.id = BUI.id();
+
+    this.height = 600;
+    this.width = 600;
+    if (args != null){
+        if (args.height){
+            this.height = args.height;
+        }
+        if (args.width){
+            this.width = args.width;
+        }
+    }
+
+    this.onSelectRow = new Event(this);
+    this.onLoaded = new Event(this);
+};
+
+/**
+* Returns a panel containing the grid of containers
+*
+* @method getPanel
+* @return A panel containing the grid of containers
+*/
+ContainerPrepareSpreadSheet.prototype.getPanel = function() {
+    var _this = this;
+
+    this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+        storeId:&#039;spreadSheedStore&#039;,
+        fields:[&#039;shippingName&#039;, &#039;barCode&#039;, &#039;containerCode&#039;, &#039;containerType&#039;, &#039;sampleCount&#039;, &#039;beamlineName&#039;,&#039;sampleChangerLocation&#039;,&#039;dewarId&#039;,&#039;containerId&#039;,&#039;capacity&#039;],
+        data: []
+    });
+
+    this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+        title: &#039;Loaded or to be Loaded on MxCube&#039;,
+        store: this.store,
+        cls : &#039;border-grid&#039;,
+        height  : this.height,
+        width  : this.width,
+        flex    : 0.5,
+        columns: [
+            /*{
+                dataIndex: &#039;rowIndex&#039;,
+                sortable : false,
+                autoSizeColumn: true,
+                // other config you need..
+                renderer : function(value, metaData, record, rowIndex)
+                {
+                    return rowIndex+1;
+                }
+            },*/
+            {
+                header: &#039;Shipment&#039;,
+                dataIndex: &#039;shippingName&#039;,
+                type: &#039;text&#039;,
+                flex: 1,
+                readOnly: true
+            },
+             {
+                header: &#039;DewarId&#039;,
+                dataIndex: &#039;dewarId&#039;,
+                type: &#039;text&#039;,
+                flex: 1,
+                hidden : true,
+                readOnly: true
+            },              
+             {
+                header: &#039;ContainerId&#039;,
+                dataIndex: &#039;containerId&#039;,
+                hidden : true,
+                type: &#039;text&#039;,
+                flex: 1,
+                readOnly: true
+            },   
+             {
+                header: &#039;Container&#039;,
+                dataIndex: &#039;containerCode&#039;,
+                type: &#039;text&#039;,
+                flex: 1,
+                readOnly: true,
+                renderer : function(value, metaData, record, rowIndex){
+                    
+                    return record.data.containerCode +  &quot; &lt;span style=&#039;color:gray;font-size:10px; font-style:italic;&#039;&gt;(&quot; + record.data.sampleCount +&quot; samples)&lt;/span&gt;&quot;;
+                }
+                
+            },
+            {
+                header: &#039;Barcode&#039;,
+                dataIndex: &#039;barCode&#039;,
+                type: &#039;text&#039;,
+                flex: 1,
+                readOnly: true
+            },
+           
+            {
+                header: &#039;Container type&#039;,
+                dataIndex: &#039;containerType&#039;,
+                type: &#039;text&#039;,
+                 flex: 0.75,
+                readOnly: true,
+                renderer : function(value, metaData, record, rowIndex){                    
+                    switch(record.data.containerType) {
+                            case &quot;Unipuck&quot;:
+                                return   &quot;&lt;kbd style=&#039;color:white;font-size:11px;background-color:blue;&#039;&gt;UNIPUCK&lt;/kbd&gt;&quot;;                                
+                             case &quot;Spinepuck&quot;:
+                                return &quot;&lt;kbd style=&#039;color:black;font-size:11px;background-color:#CCCCCC;&#039;&gt;SPINEPUCK&lt;/kbd&gt;&quot;;  
+                            default:
+                               return record.data.containerType;
+                        }
+                }
+            },
+            {
+                header: &#039;Samples&#039;,
+                dataIndex: &#039;sampleCount&#039;,
+                type: &#039;text&#039;,
+                flex: 0.6,
+                hidden :true,
+                readOnly: true
+            },
+            { 
+                header : &#039;Beamline&#039;,
+                dataIndex: &#039;beamlineName&#039;,
+                type: &#039;dropdown&#039;,			        	 								
+                flex: 0.6,
+                source: EXI.credentialManager.getBeamlineNames()
+            },
+            {
+                header: &#039;Sample Changer Location&#039;,
+                dataIndex: &#039;sampleChangerLocation&#039;,
+                flex: 1,
+                type: &#039;text&#039;
+            }       
+        ],
+        viewConfig: {
+            getRowClass: function(record, index, rowParams, store) {
+                if (record.get(&#039;sampleChangerLocation&#039;) == &quot; &quot;) {
+                    return &quot;warning-row&quot;;
+                }
+                for (var i = 0 ; i &lt; _this.dewars.length ; i++){
+                    var dewar = _this.dewars[i];
+                    if (record.get(&#039;dewarId&#039;) != dewar.dewarId) {
+                        if (record.get(&#039;sampleChangerLocation&#039;) == dewar.sampleChangerLocation){
+                            return &quot;puck-error&quot;;
+                        }
+                    }
+                }
+                if (_this.sampleChangerWidget){
+                    if (record.get(&#039;sampleChangerLocation&#039;) &gt; _this.sampleChangerWidget.sampleChangerCapacity) {
+                        return &quot;warning-row&quot;;
+                    }
+                    var puckToBeFilled = _this.sampleChangerWidget.findPuckById(_this.sampleChangerWidget.convertSampleChangerLocationToId(record.get(&#039;sampleChangerLocation&#039;)));
+                    if (puckToBeFilled.capacity != record.get(&#039;capacity&#039;)){
+                        return &quot;warning-row&quot;;
+                    }
+                }
+                return &quot;&quot;;
+            }
+        },
+        listeners: {
+            itemclick: function(grid, record, item, index, e) {
+                _this.onSelectRow.notify(record);             
+            }
+           
+
+        },
+        margin  : 5,
+        items   : [
+            {
+                html : &quot;&lt;div style=&#039;height:700px;&#039; id=&#039;&quot; + this.id +&quot;&#039;&gt;&lt;/div&gt;&quot;,
+                flex : 1,
+                height : 400                              
+            }
+            
+        ]
+    });
+
+    //arrowUp and arrowDown listeners. 
+    //Needs the first column of row Index
+    // this.panel.view.addElListener(&#039;keyup&#039;, function(event,row) {
+    //     if (event.keyCode == 38 || event.keyCode == 40) { 
+    //         _this.onSelectRow.notify(_this.panel.store.getAt(Number(row.cells[0].innerText)-1));
+    //     }
+    // });
+
+    // this.panel.on(&#039;boxready&#039;, function() {
+    //     for (var i = 0 ; i &lt; _this.warningRows.length ; i++) {
+    //         var containerId = _this.warningRows[i];
+    //         _this.addClassToRow (containerId, &quot;warning-row&quot;);
+    //     }
+    // });
+
+    return this.panel;
+};
+
+/**
+* Loads the processing dewars from the database
+*
+* @method loadProcessingDewars
+* @return
+*/
+ContainerPrepareSpreadSheet.prototype.loadProcessingDewars = function (sampleChangerWidget) {
+    var _this = this;
+
+    this.panel.setLoading();
+    var onSuccessProposal = function(sender, containers) {
+        var processingContainers = _.filter(containers, function(e){return e.shippingStatus == &quot;processing&quot;;});
+        _this.load(processingContainers,sampleChangerWidget);
+        _this.panel.setLoading(false);
+        _this.onLoaded.notify(processingContainers);
+    };
+    var onError = function(sender, error) {        
+        EXI.setError(&quot;Ops, there was an error&quot;);
+        _this.panel.setLoading(false);
+    };
+    EXI.getDataAdapter({onSuccess : onSuccessProposal, onError:onError}).proposal.dewar.getDewarsByProposal();
+}
+
+/**
+* Loads an array of dewars to the store
+*
+* @method load
+* @param dewars
+* @return
+*/
+ContainerPrepareSpreadSheet.prototype.load = function(dewars, sampleChangerWidget) {
+    this.dewars = dewars;
+    if (sampleChangerWidget){
+        this.sampleChangerWidget = sampleChangerWidget;
+    }
+    var data = [];
+    //Parse data
+    for (dewar in dewars) {
+        if (dewars[dewar].sampleCount &gt; 0){
+            var containerType = &quot;Unipuck&quot;;
+            if (dewars[dewar].capacity){
+                if (dewars[dewar].capacity == 10) {
+                    containerType = &quot;Spinepuck&quot;;
+                }
+            }
+            data.push({
+                shippingName : dewars[dewar].shippingName,
+                barCode : dewars[dewar].barCode,
+                containerCode : dewars[dewar].containerCode,
+                containerType : containerType,
+                sampleCount : dewars[dewar].sampleCount,
+                beamlineName : dewars[dewar].beamlineName,
+                sampleChangerLocation : dewars[dewar].sampleChangerLocation,
+                dewarId : dewars[dewar].dewarId,
+                containerId : dewars[dewar].containerId,
+                capacity : dewars[dewar].capacity
+            });
+        }
+    }
+    this.store.loadData(data);
+};
+
+/**
+* Updates the sample changer location cell of the record with the corresponding container Id
+*
+* @method updateSampleChangerLocation
+* @param {Integer} containerId The container Id of the record to be updated
+* @param {Integer} location The new value for the sample changer location cell in the grid
+* @return
+*/
+ContainerPrepareSpreadSheet.prototype.updateSampleChangerLocation = function (containerId, location) {
+    var _this = this;
+
+    var recordsByContainerId = _.filter(_this.panel.store.data.items,function(o) {return o.data.containerId == containerId});
+
+    for (var i = 0 ; i &lt; recordsByContainerId.length ; i++) {
+        var record = recordsByContainerId[i];
+        if (record.get(&#039;containerId&#039;) == containerId) {
+            var beamlineName = record.get(&#039;beamlineName&#039;);
+
+            var onSuccess = function(sender, containers) {
+                _this.loadProcessingDewars();
+            };
+            var onError = function(sender, error) {        
+                EXI.setError(&quot;Ops, there was an error&quot;);
+            };
+
+            EXI.getDataAdapter({onSuccess : onSuccess, onError:onError}).proposal.dewar.updateSampleLocation([containerId], [beamlineName], [location]);
+            return
+        }
+    }
+};
+
+/**
+* Returns the row with the given containerId
+*
+* @method getRowByContainerId
+* @param {Integer} containerId The container Id of the record to be returned
+* @return The row with the given containerId
+*/
+ContainerPrepareSpreadSheet.prototype.getRowsByContainerId = function (containerId) {
+    var recordsByContainerId = _.filter(this.panel.store.data.items,function(o) {return o.data.containerId == containerId});
+    return recordsByContainerId;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

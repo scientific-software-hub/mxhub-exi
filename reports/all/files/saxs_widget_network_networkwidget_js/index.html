@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/network/networkwidget.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/network/networkwidget.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">118.87</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">250</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">56.65</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.81</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function NetworkWidget(args) {
+	this.id = &quot;NetworkViewer_&quot; + Math.random().toString().replace(&quot;.&quot;, &quot;_&quot;);
+
+	this.label = true;
+	if (args != null) {
+		if (args.targetId != null) {
+			this.targetId = args.targetId;
+		}
+		if (args.label != null) {
+			this.label = args.label;
+		}
+	}
+
+	this.onVertexOver = new Event(this);
+	this.onVertexOut = new Event(this);
+}
+
+NetworkWidget.prototype.draw = function(dataset, formatter, layout) {
+
+	this.graphCanvas = new GraphCanvas(this.id, document.getElementById(this.targetId), {
+		&quot;labeled&quot; : this.label,
+		&quot;multipleSelectionEnabled&quot; : false,
+		&quot;draggingCanvasEnabled&quot; : false
+	});
+	this.graphCanvas.draw(dataset, formatter, layout);
+
+	var _this = this;
+	this.graphCanvas.onVertexOver.attach(function(sender, nodeId) {
+		_this.onVertexOver.notify(nodeId);
+	});
+
+	this.graphCanvas.onVertexOut.attach(function(sender, nodeId) {
+		_this.onVertexOut.notify(nodeId);
+	});
+};
+
+/** SELECT VERTICES BY NAME * */
+NetworkWidget.prototype.selectVertexByName = function(vertexName) {
+	var vertices = this.getDataset().getVertexByName(vertexName);
+	if (vertices != null) {
+		for ( var nodeId in vertices) {
+			if (vertices.hasOwnProperty(nodeId)) {
+				var vertexId = vertices[nodeId].getId();
+				this.selectVertexById(vertexId);
+			}
+		}
+	}
+};
+
+NetworkWidget.prototype.selectVerticesByName = function(verticesName) {
+	for ( var i = 0; i &lt; verticesName.length; i++) {
+		this.selectVertexByName(verticesName[i]);
+	}
+};
+
+/** SELECT VERTICES BY ID * */
+NetworkWidget.prototype.selectVertexById = function(vertexId) {
+	this.graphCanvas.selectNode(vertexId);
+	this.blinkVertexById(vertexId);
+};
+
+NetworkWidget.prototype.selectVerticesById = function(verticesId) {
+	for ( var i = 0; i &lt; verticesId.length; i++) {
+		this.selectVertexById(verticesId[i]);
+	}
+};
+
+/** VECINDARIO * */
+NetworkWidget.prototype.selectNeighbourhood = function() {
+	this.selectEdgesFromVertices();
+	this.selectAdjacent();
+};
+
+/** DESELECT * */
+NetworkWidget.prototype.deselectNodes = function() {
+	this.graphCanvas.deselectNodes();
+};
+
+/** SELECT ALL NODES * */
+NetworkWidget.prototype.selectAllNodes = function() {
+	this.getGraphCanvas().selectAllNodes();
+};
+
+/** SELECT EVERYTHING * */
+NetworkWidget.prototype.selectAll = function() {
+	this.getGraphCanvas().selectAll();
+};
+
+/** SELECT ALL EDGES * */
+NetworkWidget.prototype.selectAllEdges = function() {
+	this.getGraphCanvas().selectAllEdges();
+};
+
+/** ZOOM * */
+NetworkWidget.prototype.setScale = function(value) {
+	this.graphCanvas.setScale(value);
+};
+
+NetworkWidget.prototype.getScale = function() {
+	return this.graphCanvas.getScale(value);
+};
+
+/** SELECT ADJACENT VERTICES FROM SELECTED VERTICES * */
+NetworkWidget.prototype.selectAdjacent = function() {
+	var selectedVertices = this.getGraphCanvas().getSelectedVertices();
+	var edges = [];
+	for ( var i = 0; i &lt; selectedVertices.length; i++) {
+		edges = edges.concat(this.getGraphCanvas().getDataset().getVertexById(selectedVertices[i]).getEdges());
+	}
+	var vertices = [];
+	for ( i = 0; i &lt; edges.length; i++) {
+		vertices.push(edges[i].getNodeSource().getId());
+		vertices.push(edges[i].getNodeTarget().getId());
+	}
+
+	this.selectVerticesById(vertices);
+};
+
+/** SELECT EDGES FROM SELECTED VERTICES * */
+NetworkWidget.prototype.selectEdgesFromVertices = function() {
+	var selectedVertices = this.getGraphCanvas().getSelectedVertices();
+	var edges = [];
+	for ( var i = 0; i &lt; selectedVertices.length; i++) {
+		edges = edges.concat(this.getGraphCanvas().getDataset().getVertexById(selectedVertices[i]).getEdges());
+	}
+	var edgesId = [];
+	for (  i = 0; i &lt; edges.length; i++) {
+		edgesId.push(edges[i].getId());
+	}
+	this.getGraphCanvas().selectEdges(edgesId);
+};
+
+/** BLINKING * */
+NetworkWidget.prototype.blinkVertexById = function(vertexId) {
+	this.graphCanvas.blinkVertexById(vertexId);
+};
+
+/** COMPONENTE CONEXA DE LOS NODOS SELECCIONADOS * */
+NetworkWidget.prototype.selectConnectedComponent = function() {
+	var elements = this.getConnectedComponent();
+	this.selectVerticesById(elements.nodes);
+	this.graphCanvas.selectEdges(elements.edges);
+};
+
+NetworkWidget.prototype.getConnectedComponent = function() {
+	var nodosVisitados = {};
+	var aristasVisitadas = {};
+	var arrNodos = [];
+	var arrAristas = [];
+	var selectedGraphNodesId = this.getGraphCanvas().getSelectedVertices();
+	for ( var i = 0; i &lt; selectedGraphNodesId.length; i++) {
+		this.visitNode(selectedGraphNodesId[i], nodosVisitados, aristasVisitadas, arrNodos, arrAristas);
+	}
+	return {
+		nodes : arrNodos,
+		edges : arrAristas
+	};
+};
+
+NetworkWidget.prototype.visitNode = function(nodeId, nodosVisitados, aristasVisitadas, arrNodos, arrAristas) {
+	nodosVisitados[nodeId] = true;
+	arrNodos.push(nodeId);
+	var nodeEdges = this.getDataset().getVertexById(nodeId).getEdges();
+	for ( var j = 0; j &lt; nodeEdges.length; j++) {
+		var edge = nodeEdges[j];
+		var edgeId = edge.getId();
+		if (aristasVisitadas[edgeId] == null) {
+			aristasVisitadas[edgeId] = true;
+			arrAristas.push(edgeId);
+			var nodeTargetId = edge.getNodeTarget().getId();
+			if (nodosVisitados[nodeTargetId] == null) {
+				this.visitNode(nodeTargetId, nodosVisitados, aristasVisitadas, arrNodos, arrAristas);
+			}
+			var nodeSourceId = edge.getNodeSource().getId();
+			if (nodosVisitados[nodeSourceId] == null) {
+				this.visitNode(nodeSourceId, nodosVisitados, aristasVisitadas, arrNodos, arrAristas);
+			}
+		}
+	}
+};
+
+/** COLLAPSE SELECTED VERTICES * */
+NetworkWidget.prototype.collapse = function() {
+	var selectedVertices = this.getGraphCanvas().getSelectedVertices();
+	var xMin = -Infinity;
+	var xMax = Infinity;
+	var yMin = -Infinity;
+	var yMax = Infinity;
+
+	for ( var i = 0; i &lt; selectedVertices.length; i++) {
+		var vertex = this.getGraphCanvas().getLayout().getNodeById(selectedVertices[i]);
+		if (xMin &lt; vertex.x) {
+			xMin = vertex.x;
+		}
+		if (xMax &gt; vertex.x) {
+			xMax = vertex.x;
+		}
+		if (yMin &lt; vertex.y) {
+			yMin = vertex.y;
+		}
+		if (yMax &gt; vertex.y) {
+			yMax = vertex.y;
+		}
+	}
+
+	var centerX = xMin - xMax;
+	var centerY = yMin - yMax;
+	var radius = (xMax - xMin) / 4;
+
+	var count = selectedVertices.length;
+	var verticesCoordinates = [];
+
+	for ( i = 0; i &lt; selectedVertices.length; i++) {
+		x = centerX + radius * Math.sin(i * 2 * Math.PI / count);
+		y = centerY + radius * Math.cos(i * 2 * Math.PI / count);
+		verticesCoordinates.push({
+			&#039;x&#039; : x,
+			&#039;y&#039; : y
+		});
+	}
+
+	for ( i = 0; i &lt; selectedVertices.length; i++) {
+		this.getGraphCanvas().getLayout().getNodeById(selectedVertices[i]).setCoordinates(verticesCoordinates[i].x, verticesCoordinates[i].y);
+	}
+};
+
+/** SETTER FONT SIZE * */
+NetworkWidget.prototype.setVerticesFontSize = function(value) {
+	for ( var nodeId in this.getDataset().getVertices()) {
+		if (this.getDataset().getVertices().hasOwnProperty(nodeId)) {
+			this.getFormatter().getVertexById(nodeId).getDefault().setFontSize(value);
+		}
+	}
+};
+
+/** GETTERS * */
+NetworkWidget.prototype.getFormatter = function() {
+	return this.getGraphCanvas().getFormatter();
+};
+NetworkWidget.prototype.getLayout = function() {
+	return this.getGraphCanvas().getLayout();
+};
+
+NetworkWidget.prototype.getDataset = function() {
+	return this.getGraphCanvas().getDataset();
+};
+
+NetworkWidget.prototype.getGraphCanvas = function() {
+	return this.graphCanvas;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

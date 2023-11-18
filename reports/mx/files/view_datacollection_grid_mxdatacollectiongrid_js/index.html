@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/datacollection/grid/mxdatacollectiongrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/datacollection/grid/mxdatacollectiongrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">115.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">138</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.32</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* Displays the data collections by session or acronym of the protein
+*
+* @class MXDataCollectionGrid
+* @constructor
+*/
+function MXDataCollectionGrid(args) {
+    this.id = BUI.id();
+
+    /** DATACOLLECTION, DATACOLLECTION_COLLAPSED, PLATES_VIEW */
+    this.renderingType = &#039;DATACOLLECTION&#039;;
+
+    this.uncollapsedDataCollectionGrid = new UncollapsedDataCollectionGrid();
+    this.collapsedDataCollectionGrid = new CollapsedDataCollectionGrid();
+    this.platesDataCollectionGrid = new PlatesDataCollectionGrid();  
+                                                                    
+    this.activePanel = this.uncollapsedDataCollectionGrid;
+}
+
+MXDataCollectionGrid.prototype.getPanel = function(dataCollectionGroup) {
+    var _this = this;
+
+    this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {  
+        id: this.id,
+        tbar: this.getToolBar(),        
+        items: [_this.activePanel.getPanel(dataCollectionGroup)]
+     });
+   
+    return this.panel;
+};
+
+MXDataCollectionGrid.prototype.getToolBar = function() {
+    var _this = this;
+    function onMenuClicked(widget){
+        if (_this.activePanel != widget){
+            _this.activePanel = widget;
+            if (Ext.getCmp(_this.id + &quot;_search&quot;).getValue() != &quot;&quot;) {
+                _this.reloadData(_this.filterBy(Ext.getCmp(_this.id + &quot;_search&quot;).getValue()));
+            } else {
+                _this.reloadData(_this.dataCollectionGroup);
+            }
+        }
+    }
+
+    var menu =  Ext.create(&#039;Ext.menu.Menu&#039;, {     
+        items: [{
+            text: &#039;Data Collection&#039;,
+            handler: function(){
+                _this.renderingType = &quot;DATACOLLECTION&quot;;
+                onMenuClicked(_this.uncollapsedDataCollectionGrid);
+            }
+        },{
+            text: &#039;Summary&#039;,            
+            handler: function(){
+                _this.renderingType = &quot;DATACOLLECTION_COLLAPSED&quot;;
+                onMenuClicked(_this.collapsedDataCollectionGrid);
+            }
+        },{
+            text: &#039;Plates&#039;,            
+            handler: function(){
+                _this.renderingType = &quot;PLATES&quot;;
+                
+                if (_this.activePanel != _this.platesDataCollectionGrid){
+                    _this.activePanel = _this.platesDataCollectionGrid;
+                    _this.reloadData(_this.dataCollectionGroup);                 
+                    if (Ext.getCmp(_this.id + &quot;_search&quot;).getValue() != &quot;&quot;) {
+                       _this.platesDataCollectionGrid.select(_this.filterBy(Ext.getCmp(_this.id + &quot;_search&quot;).getValue()));
+                    }
+                }
+            }
+        }]
+   });
+
+    return Ext.create(&#039;Ext.toolbar.Toolbar&#039;, {
+        width: 500,
+        items: [
+           {
+                text:&#039;View&#039;,
+                iconCls: &#039;bmenu&#039;,  // &lt;-- icon
+                menu : menu  // assign menu by instance
+            },
+            &#039;-&gt;&#039;, 
+            {
+                xtype: &#039;textfield&#039;,
+                id: this.id + &quot;_search&quot;,
+                width: 400,
+                emptyText: &#039;enter search prefix, sample or protein&#039;,
+                listeners: {
+                    specialkey: function(field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            _this.filter = field.getValue();
+
+                            if (_this.renderingType == &quot;PLATES&quot;){     
+                                if (Ext.getCmp(_this.id + &quot;_search&quot;).getValue() != &quot;&quot;) {                        
+                                    _this.platesDataCollectionGrid.select(_this.filterBy(Ext.getCmp(_this.id + &quot;_search&quot;).getValue()));
+                                } else {
+                                    Ext.getCmp(_this.id + &quot;_found&quot;).setText(&quot;&quot;);
+                                    _this.reloadData(_this.dataCollectionGroup);
+                                }
+                            } else {
+                                _this.reloadData(_this.filterBy(field.getValue()));
+                            }
+                        }
+                    }
+                }
+            },
+            { xtype: &#039;tbtext&#039;, text: &#039;&#039;, id: this.id + &quot;_found&quot; }
+        ]
+    });
+};
+
+MXDataCollectionGrid.prototype.reloadData = function(dataCollections) {
+    this.panel.removeAll();
+    this.panel.add(this.activePanel.getPanel(this.dataCollectionGroup));
+    this.activePanel.load(dataCollections);
+};
+
+MXDataCollectionGrid.prototype.load = function(dataCollectionGroup) {    
+    this.dataCollectionGroup = dataCollectionGroup;  
+    this.activePanel.load(this.dataCollectionGroup);
+};
+
+
+/**
+* Filters data by prefix, protein acronym or sample
+*
+* @method filterBy
+* @return {String} searchTerm prefix, protein acronym or sample to be searched
+*/
+MXDataCollectionGrid.prototype.filterBy = function(searchTerm) {  
+    var filtered = _.filter(this.dataCollectionGroup, function(dataCollection) {
+        var params = [&quot;DataCollection_imagePrefix&quot;, &quot;Protein_acronym&quot;, &quot;BLSample_name&quot;];
+        for (var i = 0; i &lt; params.length; i++) {
+            var param = params[i];
+            if (dataCollection[param]) {
+                if (dataCollection[param].indexOf(searchTerm) != -1) {
+                    return dataCollection;
+                }
+            }
+        }
+    });
+    Ext.getCmp(this.id + &quot;_found&quot;).setText(filtered.length + &quot; items found&quot;);
+    return filtered;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

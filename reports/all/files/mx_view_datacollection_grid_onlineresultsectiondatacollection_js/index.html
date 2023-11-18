@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/datacollection/grid/onlineresultsectiondatacollection.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/datacollection/grid/onlineresultsectiondatacollection.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">90.90</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">268</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">42.65</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.86</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function OnlineResultSectionDataCollection(args) {
+	
+	this.noFoundClass = &quot;summary_datacollection_noFound&quot;;
+	this.failedClass = &quot;summary_datacollection_failed&quot;;
+	this.successClass = &quot;summary_datacollection_success&quot;;
+}
+
+
+OnlineResultSectionDataCollection.prototype.getScreeningData = function(dataCollectionGroup){
+    var items = [];
+     
+	var parsed = [];
+	if (dataCollectionGroup.Screening_screeningId != null){
+		if (dataCollectionGroup.ScreeningOutput_indexingSuccess){
+            items.push({
+                name   : &quot;Indexing&quot;,
+                status : &quot;Success&quot;,
+                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                items  : [
+                    {
+                        name  : &#039;Mosaicity&#039;,
+                        value : dataCollectionGroup.ScreeningOutput_mosaicity,
+                        units : &#039;º&#039;
+                    }
+                ]
+            });
+
+		}
+		else{
+			 items.push({
+                name   : &quot;Indexing&quot;,
+                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                status : &quot;Failure&quot;,
+                items  : []
+            });
+		}
+    }
+   /* else{
+        items.push({
+                name   : &quot;No indexing&quot;,
+                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                status : &quot;Not found&quot;,
+                items  : []
+            });
+    }*/
+    
+    if (dataCollectionGroup.ScreeningOutput_strategySuccess){
+           var subItems = [ {
+                        name  : &#039;Ranking Res.&#039;,
+                        value : dataCollectionGroup.ScreeningOutput_rankingResolution,
+                        units : &#039;Å&#039;
+                    },                              
+           ];
+        if (dataCollectionGroup.ScreeningOutputLattice_spaceGroup){  
+           subItems.push( {
+                            name : &#039;Space Group&#039;,
+                            value : dataCollectionGroup.ScreeningOutputLattice_spaceGroup,
+                            units : &#039;&#039;
+		   });
+           subItems.push( {
+                            name : &#039;a,b,c&#039;,
+                            value : dataCollectionGroup.ScreeningOutputLattice_unitCell_a + &quot;, &quot; + dataCollectionGroup.ScreeningOutputLattice_unitCell_b + &quot;, &quot; + dataCollectionGroup.ScreeningOutputLattice_unitCell_c,
+                            units : &#039;&#039;
+		   });
+           
+           subItems.push( {
+                            name : &#039;α β γ&#039;,
+                            value : dataCollectionGroup.ScreeningOutputLattice_unitCell_alpha + &quot;, &quot; + dataCollectionGroup.ScreeningOutputLattice_unitCell_beta + &quot;, &quot; + dataCollectionGroup.ScreeningOutputLattice_unitCell_gamma,
+                            units : &#039;&#039;
+            });      		                     				
+			                     
+        }
+         items.push({
+                name   : &quot;Strategy&quot;,
+                status : &quot;Success&quot;,
+                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                items  : subItems 
+         });	
+    }
+   /* else{
+        items.push({
+            name   : &quot;No strategy&quot;,
+            status : &quot;Not found&quot;,
+            datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+            items  : []
+        });
+    }*/
+        
+    
+    /** No autprocessing */
+   if (items.length == 0){
+            return {
+            name               :&quot;Screening&quot;,
+            status             : &quot;Not found&quot;,
+            items : []
+                
+        };
+    }
+
+    var status = &quot;Failure&quot;;
+    for (var i = 0; i &lt; items.length; i++) {
+        if (items[i].status == &quot;Success&quot;){
+            status = &quot;Success&quot;;
+        }
+        
+    }
+    return {
+          name : &quot;Screening&quot;,
+          status :status,
+          items : items  
+    };           
+};
+
+
+
+OnlineResultSectionDataCollection.prototype.getAutoprocResults = function(dataCollectionGroup) {
+   /** Paring autoprocessing */
+    var autoprocessing = [];    
+    var programs = dataCollectionGroup.processingPrograms; 
+    var results = dataCollectionGroup.processingStatus;
+    var spaceGroups = dataCollectionGroup.AutoProc_spaceGroups;
+    
+	if (programs != null){
+		programs = programs.split(&quot;,&quot;);
+		results = results.split(&quot;,&quot;);
+        spaceGroups = spaceGroups.split(&quot;,&quot;);
+		
+        var aux = {};
+		for (var i= 0; i &lt; programs.length; i++){
+			var name = programs[i].trim();
+          
+			if (aux[name] == null){
+				aux[name] = {};
+                aux[name][&quot;spaceGroup&quot;] = [];
+				aux[name][&quot;run&quot;] = 0;
+				aux[name][&quot;success&quot;] = 0;    
+			}
+            aux[name][&quot;spaceGroup&quot;].push(spaceGroups[i]);
+			aux[name][&quot;run&quot;] =  aux[name][&quot;run&quot;] + 1;
+			aux[name][&quot;success&quot;] =  aux[name][&quot;success&quot;]  + 1;
+		}
+        
+        
+            
+        for (var key in aux){
+            var status = &quot;Failure&quot;;
+            if (aux[key].success &gt; 0){
+                status = &quot;Success&quot;;
+            }
+            
+            autoprocessing.push({
+               name     : key,
+               dataCollectionId     : dataCollectionGroup.DataCollection_dataCollectionId,
+               run      :  aux[key].run,
+               success  :  aux[key].success,
+               spaceGroup  :  aux[key].spaceGroup,
+               status   : status,
+               items   : [] 
+            });
+        }
+	}
+    
+    /** Adding autoprocessing to results or add no autprocessing if any*/
+    if (autoprocessing.length &gt; 0){
+       return {
+                                name                : &quot;Autoprocessing&quot;,
+                                items               : autoprocessing,
+                                status              : &quot;Success&quot;,
+                                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId
+        };
+    }
+    else{
+        return {
+                                name                : &quot;Autoprocessing&quot;,
+                                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                                 status             : &quot;Not found&quot;,
+                                items : [
+                                    /*{
+                                       name     : &quot;No autoprocessing&quot;,
+                                       status   : &quot;Not found&quot;,
+                                       items    : []
+                                }*/
+                                ]
+        };
+    }
+};
+
+OnlineResultSectionDataCollection.prototype.getPhasingResults = function(dataCollectionGroup) {
+    if (dataCollectionGroup!= null){
+		if (dataCollectionGroup.Phasing_phasingStepType != null){
+             return {
+                                name : &quot;Phasing&quot;,
+                                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                                items : [{
+                                       name     : &quot;Phasing&quot;,
+                                       status   : &quot;Success&quot;,
+                                       items    : []
+                                }]
+            };
+        }
+        else{
+            return {
+                                name : &quot;Phasing&quot;,
+                                datacollectionId    : dataCollectionGroup.DataCollection_dataCollectionId,
+                                items : [{
+                                       name     : &quot;No phasing&quot;,
+                                       status   : &quot;Not found&quot;,
+                                       items    : []
+                                }]
+            };
+        }
+    }
+};
+OnlineResultSectionDataCollection.prototype.parseData = function(dataCollectionGroup) {
+	var resultParsed = [];
+    resultParsed.push(this.getAutoprocResults(dataCollectionGroup));
+    resultParsed.push(this.getScreeningData(dataCollectionGroup));
+    //resultParsed.push(this.getPhasingResults(dataCollectionGroup));
+	return resultParsed;
+};
+
+
+OnlineResultSectionDataCollection.prototype.getHTML = function(dataCollectionGroup, autoProcResults){
+    var parseResults = this.parseData(dataCollectionGroup);
+
+    parseResults[0].autoProcResults = autoProcResults;
+    var html = &quot;&quot;;
+    dust.render(&quot;resultsection.autoprocessing&quot;, parseResults, function(err, out) {
+        html = out;
+        
+    });
+       
+                                        
+    return html;	
+};
+
+
+OnlineResultSectionDataCollection.prototype.getPhasingHTML = function(dataCollectionGroup){
+	var html= &quot;&quot;;
+	if (dataCollectionGroup!= null){
+		if (dataCollectionGroup.Phasing_phasingStepType != null){
+			var steps = dataCollectionGroup.Phasing_phasingStepType.split(&quot;,&quot;);
+			var parsed = [];
+			for (var i = 0; i &lt; steps.length; i++) {
+				parsed.push({
+					iconClass : &quot;summary_datacollection_success&quot;,
+					value : steps[i]
+					
+				});
+			}
+			html = html + this.getIconTable(parsed);
+		}
+		else{
+			html = html + this.getIconTable([{
+				iconClass : &quot;summary_datacollection_noFound&quot;,
+				value : &quot;Phasing&quot;
+			}]);
+		}
+		
+		if (dataCollectionGroup.Phasing_spaceGroup != null){
+			html = html + this.getHTMLTable([{
+            	key : &#039;Space Groups&#039;,
+ 				value : dataCollectionGroup.Phasing_spaceGroup 
+             }]);
+		}
+	}
+	return html;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

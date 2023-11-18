@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/autoprocintegrationgridfileexplorer.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/autoprocintegrationgridfileexplorer.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">108.95</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">203</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">30.32</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.57</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* It shows information from the autoprocessing like cells (a,b,c,alpha,beta,gamma) and also about phasing
+*
+* @class AutoProcIntegrationFileExplorerGrid
+* @constructor
+*/
+function AutoProcIntegrationFileExplorerGrid(args) {
+	this.height = 500;
+	this.tbar = false;
+	this.id = BUI.id();
+	
+	this.preventSelection = false;
+	this.maxHeight = 500;
+	this.minHeight = 500;
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.maxHeight != null) {
+			this.maxHeight = args.maxHeight;
+		}
+		if (args.searchBar != null) {
+			this.searchBar = args.searchBar;
+		}
+
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+
+		if (args.collapsed != null) {
+			this.collapsed = args.collapsed;
+		}
+
+		if (args.width != null) {
+			this.width = args.width;
+		}
+	}
+	
+	this.onSelected = new Event(this);
+	
+};
+
+AutoProcIntegrationFileExplorerGrid.prototype.load = function(data) {
+	this.store.loadData(data, false);
+};
+
+AutoProcIntegrationFileExplorerGrid.prototype.selectRowByAutoProcIntegrationId = function(autoProcIntegrationId) {
+	this.preventSelection = true;
+	this.panel.getSelectionModel().select(this.store.find(&quot;v_datacollection_summary_phasing_autoProcIntegrationId&quot;, autoProcIntegrationId));
+};
+
+AutoProcIntegrationFileExplorerGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		sorters : &#039;spaceGroup&#039;,
+		fields : [ &#039;autoProcId&#039;,
+		           &#039;refinedCellA&#039;, 
+                   &#039;v_datacollection_summary_phasing_autoProcIntegrationId&#039;,
+		           &#039;autoProcIntegrationId&#039;,
+		           &#039;v_datacollection_summary_phasing_anomalous&#039;,
+		           &#039;v_datacollection_summary_phasing_processingPrograms&#039;,
+		           &#039;v_datacollection_summary_phasing_autoproc_space_group&#039;]
+	});
+    
+	var selModel = Ext.create(&#039;Ext.selection.RowModel&#039;, {
+		allowDeselect : true,
+		mode : &#039;multi&#039;,
+		listeners : {
+			selectionchange : function(sm, selections) {
+				var records = [];
+				if (selections != null) {
+					for (var i = 0; i &lt; selections.length; i++) {
+						records.push(selections[i].data);
+					}
+
+					/** Event is only triggered if node is a leaf **/
+					if (!_this.preventSelection){
+						_this.onSelected.notify(records);
+					}
+					else{
+						_this.preventSelection = false;
+					}
+				}
+			}
+
+		} });
+	
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : &#039;Auto-Processing Integration&#039;,
+		store : this.store,
+		selModel : selModel,
+		cls : &#039;border-grid&#039;,
+        layout : &#039;fit&#039;,
+		//maxHeight : this.maxHeight,
+		//minHeight : this.maxHeight,
+		columns : [ 
+            
+            {
+			text : &#039;autoProcIntegrationId&#039;,
+			dataIndex : &#039;processingPrograms&#039;,
+            flex : 1,
+            hidden : true,
+			renderer : function(e, sample, record){
+                return record.data.v_datacollection_summary_phasing_autoProcIntegrationId;
+			}
+		},
+        {
+			text : &#039;Autoprocessing&#039;,
+			dataIndex : &#039;processingPrograms&#039;,
+            flex : 1,
+			renderer : function(e, sample, record){
+				return record.data.v_datacollection_summary_phasing_processingPrograms;
+			}
+		},
+        {
+			text : &#039;Space Group&#039;,
+            flex : 0.75,
+			dataIndex : &#039;v_datacollection_summary_phasing_autoproc_space_group&#039;,
+			renderer : function(e, sample, record){
+				return record.data.v_datacollection_summary_phasing_autoproc_space_group;
+			}
+		},
+		{
+			text : &#039;Unit cell&#039;,
+			dataIndex : &#039;processingPrograms&#039;,
+			flex : 1.5,
+			renderer : function(e, sample, record){
+				var html  = &quot;&quot;;
+				try{
+					dust.render(&quot;AutoProcIntegrationFileExplorerGrid_autoprocolumn&quot;, record.data, function(err, out){
+						html = out;
+					});
+				}
+				catch(e){
+					return &quot;Parsing error&quot;;
+				}
+				return html;
+			}
+		},
+		{
+			text : &#039;Statistics&#039;,
+			dataIndex : &#039;processingPrograms&#039;,
+			flex : 3,
+			renderer : function(e, sample, record){
+				try{
+					var type = record.data.scalingStatisticsType.split(&quot;,&quot;);
+					var resolutionLimitLow = record.data.resolutionLimitLow.split(&quot;,&quot;);
+					var resolutionLimitHigh = record.data.resolutionLimitHigh.split(&quot;,&quot;);
+					var multiplicity = record.data.multiplicity.split(&quot;,&quot;);
+					var meanIOverSigI = record.data.meanIOverSigI.split(&quot;,&quot;);
+					var completeness = record.data.completeness.split(&quot;,&quot;);
+					
+					var parsed = [];
+					for (var i = 0; i &lt; type.length; i++) {
+						parsed.push({
+							type 					: type[i],
+							resolutionLimitLow 		: resolutionLimitLow[i],
+							resolutionLimitHigh 	: resolutionLimitHigh[i],
+							multiplicity 			: multiplicity[i],
+							meanIOverSigI 			: meanIOverSigI[i],
+							completeness 			: completeness[i]
+							
+						});
+					}
+					var html  = &quot;&quot;;
+					dust.render(&quot;AutoProcIntegrationFileExplorerGrid_statistics&quot;, parsed, function(err, out){
+						html = out;
+					});
+				}
+				catch(e){
+					return &quot;&lt;span class=&#039;summary_datacollection_parameter_name&#039;&gt;Not found&lt;/span&gt;&quot;;
+				}
+				return html;
+			}
+		},
+		{
+			text : &#039;Phasing&#039;,
+			dataIndex : &#039;processingPrograms&#039;,
+            hidden : true,
+			flex : 1.5,
+			renderer : function(e, sample, record){
+				var html  = &quot;&quot;;
+				if (record.data.phasingStepType){			
+					try{
+						dust.render(&quot;AutoProcIntegrationFileExplorerGrid_phasing&quot;, record.data, function(err, out){
+							html = out;
+						});
+					}
+					catch(e){
+						return &quot;Parsing error&quot;;
+					}
+				}
+				return html;
+			}
+		}
+		
+		],
+		flex : 1,
+		viewConfig : {
+			//stripeRows : true,
+			preserveScrollOnRefresh: true,
+			listeners : {
+			}
+		}
+	});
+
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

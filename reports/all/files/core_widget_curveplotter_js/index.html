@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - core/widget/curveplotter.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>core/widget/curveplotter.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">116.49</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">330</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.13</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.87</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function CurvePlotter(args) {
+    this.id = BUI.id();
+
+    this.backgroundColor = &quot;#FFFFFF&quot;;
+
+    this.margin = &#039;0 0 0 5&#039;;
+    this.ruleColor = &quot;black&quot;;
+    this.targetId = &quot;plotCanvas&quot; + BUI.id();
+    this.legend = &#039;onmouseover&#039;;
+
+    if (args != null) {
+        if (args.margin != null) {
+            this.margin = args.margin;
+        }
+        if (args.legend != null) {
+            this.legend = args.legend;
+        }
+        if (args.targetId != null) {
+            this.targetId = args.targetId;
+        }
+    }
+
+    this.onRendered = new Event(this);
+    this.onPointClickCallback = new Event();
+
+}
+
+CurvePlotter.prototype.getPanel = function() {
+    this.plotPanel = Ext.create(&#039;Ext.container.Container&#039;, {
+        layout: {
+            type: &#039;hbox&#039;
+        },
+        flex: 0.7,
+        margin: this.margin,
+        items: [{
+            html: &#039;&lt;div id=&quot;&#039; + this.targetId + &#039;&quot;&gt;&lt;/div&gt;&#039;,
+            id: this.id,
+        }]
+    });
+
+    this.plotPanel.on(&quot;afterrender&quot;, function() {
+    });
+
+    this.plotPanel.on(&quot;resize&quot;, function() {
+    });
+    return this.plotPanel;
+};
+
+CurvePlotter.prototype.getPointCount = function() {
+    return this.dygraph.rawData_.length;
+};
+
+CurvePlotter.prototype.getColors = function() {
+    return this.dygraph.getColors();
+};
+
+CurvePlotter.prototype.getLabels = function() {
+    return this.dygraph.getLabels();
+};
+
+CurvePlotter.prototype.render = function(url) {
+    var _this = this;
+    if (document.getElementById(this.targetId) != null) {
+        document.getElementById(this.targetId).innerHTML = &quot;&quot;;
+
+        this.width = this.plotPanel.getWidth();
+        this.height = this.plotPanel.getHeight();
+
+        document.getElementById(this.targetId).setAttribute(&quot;style&quot;, &quot;border: 1px solid #000000; height:&quot; + (this.plotPanel.getHeight() - 1) + &quot;px;width:&quot; + (this.plotPanel.getWidth() - 2) + &quot;px;&quot;);
+
+        Ext.getCmp(this.id).setHeight(this.plotPanel.getHeight());
+        Ext.getCmp(this.id).setWidth(this.plotPanel.getWidth());
+
+
+        this.dygraph = new Dygraph(
+            document.getElementById(this.targetId),
+            url,
+            {
+                title: this.title,
+                titleHeight: 20,
+
+                legend: this.legend,
+                labelsSeparateLines: true,
+                errorBars: true,
+                connectSeparatedPoints: true,
+                pointClickCallback: function(e, p) {
+                    _this.onPointClickCallback.notify(p.name);
+                }
+            }
+
+        );
+      
+        this.dygraph.ready(function() {
+            _this.onRendered.notify();
+        });
+    }
+};
+
+CurvePlotter.prototype.loadMerge = function(subtractionIdList, from, to, scale) {
+    this.render(EXI.getDataAdapter().saxs.hplc.getFramesMergeURL(subtractionIdList, from, to, scale));
+};
+
+CurvePlotter.prototype.loadHPLCFrame = function(experimentId, frameNumber) {
+    this.render(EXI.getDataAdapter().saxs.hplc.getHPLCFramesScatteringURL(experimentId, frameNumber));
+};
+
+CurvePlotter.prototype.loadUrl = function(url) {
+    this.render(url);
+};
+
+
+CurvePlotter.prototype.load = function(selections) {
+    this.render(EXI.getDataAdapter().saxs.frame.getFramesURL(selections.frame, selections.average, selections.subtracted, selections.sampleaverage, selections.bufferaverage));
+};
+
+
+function AutoProcIntegrationCurvePlotter(args) {
+    CurvePlotter.call(this, args);
+
+    this.margin = &#039;10 0 0 0&#039;;
+    this.height = null;
+    this.title = &quot;&quot;;
+    if (args != null) {
+        if (args.height != null) {
+            this.height = args.height;
+        }
+        if (args.title != null) {
+            this.title = args.title;
+        }
+    }
+
+    this.data = {
+        labels: [], // labels = [{name: &#039;axisX&#039;, x: true, y, false},{name: &#039;axisXY&#039;, x: false, y, true}] 
+        data: []
+    };
+
+    this.xLabels = [];
+}
+
+
+AutoProcIntegrationCurvePlotter.prototype.getPointCount = CurvePlotter.prototype.getPointCount;
+AutoProcIntegrationCurvePlotter.prototype.getLabels = CurvePlotter.prototype.getLabels;
+
+
+AutoProcIntegrationCurvePlotter.prototype.toCSV = function(labels, data) {
+    var csv = labels.toString() + &quot;\n&quot;;
+    for (var i = 0; i&lt; data.length; i++){
+        for (var j = 0; j&lt; data[i].length; j++){
+            csv = csv +  data[i][j] + &quot;,&quot; ;
+        }
+        /** Removing last , */
+        csv = csv.substring(0, csv.length - 1);
+        csv = csv + &quot;\n&quot;;
+        
+    }
+    return csv;
+};
+/**
+* Render the dygraph widget on a container that should exists with id = this.id
+*
+* 
+* @method render
+*/
+AutoProcIntegrationCurvePlotter.prototype.render = function(labels, data) {
+    var _this = this;
+
+   
+   
+    /** Plotting */
+    var g = new Dygraph(
+        document.getElementById(this.targetId),
+        this.toCSV(labels, data),
+        {
+            title: this.title,
+            titleHeight: 20,
+            legend : &#039;always&#039;,
+            height: this.height - 100,
+            hideOverlayOnMouseOut :true,
+            labelsSeparateLines: true,
+            labelsDiv :_this.targetId + &quot;_legend&quot;,
+            labelsDivStyles : &quot; { &#039;fontSize&#039;: 6 } &quot;,
+            axisLabelWidth : 20,
+           
+            connectSeparatedPoints: true,
+            pointClickCallback: function(e, p) {
+                _this.onPointClickCallback.notify(p.name);
+            },
+            axes: {
+                x: {
+                     pixelsPerXLabel : 30,
+                    axisLabelFormatter: function(d, gran, opts) {
+                        return _this.xLabels[d];                        
+                    }
+                }
+            }
+        }
+
+    );
+
+    g.ready(function() {
+        //g.setAnnotations(_this.getAnnotations(data, labels));
+    });
+
+};
+
+/**
+ * Example csv
+Resolution,11259175,11259180,11259326
+2.4,143.9,0,143.9,0,,0
+2.57,99.2,0,99.2,0,,0
+2.77,62.7,0,62.7,0,,0
+3.04,41.4,0,41.4,0,,0
+3.39,24.0,0,24.0,0,,0
+3.74,,0,,0,56.0,0
+3.87,,0,,0,55.0,0
+3.91,18.2,0,18.2,0,,0
+4.03,,0,,0,53.0,0
+4.21,,0,,0,53.6,0
+4.43,,0,,0,54.6,0
+4.71,,0,,0,53.9,0
+4.78,19.1,0,19.1,0,,0
+5.07,,0,,0,49.2,0
+5.59,,0,,0,52.2,0
+6.39,,0,,0,45.5,0
+6.73,16.4,0,16.4,0,,0
+8.05,,0,,0,38.1,0
+ */
+AutoProcIntegrationCurvePlotter.prototype.loadUrl = function(url) {
+
+    var _this = this;
+    $.ajax({
+        url: url,
+        context: this
+
+    }).done(function(csv) {
+        var index = 0;
+        var _this = this;
+        _this.xLabels = [];
+        if (csv) {
+            var lines = csv.split(&quot;\n&quot;);
+            var labelsHeader = [];
+
+            if (lines) {
+                if (lines[0]) {
+                    this.data.labels = lines[0].split(&quot;,&quot;);
+
+                }
+                else {
+                    /** No Lines */
+                    EXI.setError(&quot;No labels on csv&quot;);
+                    return;
+                }
+
+                var toNumber = function toNumber(el) {
+                        if (el) {
+                            if (el != &quot;&quot;) {
+                                return parseFloat(el);
+                            }
+                            else {
+                                return &quot;&quot;;
+                            }
+                        }
+                        else {
+                            return &quot;&quot;;
+                        }
+                };
+                    
+                var convertToNumber = function (element) {
+                    var noError = [];
+                    var elements = element.split(&#039;,&#039;);                                       
+                    elements = _.map(elements, toNumber);                 
+                    noError.push(index);
+                    _this.xLabels.push(elements[0]);
+
+                    for (var i = 1; i &lt; elements.length; i++) {
+                        if (i % 2 != 0) {
+                            noError.push(elements[i]);
+                        }
+                    }
+                    index = index + 1;
+                    return noError;
+                };
+                lines = lines.reverse();
+                /** Parsing data it means remove labels, split by , and convert to number */
+                this.data.data = _.map(_.slice(lines, 1, lines.length - 1), convertToNumber);
+
+
+                try {
+
+                    this.render(this.data.labels, this.data.data);
+                }
+                catch (e) {
+                    EXI.setError(e.message);
+                }
+            }
+        }
+        else {
+            /** No Lines */
+            EXI.setError(&quot;CSV is empty&quot;);
+            return;
+        }
+    });
+
+};
+
+AutoProcIntegrationCurvePlotter.prototype.getHTML = function() {
+    return &#039;&lt;div  id=&quot;&#039; + this.targetId + &#039;&quot;&gt;&lt;/div&gt;&lt;div  style=&quot;height:20px&quot; id=&quot;&#039; + this.targetId + &#039;_legend&quot;&gt;&lt;/div&gt;&#039;;
+};
+AutoProcIntegrationCurvePlotter.prototype.getPanel = function() {
+    
+    this.plotPanel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+        layout: {
+            type: &#039;fit&#039;
+        },
+        height: this.height,
+        margin: this.margin,
+        items: [{
+                    html: this.getHTML(),
+                    id: this.id,
+                    style: {
+                      border: &quot;1px solid black&quot;  
+                    },
+                    height : this.height,
+                    border : 1
+        }
+       
+        ]
+    });   
+    return this.plotPanel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

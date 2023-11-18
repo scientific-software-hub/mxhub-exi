@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/macromoleculeform.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/macromoleculeform.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">106.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">327</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">32.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.93</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Macromolecule form with the general parameters of a macromolecule
+ * 
+ * @witdh
+ * @height
+ * 
+ * #onSave button save has been clicked
+ * #onClose button close has been clicked
+ */
+function MacromoleculeForm(args) {
+	this.id = BUI.id();
+	this.width = 700;
+	this.height = 700;
+
+	if (args != null) {
+		if (args.width != null) {
+			this.width = args.width;
+		}
+		if (args.height != null) {
+			this.height = args.height;
+		}
+	}
+	
+	/** Events **/
+	this.onSave = new Event(this);
+	this.onClose = new Event(this);
+}
+
+/** Type : is the Ext type then requiredtext or textfield * */
+MacromoleculeForm.prototype._getFieldTextWithHelp = function(type, fieldLabel, fieldName, help) {
+	return Ext.create(&#039;Ext.container.Container&#039;, {
+		items : [ {
+			xtype : type,
+			fieldLabel : fieldLabel,
+			name : fieldName,
+			id : this.id + fieldName
+		}, {
+			xtype : &#039;label&#039;,
+			forId : &#039;myFieldId&#039;,
+			text : help,
+			margin : &quot;5 0 0 105&quot;,
+			cls : &quot;inline-help&quot;
+		} ]
+	});
+};
+
+MacromoleculeForm.prototype._getNumericWithHelp = function(type, fieldLabel, fieldName, help) {
+	return Ext.create(&#039;Ext.container.Container&#039;, {
+		margin : &quot;0 0 0 10&quot;,
+		items : [ {
+			xtype : type,
+			fieldLabel : fieldLabel,
+			name : fieldName,
+			id : this.id + fieldName,
+			decimalPrecision : 6,
+			width : 220
+		}, {
+			xtype : &#039;label&#039;,
+			forId : &#039;myFieldId&#039;,
+			text : help,
+			margin : &quot;5 0 0 10&quot;,
+			cls : &quot;inline-help&quot;
+		} ]
+	});
+};
+
+MacromoleculeForm.prototype._getButtons = function() {
+	var _this = this;
+	return [ {
+		text : &#039;Save&#039;,
+		handler : function() {
+			_this._save();
+		}
+	}
+	];
+};
+
+/** It persits the macromolecule in the database **/
+MacromoleculeForm.prototype._persist = function(macromoleculeId, acronym, name, molecularMass, extintionCoefficient, comments, refractiveIndex, solventViscosity) {
+	var proposalId = Ext.getCmp(&quot;proposalIdCombo&quot;).getValue();
+	if (proposalId == null){
+			BUI.showError(&quot;Please select a proposal&quot;);
+			return;
+	}
+	
+	/** Checking not duplicated acronym **/
+	if (macromoleculeId == null){
+		if (EXI.proposalManager.getMacromoleculeByAcronym(acronym) != null){
+			BUI.showError(&quot;Duplicated acronym&quot;);
+			return;
+		}
+	}
+	
+	if (macromoleculeId == null){
+		/** new macromolecule **/
+		this.macromolecule = {};
+		this.macromolecule.macromoleculeId = null;
+	}
+	else{
+		this.macromolecule.macromoleculeId = macromoleculeId;
+	}
+	
+	this.macromolecule[&quot;acronym&quot;] = acronym;
+	this.macromolecule[&quot;name&quot;] = name;
+	this.macromolecule[&quot;molecularMass&quot;] = molecularMass;
+	this.macromolecule[&quot;extintionCoefficient&quot;] = extintionCoefficient;
+	this.macromolecule[&quot;comments&quot;] = comments;
+	this.macromolecule[&quot;symmetry&quot;] =  Ext.getCmp(this.id + &#039;comboSym&#039;).getValue();
+	this.macromolecule[&quot;refractiveIndex&quot;] =  refractiveIndex;
+	this.macromolecule[&quot;solventViscosity&quot;] =  solventViscosity;
+	this.macromolecule[&quot;proposalId&quot;] =  proposalId;
+	
+	var _this = this;
+	
+	var onSuccess = (function(sender, proposal) {
+		var onSuccess2 = function(sender, proposals){
+			_this.panel.setLoading(false);
+			_this.onSave.notify();
+			_this.onClose.notify();
+		};
+		_this.panel.setLoading(&quot;Updading proposal information&quot;);
+		EXI.getDataAdapter({onSuccess : onSuccess2}).proposal.proposal.update();
+		
+//		var manager = new ProposalUpdater(); 
+//		manager.onSuccess.attach(function(sender, proposals){
+//			_this.load(ProposalManager.getBuffers());	
+//			_this.panel.setLoading(false);
+//			_this.onClose.notify();
+//		});
+//		_this.panel.setLoading();
+//		manager.get(true);
+		
+	});
+	
+	this.panel.setLoading(&quot;Saving Macromolecule&quot;);
+	EXI.getDataAdapter({onSuccess: onSuccess }).saxs.macromolecule.saveMacromolecule(this.macromolecule);
+};
+
+/** Save the macromolecule in the DB **/
+MacromoleculeForm.prototype._save = function() {
+	
+	var _this = this;
+	
+	var acronym = this._getField(&quot;acronym&quot;);
+	var name = this._getField(&quot;name&quot;);
+	var molecularMass = this._getField(&quot;molecularMass&quot;);
+	var extintionCoefficient = this._getField(&quot;extintionCoefficient&quot;);
+	var comments = this._getField(&quot;comments&quot;);
+	
+	var refractiveIndex = this._getField(&quot;refractiveIndex&quot;);
+	var solventViscosity = this._getField(&quot;solventViscosity&quot;);
+	
+	/** Checking required fields **/
+	if (name == &quot;&quot;) {
+		BUI.showError(&quot;Name field is mandatory&quot;);
+		return;
+	}
+	if (acronym == &quot;&quot;) {
+		BUI.showError(&quot;Acroynm field is mandatory&quot;);
+		return;
+	}
+
+	if (this.macromolecule != null){
+		/** Checking if it is a new macromolecule **/
+		if (this.macromolecule.macromoleculeId == null){
+			/** Check if the acronym exists already **/
+			this._persist(null, acronym, name, molecularMass, extintionCoefficient, comments, refractiveIndex, solventViscosity);
+		}
+		else{
+			/** It is an update **/
+			this._persist(this.macromolecule.macromoleculeId, acronym, name, molecularMass, extintionCoefficient, comments, refractiveIndex, solventViscosity);
+		}
+	}
+	else{
+		/** It is a new macromolecule **/
+		this._persist(null, acronym, name, molecularMass, extintionCoefficient, comments, refractiveIndex, solventViscosity);
+	}
+};
+
+
+
+MacromoleculeForm.prototype._getItems = function() {
+	var _this = this;
+	/** Symmetry combo box **/
+	var symmetry = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;s&#039; ],
+		data : this._getSymmetries()
+	});
+
+	this.symmetryComboBox = Ext.create(&#039;Ext.form.ComboBox&#039;, {
+		fieldLabel : &#039;Symmetry&#039;,
+		store : symmetry,
+		id : this.id + &#039;comboSym&#039;,
+		queryMode : &#039;local&#039;,
+		displayField : &#039;s&#039;,
+		valueField : &#039;s&#039;,
+		value : &quot;P1&quot;, 
+		margin : &quot;0 0 0 30&quot;,
+		width : 220
+	});
+	return [ BIOSAXS_COMBOMANAGER.getComboProposal({labelWidth : 100}),
+	         this._getFieldTextWithHelp(&quot;requiredtextfield&quot;, &quot;Name&quot;, &quot;name&quot;, &quot;Long name. i.e: Bovine serum albumin&quot;),
+			 this._getFieldTextWithHelp(&quot;requiredtextfield&quot;, &quot;Acronym&quot;, &quot;acronym&quot;, &quot;Acronym will be used in the files and analisys. i.e: BSA&quot;),
+			 this._getFieldTextWithHelp(&quot;textfield&quot;, &quot;Mol. Mass (Da)&quot;, &quot;molecularMass&quot;, &quot;Atomic mass estimation measured in Da&quot;),
+			{
+				xtype : &#039;container&#039;,
+				layout : &#039;hbox&#039;,
+				margin : &quot;10 0 0 0&quot;,
+				items :[
+				        	this._getNumericWithHelp(&quot;numberfield&quot;, &quot;Extinction coef.&quot;, &quot;extintionCoefficient&quot;, &quot;&quot;),
+							this.symmetryComboBox
+				        ]
+			},
+			{
+				xtype : &#039;container&#039;,
+				layout : &#039;hbox&#039;,
+				margin : &quot;5 0 0 0&quot;,
+				items :[
+				        	this._getNumericWithHelp(&quot;numberfield&quot;, &quot;Refractive Index&quot;, &quot;refractiveIndex&quot;, &quot;How radiation propagates through the medium&quot;),
+							this._getNumericWithHelp(&quot;numberfield&quot;, &quot;Solvent Viscosity&quot;, &quot;solventViscosity&quot;, &quot;&quot;)
+				]
+					
+		
+			},
+			
+			
+			{
+				id : this.id + &quot;comments&quot;,
+				xtype : &#039;textareafield&#039;,
+				name : &#039;comments&#039;,
+				margin : &#039;35 0 0 10&#039;,
+				fieldLabel : &#039;Comments&#039;,
+				width : this.width - 100,
+				height : 100
+			} ];
+	
+	return  Ext.create(&#039;Ext.form.Panel&#039;, {
+		width : this.width,
+		height : this.height,
+		items : this._getItems()
+	});
+};
+
+MacromoleculeForm.prototype._getSymmetries = function() {
+	return  [ {
+		&quot;s&quot; : &quot;P1&quot;
+	}, {
+		&quot;s&quot; : &quot;P2&quot;
+	}, {
+		&quot;s&quot; : &quot;P3&quot;
+	}, {
+		&quot;s&quot; : &quot;P4&quot;
+	}, {
+		&quot;s&quot; : &quot;P5&quot;
+	}, {
+		&quot;s&quot; : &quot;P6&quot;
+	}, {
+		&quot;s&quot; : &quot;P32&quot;
+	}, {
+		&quot;s&quot; : &quot;P42&quot;
+	}, {
+		&quot;s&quot; : &quot;P52&quot;
+	}, {
+		&quot;s&quot; : &quot;P62&quot;
+	}, {
+		&quot;s&quot; : &quot;P222&quot;
+	} ];
+};
+
+MacromoleculeForm.prototype.getPanel = function() {
+	this.panel =  Ext.create(&#039;Ext.panel.Panel&#039;, {
+		layout : &#039;hbox&#039;,
+		buttons : this._getButtons(),
+		cls : &#039;border-grid&#039;,
+		items : [
+		         {
+					xtype : &#039;container&#039;,
+					margin : &#039;20 0 0 20&#039;,
+					layout : &#039;vbox&#039;,
+					items : this._getItems()
+		         }]
+	});
+	return this.panel;
+};
+
+
+/** Populates each text field by field name and value **/
+MacromoleculeForm.prototype._populateField = function(fieldName, value) {
+	if (value != null){
+		Ext.getCmp(this.id + fieldName).setValue(value);
+	}
+};
+
+/** Gets the value of a textfield **/
+MacromoleculeForm.prototype._getField = function(fieldName) {
+	return Ext.getCmp(this.id + fieldName).getValue();
+};
+
+
+/** It populates the form **/
+MacromoleculeForm.prototype.load = function(macromolecule) {
+	this.macromolecule = macromolecule;
+	if (macromolecule != null){
+		this._populateField(&quot;name&quot;, macromolecule.name);
+		this._populateField(&quot;acronym&quot;, macromolecule.acronym);
+		this._populateField(&quot;extintionCoefficient&quot;, macromolecule.extintionCoefficient);
+		this._populateField(&quot;molecularMass&quot;, macromolecule.molecularMass);
+		this._populateField(&quot;comments&quot;, macromolecule.comments);
+		this._populateField(&quot;refractiveIndex&quot;, macromolecule.refractiveIndex);
+		this._populateField(&quot;solventViscosity&quot;, macromolecule.solventViscosity);
+		if (macromolecule.symmetry != null){
+			Ext.getCmp(this.id + &#039;comboSym&#039;).setValue(macromolecule.symmetry);
+		}
+		if (this.macromolecule.proposalId != null){
+			Ext.getCmp(&quot;proposalIdCombo&quot;).setValue(this.macromolecule.proposalId);
+			Ext.getCmp(&quot;proposalIdCombo&quot;).disable();
+		}
+		
+	}
+};
+
+
+MacromoleculeForm.prototype.input = function() {
+	return {};
+};
+
+
+/** It populates the form **/
+MacromoleculeForm.prototype.test = function(targetId) {
+	var macromoleculeForm = new MacromoleculeForm();
+	macromoleculeForm.onClose.attach(function(sender){
+		alert(&quot;Click on close&quot;);
+	});
+	var panel = macromoleculeForm.getPanel();
+	panel.render(targetId);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

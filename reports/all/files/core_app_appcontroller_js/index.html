@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - core/app/appcontroller.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>core/app/appcontroller.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">171.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">1</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">0.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.00</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">//
+//function ExiController(){
+//	this.init();
+//};
+//
+//ExiController.prototype.init = function(){
+//	function setPageBackground() {
+//
+//	}
+//	function notFound() {
+//
+//	}
+//
+//	function loadNavigationPanel(listView){
+//		/** Cleaning up navigation panel **/
+//		EXI.clearNavigationPanel();
+//		EXI.setLoadingNavigationPanel(true);
+//		
+//		/** Load data data **/
+//		var adapter = new DataAdapter();
+//		adapter.onSuccess.attach(function(sender, data) {
+//			/** Load panel **/
+//			EXI.addNavigationPanel(listView);
+//			/** Load data **/
+//			listView.store.loadData(data);
+//			EXI.setLoadingNavigationPanel(false);
+//		});
+//		
+//		/** Handle error **/
+//		adapter.onError.attach(function(sender, data) {
+//			EXI.setLoadingNavigationPanel(false);
+//		});
+//		return adapter;
+//	}
+//	
+//	
+//	/** Welcome Page **/
+//	Path.map(&quot;#/&quot;).to(function() {}).enter(setPageBackground);
+//	
+//	
+//	/** 
+//	 * Loading navigation panel
+//	 *  
+//	 * #/session/nav
+//	 * #/experiment/nav
+//	 * #/macromolecule/nav
+//	 * 
+//	 * */
+//	Path.map(&quot;#/:navigation/nav&quot;).to(function() {
+//		/** Session navigation **/
+//		if (this.params[&#039;navigation&#039;] == &quot;session&quot;) {
+//			var listView = new SessionListView();
+//			/** When selected move to hash **/
+//			listView.onSelect.attach(function(sender, selected) {
+//				location.hash = &quot;/session/nav/&quot; + selected[0].sessionId + &quot;/session&quot;;
+//			});
+//			var adapter = loadNavigationPanel(listView);
+//			adapter.getSessions();
+//		}
+//
+//		if (this.params[&#039;navigation&#039;] == &quot;shipping&quot;) {
+//			var listView = new ShippingListView();
+//			/** When selected move to hash **/
+//			listView.onSelect.attach(function(sender, selected) {
+//				location.hash = &quot;/shipping/&quot; + selected[0].shippingId + &quot;/main&quot;;
+//			});
+//			var adapter = loadNavigationPanel(listView);
+//			adapter.getShippings();
+//		}
+//		
+//		if (this.params[&#039;navigation&#039;] == &quot;experiment&quot;) {
+//			var listView = new ExperimentListView();
+//			/** When selected move to hash **/
+//			listView.onSelect.attach(function(sender, selected) {
+//				location.hash = &quot;/experiment/experimentId/&quot; + selected[0].experimentId + &quot;/main&quot;;
+//			});
+//			var adapter = loadNavigationPanel(listView);
+//			adapter.getExperiments();
+//		}
+//		
+//		if (this.params[&#039;navigation&#039;] == &quot;template&quot;) {
+//			var listView = new TemplateListView();
+//			/** When selected move to hash **/
+//			listView.onSelect.attach(function(sender, selected) {
+//				location.hash = &quot;/experiment/templateId/&quot; + selected[0].experimentId + &quot;/main&quot;;
+//			});
+//			var adapter = loadNavigationPanel(listView);
+//			adapter.getByExperimentByKey(&quot;experimentType&quot;, &quot;TEMPLATE&quot;);
+//		}
+//		
+//
+//		if (this.params[&#039;navigation&#039;] == &quot;macromolecule&quot;) {
+//			alert(&quot;not implemented yet&quot;);
+//		}
+//		
+//	}).enter(setPageBackground);
+//
+//	/** Loading a single session on the navigation panel **/
+//	Path.map(&quot;#/session/nav/:sessionId/session&quot;).to(function() {
+//		var listView = new ExperimentListView();
+//		/** When selected move to hash **/
+//		listView.onSelect.attach(function(sender, selected) {
+//			location.hash = &quot;/experiment/experimentId/&quot; + selected[0].experimentId + &quot;/main&quot;;
+//		});
+//		var adapter = loadNavigationPanel(listView);
+//		adapter.getExperimentsBySessionId(this.params[&#039;sessionId&#039;]);
+//		
+//	}).enter(setPageBackground);
+//
+//	Path.map(&quot;#/experiment/experimentId/:experimentId/main&quot;).to(function() {
+//			var mainView = new ExperimentMainView();
+//			EXI.addMainPanel(mainView);
+//			mainView.load(this.params[&#039;experimentId&#039;]);
+//					/** Selecting data collections from experiment **/
+//			mainView.onSelect.attach(function(sender, element) {
+//					EXI.localExtorage.selectedSubtractionsManager.append(element);
+//			});
+//			mainView.onDeselect.attach(function(sender, element) {
+//					EXI.localExtorage.selectedSubtractionsManager.remove(element);
+//			});
+//
+//	}).enter(setPageBackground);
+//	
+//	
+//	/** Loading Experiments **/
+//	Path.map(&quot;#/experiment/:key/:value/main&quot;).to(function() {
+//		var adapter = new DataAdapter();
+//		EXI.setLoadingMainPanel();
+//		adapter.onSuccess.attach(function(sender, data) {
+//			EXI.setLoadingMainPanel(false);
+//			if (data != null) {
+//				if (data.length &gt; 0) {
+//					var mainView = null;
+//					if (data[0].experimentType == &quot;STATIC&quot;) {
+//						mainView = new ExperimentMainView();
+//						
+//					}
+//					if (data[0].experimentType == &quot;HPLC&quot;) {
+//						mainView = new HPLCMainView();
+//					}
+//					
+//					if (data[0].experimentType == &quot;TEMPLATE&quot;) {
+//						mainView = new TemplateMainView();
+//					}
+//					
+//					EXI.addMainPanel(mainView);
+//					mainView.load(data);
+//					/** Selecting data collections from experiment **/
+//					mainView.onSelect.attach(function(sender, element) {
+//						EXI.localExtorage.selectedSubtractionsManager.append(element);
+//					});
+//					mainView.onDeselect.attach(function(sender, element) {
+//						EXI.localExtorage.selectedSubtractionsManager.remove(element);
+//					});
+//					
+//				}
+//			}
+//		});
+//		if ((this.params[&#039;key&#039;] == &quot;experimentId&quot;)||(this.params[&#039;key&#039;] == &quot;templateId&quot;)){
+//			adapter.getByExperimentId([this.params[&#039;value&#039;]]);
+//		}
+//		else{
+//			adapter.getByExperimentByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+//		}
+//		
+//
+//	}).enter(setPageBackground);
+//
+//	Path.map(&quot;#/tool/crysol/main&quot;).to(function() {
+//		var mainView = new CrysolMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//
+//	
+//	Path.map(&quot;#/tool/subtraction/main&quot;).to(function() {
+//		var mainView = new SubtractionMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//	
+//	Path.map(&quot;#/datacollection/:key/:value/main&quot;).to(function() {
+//		EXI.setLoadingMainPanel();
+//		var adapter = new DataAdapter();
+//		adapter.onSuccess.attach(function(sender, data) {
+//			var mainView = new DataCollectionMainView();
+//			EXI.addMainPanel(mainView);
+//			mainView.load(data);
+//			EXI.setLoadingMainPanel(false);
+//			/** Selecting data collections from experiment **/
+//			mainView.onSelect.attach(function(sender, element) {
+//				EXI.localExtorage.selectedSubtractionsManager.append(element);
+//			});
+//			mainView.onDeselect.attach(function(sender, element) {
+//				EXI.localExtorage.selectedSubtractionsManager.remove(element);
+//			});
+//		});
+//		adapter.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+//
+//	}).enter(setPageBackground);
+//
+//	
+//	Path.map(&quot;#/datacollection/:key/:value/primaryviewer&quot;).to(function() {
+//		var adapter = new DataAdapter();
+//		adapter.onSuccess.attach(function(sender, data) {
+//			var primaryMainView = new PrimaryDataMainView();
+//			EXI.addMainPanel(primaryMainView);
+//			primaryMainView.load(data);
+//
+//		});
+//		adapter.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+//	}).enter(setPageBackground);
+//
+//	Path.map(&quot;#/datacollection/:key/:value/merge&quot;).to(function() {
+//		var adapter = new DataAdapter();
+//		adapter.onSuccess.attach(function(sender, data) {
+//			var primaryMainView = new MergeMainView();
+//			EXI.addMainPanel(primaryMainView);
+//			primaryMainView.load(data);
+//
+//		});
+//		adapter.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+//	}).enter(setPageBackground);
+//
+//	Path.map(&quot;#/project/:projectId/run/:runId/main&quot;).to(function() {
+//		var projectId = this.params[&#039;projectId&#039;];
+//		var runId = this.params[&#039;runId&#039;];
+//		var exidataAdapter = new ExiDataAdapter();
+//		exidataAdapter.onSuccess.attach(function(sender, runs) {
+//			for (var i = 0; i &lt; runs.length; i++) {
+//				if (runs[i].internalId == runId) {
+//					var main = new RunMainView();
+//					EXI.addMainPanel(main);
+//					main.load(runs[i]);
+//				}
+//			}
+//		});
+//		exidataAdapter.getRuns(projectId);
+//	}).enter(setPageBackground);
+//
+//	
+//	Path.map(&quot;#/prepare/designer/main&quot;).to(function() {
+//		var mainView = new ExperimentDesignerMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//	
+//	
+//	Path.map(&quot;#/prepare/buffer/main&quot;).to(function() {
+//		var mainView = new BufferMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//	
+//	
+//	Path.map(&quot;#/shipping/:shippingId/main&quot;).to(function() {
+//		var mainView = new ShippingMainView();
+//		var shippindId = this.params[&#039;shippingId&#039;];
+//		EXI.addMainPanel(mainView);
+//		mainView.load(shippindId);
+//	}).enter(setPageBackground);
+//	
+//	
+//	Path.map(&quot;#/prepare/stocksolution/main&quot;).to(function() {
+//		var mainView = new StockSolutionMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//	
+//	
+//	Path.map(&quot;#/prepare/macromolecule/main&quot;).to(function() {
+//		var mainView = new MacromoleculeMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//	
+//	Path.map(&quot;#/prepare/templates/main&quot;).to(function() {
+//		var mainView = new ExperimentDesignerMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(setPageBackground);
+//	
+//	Path.map(&quot;#/prepare/designer&quot;).to(function() {
+//		var wizardWidget = new WizardWidget({
+//			windowMode : true,
+//			width : 1200
+//		});
+//
+//		wizardWidget.onFinished.attach(function(sender, result) {
+//			var adapter = new DataAdapter();
+//			wizardWidget.window.close();
+//			EXI.setLoading();
+//			adapter.onSuccess.attach(function(sender, experiment) {
+//				location.hash = &quot;/experiment/experimentId/&quot; + experiment.experimentId + &quot;/main&quot;;
+//			});
+//			wizardWidget.current.setLoading(&quot;ISPyB: Creating experiment&quot;);
+//			
+//			adapter.saveTemplate(result.name, &quot;comments&quot;, result.data);
+//		});
+//
+//		var manager = new ProposalUpdater(); 
+//		manager.onSuccess.attach(function(sender, proposals){
+//			wizardWidget.draw(this.targetId, new MeasurementCreatorStepWizardForm(ProposalManager.getMacromolecules(), ProposalManager.getBuffers()));
+//		});
+//		manager.get();
+//		
+//	}).enter(setPageBackground);
+//	
+//	
+//	Path.map(&quot;#/welcome/:user/main&quot;).to(function() {
+//		var user = this.params[&#039;shippingId&#039;];
+//		var mainView = new WelcomeMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load(user);
+//	}).enter(setPageBackground);
+//	
+//	
+//	
+//	Path.map(&quot;#/login&quot;).to(function() {
+//		var _this = this;
+//		
+//		
+//		EXI.authenticationForm.show();
+//		return;
+//		var authenticationForm = new AuthenticationForm();
+//		authenticationForm.onAuthenticate.attach(function(sender, args){
+//			var authenticationManager = new AuthenticationManager();
+//			authenticationManager.onSuccess.attach(function(sender, args){
+//				/** This user has been authenticated **/
+////				EXI.localExtorage.tokenManager.addToken(args.user, args.token, args.url);
+////				debugger
+//				EXI.credentialManager.addCredential(args.user, args.roles, args.token, args.url);
+////				EXI.mainMenu.addLoggin(args.user,  args.url);
+//				authenticationForm.window.close();
+//				
+//				/** load proposals **/
+//				location.hash = &quot;/welcome/&quot; + args.user + &quot;/main&quot;;
+//				
+//				/** Loading projects **/
+////				var exidataAdapter = new ExiDataAdapter();
+////				exidataAdapter.onSuccess.attach(function(sender, projects){
+////					EXI.localExtorage.userManager.setProjects(projects);
+////				});
+////				exidataAdapter.getUser();
+//				
+//				/** Loading proposal **/
+////				new ProposalUpdater().get(true);
+//				
+////				window.location.href = &#039;main.html&#039;;
+//				
+//			});
+//			
+//			authenticationManager.login(args.user, args.password, args.site);
+//			
+//		});
+//		authenticationForm.show();
+//		
+//	}).enter(setPageBackground);
+//	
+//	
+//	Path.map(&quot;#/logout&quot;).to(function() {
+//		EXI.credentialManager.logout();
+////		if (EXI.localExtorage){
+////			EXI.localExtorage.clear();
+////		}
+////		if (EXI.mainMenu){
+////			EXI.mainMenu.setCredentials();
+////		}
+//		
+////		window.location.href = &#039;main.html&#039;;
+//		
+//	}).enter(setPageBackground);
+//	
+//	// Here we set a &quot;root route&quot;.  You may have noticed that when you landed on this
+//	// page you were automatically &quot;redirected&quot; to the &quot;#/users&quot; route.  The definition
+//	// below tells PathJS to load this route automatically if one isn&#039;t provided.
+//	Path.root(&quot;#/&quot;);
+//
+//	// The `Path.rescue()` method takes a function as an argument, and will be called when
+//	// a route is activated that you have no yet defined an action for.  On this example
+//	// page, you&#039;ll notice there is no defined route for the &quot;Unicorns!?&quot; link.  Since no
+//	// route is defined, it calls this method instead.
+//	Path.rescue(notFound);
+//	
+//	
+//};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

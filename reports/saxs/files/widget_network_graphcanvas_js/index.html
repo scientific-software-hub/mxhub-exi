@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/network/graphcanvas.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/network/graphcanvas.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">112.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">1655</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">153.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">28.25</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function GraphCanvas(componentID, targetNode, args) {
+	this.args = {};
+	/** target */
+	this.targetID = targetNode.id;
+
+	/** id manage */
+	this.id = componentID;
+	this.args.idGraph = this.id + &quot;main&quot;;
+	this.args.idBackgroundNode = this.id + &quot;background&quot;;
+
+	this.args.idEdgesGraph = this.id + &quot;edges&quot;;
+	this.args.idNodesGraph = this.id + &quot;vertices&quot;;
+	this.args.idLabelGraph = this.id + &quot;label&quot;;
+	this.args.idBackground = this.id + &quot;background&quot;;
+
+	/** Objects Graph **/
+	this.dataset = null;
+	this.formatter = null;
+	this.layout = null;
+
+	/** Drawing **/
+	this.circleDefaultRadius = 2;
+	this.squareDefaultSide = this.circleDefaultRadius * 1.5;
+
+	/** Directed Arrow **/
+	this.arrowDefaultSize = this.circleDefaultRadius;
+
+	/** Groups **/
+	this.GraphGroup = null;
+	this.GraphNodeGroup = null;
+	this.GraphLabelGroup = null;
+	this.GraphBackground = null;
+
+	/** SETTINGS FLAGS **/
+	this.args.draggingCanvasEnabled = false; //Flag to set if the canvas can be dragged
+	this.args.multipleSelectionEnabled = false;
+	this.args.interactive = false;
+	this.args.labeled = false;
+	this.args.linkEnabled = false;
+
+	/** If numberEdge &gt; maxNumberEdgesMoving then only it will move edges when mouse up **/
+	this.args.maxNumberEdgesMoving = 3;
+	this.args.maxNumberEdgesFiringEvents = 50;
+
+	/** Linking edges **/
+	this.args.linking = false;
+	this.linkStartX = 0;
+	this.linkStartY = 0;
+	this.linkSVGNode = null;
+	this.linkNodeSource = null;
+	this.linkNodeTarget = null;
+
+	/** Dragging Control **/
+	this.draggingElement = null;
+	this.dragging = false;
+	this.nMouseOffsetX = 0;
+	this.nMouseOffsetY = 0;
+	this.dragStartX = 0;
+	this.dragStartY = 0;
+	this.desplazamientoX = 0;
+	this.desplazamientoY = 0;
+
+	/** Selection Control **/
+	this.selecting = false;
+	this.selectorX = null;
+	this.selectorY = null;
+	this.selectorSVGNode = null;
+
+	/** Node status **/
+	this.args.isVertexSelected = {};
+	this.args.selectedVertices = [];
+
+	/** Edges status **/
+	this.args.isEdgeSelected = {};
+	//this.args.selectedEdges = [];
+
+	if (args != null) {
+		if (args.multipleSelectionEnabled != null) {
+			this.args.multipleSelectionEnabled = args.multipleSelectionEnabled;
+			this.args.draggingCanvasEnabled = !(this.args.multipleSelectionEnabled);
+		}
+		if (args.draggingCanvasEnabled != null) {
+			this.args.draggingCanvasEnabled = args.draggingCanvasEnabled;
+			this.args.multipleSelectionEnabled = !(this.args.draggingCanvasEnabled);
+		}
+		if (args.interactive != null) {
+			this.args.interactive = args.interactive;
+		}
+		if (args.labeled != null) {
+			this.args.labeled = args.labeled;
+		}
+
+	}
+
+	/** Hashmap with the svg node labels **/
+	this.svgLabels = {};
+
+	/** EVENTS **/
+	this.onVertexOut = new Event(this);
+	this.onVertexOver = new Event(this);
+	this.onVertexSelect = new Event(this);
+	this.onEdgeSelect = new Event(this);
+	this.onCanvasClicked = new Event(this);
+	this.onVertexUp = new Event(this);
+}
+
+GraphCanvas.prototype.showLabels = function(value) {
+	this.args.labeled = value;
+	this.removeLabels();
+	if (value) {
+		this.renderLabels();
+	}
+};
+
+GraphCanvas.prototype.getSelectedVertices = function() {
+	return this.args.selectedVertices;
+};
+
+GraphCanvas.prototype.getSelectedEdges = function() {
+	var selected = [];
+	for ( var selectedEdge in this.args.isEdgeSelected) {
+		selected.push(selectedEdge);
+	}
+	return selected;
+};
+
+GraphCanvas.prototype.createSVGDom = function(targetID, id, width, height, backgroundColor) {
+	var container = document.getElementById(targetID);
+	this._svg = SVG.createSVGCanvas(container, [
+		[ &quot;style&quot;, &quot;background-color:&quot; + backgroundColor + &quot;;&quot; ], [ &quot;id&quot;, id ], [ &quot;dragx&quot;, 0 ], [ &quot;dragy&quot;, 0 ],
+		[ &quot;height&quot;, this.getFormatter().getHeight() ], [ &quot;width&quot;, this.getFormatter().getWidth() ] ]);
+	return this._svg;
+};
+
+/** MULTIPLE SELECTION **/
+GraphCanvas.prototype.isMultipleSelectionEnabled = function() {
+	return this.args.multipleSelectionEnabled;
+};
+
+GraphCanvas.prototype.setMultipleSelection = function(value) {
+	this.args.multipleSelectionEnabled = value;
+	this.args.draggingCanvasEnabled = (!value);
+};
+
+GraphCanvas.prototype.setSelecting = function(value) {
+	this.selecting = value;
+};
+
+/** linking **/
+GraphCanvas.prototype.setLinking = function(value) {
+	this.args.linkEnabled = value;
+	this.selecting = !value;
+	this.dragging = !value;
+};
+
+/** CANVAS MOVING **/
+GraphCanvas.prototype.setDraggingCanvas = function(value) {
+	this.args.draggingCanvasEnabled = value;
+	this.args.multipleSelectionEnabled = !value;
+};
+
+GraphCanvas.prototype.isDraggingCanvasEnabled = function() {
+	return this.args.draggingCanvasEnabled;
+};
+/** ZOOM **/
+GraphCanvas.prototype.getScale = function() {
+	return this.getFormatter().getZoomScale();
+};
+
+GraphCanvas.prototype.setScale = function(scale) {
+	var graphNode = document.getElementById(this.args.idGraph);
+	graphNode.setAttribute(&quot;transform&quot;, graphNode.getAttribute(&quot;transform&quot;).replace(&quot;scale(&quot; + this.getScale() + &quot;)&quot;, &quot;scale(&quot; + scale + &quot;)&quot;));
+	this.getFormatter().setZoomScale(scale);
+};
+
+GraphCanvas.prototype.zoomIn = function() {
+	this.setScale(this.getScale() + this.getFormatter().getZoomScaleStepFactor());
+};
+
+GraphCanvas.prototype.zoomOut = function() {
+	this.setScale(this.getScale() - this.getFormatter().getZoomScaleStepFactor());
+
+};
+
+/** SVG COORDENATES **/
+GraphCanvas.prototype.getSVGCoordenates = function(evt) {
+	var p = this._svg.createSVGPoint();
+	p.x = evt.clientX;
+	p.y = evt.clientY;
+
+	var m = this._svg.getScreenCTM(document.documentElement);
+	p = p.matrixTransform(m.inverse());
+	return p;
+};
+
+/** SVG EVENTS **/
+GraphCanvas.prototype.mouseClick = function(event) {
+	if (event.button == 0) {
+		if (!this.args.interactive) {
+			return;
+		}
+
+		if (this.isVertex(event.target)) {
+			this.clickNode(this.getVertexIdFromSVGId(event.target.id));
+		}
+		/** Como el evento mouseClick viene despues del mouse up es aqui donde manejo el tema de deseccionar los elementos que estoy dragging **/
+		if (this.dragging) {
+			this.dragging = false;
+		}
+	}
+};
+
+GraphCanvas.prototype.mouseMove = function(evt) {
+	if (this.selecting) {
+		this.clearLabels();
+
+		var width = (this.getSVGCoordenates(evt).x - this.selectorX);
+		var height = (this.getSVGCoordenates(evt).y - this.selectorY);
+		if ((width &gt; 0) &amp;&amp; (height &gt; 0)) {
+			this.displaySelection(this.selectorX, this.selectorY, width, height);
+		}
+		if ((width &gt; 0) &amp;&amp; (height &lt; 0)) {
+			this.displaySelection(this.selectorX, this.getSVGCoordenates(evt).y, width, Math.abs(height));
+		}
+		if ((width &lt; 0) &amp;&amp; (height &lt; 0)) {
+			this.displaySelection(this.getSVGCoordenates(evt).x, this.getSVGCoordenates(evt).y, Math.abs(width), Math.abs(height));
+		}
+		if ((width &lt; 0) &amp;&amp; (height &gt; 0)) {
+			this.displaySelection(this.selectorX + width, this.selectorY, Math.abs(width), Math.abs(height));
+		}
+
+		var x1 = (parseFloat(this.selectorSVGNode.getAttribute(&quot;x&quot;)) - DOM.select(this.id).getAttribute(&quot;dragx&quot;)) / this.getFormatter().getWidth();
+		var y1 = (parseFloat(this.selectorSVGNode.getAttribute(&quot;y&quot;)) - DOM.select(this.id).getAttribute(&quot;dragy&quot;)) / this.getFormatter().getHeight();
+		var x2 = (x1 + parseFloat(this.selectorSVGNode.getAttribute(&quot;width&quot;) / this.getFormatter().getWidth()));
+		var y2 = (y1 + parseFloat(this.selectorSVGNode.getAttribute(&quot;height&quot;) / this.getFormatter().getHeight()));
+
+		this.deselectNodes(this.getLayout());
+		var verticesSelected = this.getLayout().getVerticesByArea(x1 / this.getFormatter().getZoomScale(), y1 / this.getFormatter().getZoomScale(),
+				x2 / this.getFormatter().getZoomScale(), y2 / this.getFormatter().getZoomScale());
+		for ( var i = 0; i &lt; verticesSelected.length; i++) {
+			this.selectNode(verticesSelected[i].getId());
+			this.renderLabel(verticesSelected[i].getId());
+		}
+
+	}
+	var p = null;
+	if (this.args.linking) {
+		p = this.getSVGCoordenates(evt);
+		if (this.linkSVGNode != null) {
+			this.linkSVGNode.setAttribute(&quot;x2&quot;, p.x - 2);
+			this.linkSVGNode.setAttribute(&quot;y2&quot;, p.y - 2);
+		}
+	}
+
+	if (this.dragging) {
+		p = this.getSVGCoordenates(evt);
+		p.x -= this.nMouseOffsetX;
+		p.y -= this.nMouseOffsetY;
+		this.desplazamientoX = (this.getSVGCoordenates(evt).x - this.dragStartX);//  + parseFloat(DOM.select(this.id).getAttribute(&quot;dragx&quot;));
+		this.desplazamientoY = (this.getSVGCoordenates(evt).y - this.dragStartY);//  + parseFloat(DOM.select(this.id).getAttribute(&quot;dragy&quot;));
+
+		if (this.draggingElement != null) {
+			/** Click sobre el recct del banground que provoca que mueva todo el canvas **/
+			if (this.isNodeCanvas(this.draggingElement)) {
+
+				p = this.getSVGCoordenates(evt);
+				p.x = this.desplazamientoX;
+				p.y = this.desplazamientoY;
+
+				this.draggingElement.setAttribute(&quot;dragx&quot;, p.x);
+				this.draggingElement.setAttribute(&quot;dragy&quot;, p.y);
+				this.draggingElement = document.getElementById(this.args.idGraph);
+				this.draggingElement.setAttribute(&quot;transform&quot;, &quot;translate(&quot; + p.x + &quot;,&quot; + p.y + &quot;), scale(&quot; + this.getScale() + &quot;)&quot;);
+
+				DOM.select(this.id).setAttribute(&quot;dragx&quot;, p.x);
+				DOM.select(this.id).setAttribute(&quot;dragy&quot;, p.y);
+
+				if (this.NodeSVGbackgroundImage != null) {
+					this.NodeSVGbackgroundImage.setAttribute(&quot;dragx&quot;, p.x);
+					this.NodeSVGbackgroundImage.setAttribute(&quot;dragy&quot;, p.y);
+				}
+			} else {
+				if (this.isVertex(this.draggingElement)) {
+					this.selectNode(this.getVertexIdFromSVGId(this.draggingElement.id));
+					this.desplazamientoX = this.desplazamientoX / this.getFormatter().getZoomScale();
+					this.desplazamientoY = this.desplazamientoY / this.getFormatter().getZoomScale();
+					this.moveSelectedNodes(this.desplazamientoX, this.desplazamientoY);
+
+					this.dragStartX = this.getSVGCoordenates(evt).x;
+					this.dragStartY = this.getSVGCoordenates(evt).y;
+				} else {
+					if (this.isNodeBackground(this.draggingElement)) {
+
+						this.draggingElement.setAttribute(&quot;dragx&quot;, p.x);
+						this.draggingElement.setAttribute(&quot;dragy&quot;, p.y);
+						this.draggingElement = document.getElementById(this.args.idGraph);
+						this.draggingElement.setAttribute(&quot;transform&quot;, &quot;translate(&quot; + p.x + &quot;,&quot; + p.y + &quot;), scale(&quot; + this.getScale() + &quot;)&quot;);
+					} else {
+						this.draggingElement.setAttribute(&quot;transform&quot;, &quot;translate(&quot; + p.x + &quot;,&quot; + p.y + &quot;)&quot;);
+					}
+				}
+			}
+		}
+	}
+};
+
+GraphCanvas.prototype.moveSelectedNodes = function(offsetX, offsetY) {
+	for ( var i = 0; i &lt; this.getSelectedVertices().length; i++) {
+
+		var nodeId = this.getSelectedVertices()[i];
+		var svgNodeId = this.getSVGNodeId(nodeId);
+
+		var x = parseFloat(DOM.select(svgNodeId).getAttribute(&quot;dragx&quot;)) + parseFloat(offsetX);// -   parseFloat(DOM.select(this.id).getAttribute(&quot;dragx&quot;));
+		var y = parseFloat(DOM.select(svgNodeId).getAttribute(&quot;dragy&quot;)) + parseFloat(offsetY);// +   parseFloat(DOM.select(this.id).getAttribute(&quot;dragy&quot;));
+
+		this._movingNode(DOM.select(svgNodeId), x, y);
+	}
+};
+
+GraphCanvas.prototype.mouseDown = function(evt) {
+	if (event.button == 0) {
+
+		/** if !no interactive mouse events do anything **/
+		if (!this.args.interactive) {
+			return;
+		}
+
+		var p = this.getSVGCoordenates(evt);
+
+		/** When click on canvas or background deselect all **/
+		if (this.isNodeCanvas(evt.target) || this.isNodeBackground(evt.target)) {
+			this.deselectNodes();
+			this.deselectEdges();
+			this.onCanvasClicked.notify();
+		}
+
+		/** if I am linking vertices **/
+		if (this.args.linkEnabled) {
+
+			if (!this.args.linking) {
+				this.args.linking = true;
+				if (this.isVertex(evt.target)) {
+					this.linkStartX = p.x;
+					this.linkStartY = p.y;
+					this.linkSVGNode = SVG.drawLine(p.x, p.y, p.x, p.y, this._svg, {
+						&quot;stroke&quot; : &quot;#FF0000&quot;
+					});
+					this.linkNodeSource = this.getVertexIdFromSVGId(evt.target.id);
+				}
+			} else {
+				this.linkNodeTarget = this.getVertexIdFromSVGId(evt.target.id);
+				this.args.linking = false;
+				this.args.linkEnabled = false;
+				if (this.isVertex(evt.target)) {
+					this.getDataset().addEdge(this.linkNodeSource + &quot;_&quot; + this.linkNodeTarget, this.linkNodeSource, this.linkNodeTarget, {});
+				}
+				this.linkSVGNode.parentNode.removeChild(this.linkSVGNode);
+			}
+			return;
+		}
+
+		/** Id is a vertex or the canvas **/
+		if (this.isVertex(evt.target) || this.isNodeCanvas(evt.target) || this.isNodeBackground(evt.target)) {
+			this._startDragging(evt);
+		}
+		/** if i is  edge **/
+		if (this.isEdge(evt.target)) {
+			this.selectEdge(this.getEdgeIdFromSVGId(evt.target.getAttribute(&quot;id&quot;)));
+		}
+
+		if (this.args.multipleSelectionEnabled) {
+			if (!this.dragging) {
+				this.setSelecting(true);
+				this.selectorX = p.x;
+				this.selectorY = p.y;
+				this.displaySelection(p.x, p.y, 1, 1);
+			}
+		}
+
+	}
+	if (event.button == 1) {
+		this.setLinking(false);
+		this.setMultipleSelection(false);
+		this.selecting = false;
+
+		/** Id is a vertex or the canvas **/
+		if (this.isVertex(evt.target) || this.isNodeCanvas(evt.target) || this.isNodeBackground(evt.target)) {
+			this._startDragging(evt);
+		}
+	}
+};
+
+GraphCanvas.prototype.mouseUp = function(event) {
+	if (!this.args.interactive) {
+		return;
+	}
+
+	if (this.dragging) {
+		this._stopDragging(event);
+		if (this.isVertex(event.target)) {
+			var vertexId = this.getVertexIdFromSVGId(event.target.id);
+			if (this.getDataset().getVertexById(vertexId).getEdges().length &gt;= this.args.maxNumberEdgesMoving) {
+				this.moveEdge(vertexId);
+			}
+		}
+	}
+
+	if (this.selecting) {
+		this.setSelecting(false);
+
+		var x1 = (parseFloat(this.selectorSVGNode.getAttribute(&quot;x&quot;)) - DOM.select(this.id).getAttribute(&quot;dragx&quot;)) / this.getFormatter().getWidth();
+		var y1 = (parseFloat(this.selectorSVGNode.getAttribute(&quot;y&quot;)) - DOM.select(this.id).getAttribute(&quot;dragy&quot;)) / this.getFormatter().getHeight();
+		var x2 = (x1 + parseFloat(this.selectorSVGNode.getAttribute(&quot;width&quot;) / this.formatter.getWidth()));
+		var y2 = (y1 + parseFloat(this.selectorSVGNode.getAttribute(&quot;height&quot;) / this.formatter.getHeight()));
+
+		var verticesSelected = this.getLayout().getVerticesByArea(x1 / this.getFormatter().getZoomScale, y1 / this.getFormatter().getZoomScale,
+				x2 / this.getFormatter().getZoomScale, y2 / this.getFormatter().getZoomScale);
+
+		for ( var i = 0; i &lt; verticesSelected.length; i++) {
+			this.selectNode(verticesSelected[i].getId());
+		}
+
+		if (this.selectorSVGNode != null) {
+			this._svg.removeChild(this.selectorSVGNode);
+		}
+
+		if (this.args.labeled) {
+			this.clearLabels();
+			this.renderLabels();
+		}
+
+		this.selectorSVGNode = null;
+		//		this.renderLabels();
+	}
+};
+
+/** SELECTION **/
+GraphCanvas.prototype.displaySelection = function(x, y, width, height) {
+	if (this.selectorSVGNode != null) {
+		this.selectorSVGNode.setAttribute(&quot;x&quot;, x);
+		this.selectorSVGNode.setAttribute(&quot;y&quot;, y);
+		this.selectorSVGNode.setAttribute(&quot;width&quot;, width);
+		this.selectorSVGNode.setAttribute(&quot;height&quot;, height);
+	} else {
+		this.selectorSVGNode = SVG.drawRectangle(x, y, width, height, this._svg, {
+			&quot;fill&quot; : &quot;red&quot;,
+			&quot;stroke&quot; : &quot;black&quot;,
+			&quot;opacity&quot; : &quot;0.2&quot;,
+			&quot;stroke-opacity&quot; : &quot;1&quot;
+		});
+	}
+};
+
+/** DRAGGING **/
+GraphCanvas.prototype._startDragging = function(evt) {
+	if (!this.isDraggingCanvasEnabled()) {
+		if (this.isNodeCanvas(evt.target)) {
+			this.draggingElement = null;
+		}
+	}
+
+	if (this.isVertex(evt.target) || (this.isNodeBackground(evt.target) &amp;&amp; (this.isDraggingCanvasEnabled()))|| (this.isNodeCanvas(evt.target) &amp;&amp; (this.isDraggingCanvasEnabled()))) {
+		this.clearLabels();
+		this.draggingElement = evt.target;
+		this.dragging = true;
+		var p = this.getSVGCoordenates(evt);
+
+		this.nMouseOffsetX = p.x - parseInt(evt.target.getAttribute(&quot;dragx&quot;));
+		this.nMouseOffsetY = p.y - parseInt(evt.target.getAttribute(&quot;dragy&quot;));
+
+		if (this.isVertex(evt.target)) {
+			this.dragStartX = parseInt(this.draggingElement.getAttribute(&quot;dragx&quot;)) * this.getFormatter().getZoomScale()
+					+ parseFloat(DOM.select(this.id).getAttribute(&quot;dragx&quot;));
+			this.dragStartY = parseInt(this.draggingElement.getAttribute(&quot;dragy&quot;)) * this.getFormatter().getZoomScale()
+					+ parseFloat(DOM.select(this.id).getAttribute(&quot;dragy&quot;));
+		} else {
+			this.dragStartX = p.x - parseInt(this.draggingElement.getAttribute(&quot;dragx&quot;));// + parseFloat(DOM.select(this.id).getAttribute(&quot;dragx&quot;));
+			this.dragStartY = p.y - parseInt(this.draggingElement.getAttribute(&quot;dragy&quot;));// + parseFloat(DOM.select(this.id).getAttribute(&quot;dragy&quot;));
+		}
+	}
+};
+
+GraphCanvas.prototype._stopDragging = function(event) {
+	this.nMouseOffsetX = 0;
+	this.nMouseOffsetX = 0;
+	/** despues del evento up viene el evento click entonces acabo el dragging en el mouseclick **/
+	this.dragging = false;
+	this.draggingElement = null;
+	this.renderLabels();
+
+	this.setLinking(false);
+	this.setMultipleSelection(true);
+	this.selecting = false;
+
+};
+
+/** Move the edges of the vertex with the vertexId indicado **/
+GraphCanvas.prototype.moveEdge = function(vertexId) {
+	var x = this.getLayout().getNodeById(vertexId).x * this.getFormatter().getWidth();
+	var y = this.getLayout().getNodeById(vertexId).y * this.getFormatter().getHeight();
+
+	/** Moving edges out **/
+	for ( var i = 0; i &lt; this.getDataset().getVertexById(vertexId).getEdgesOut().length; i++) {
+		var edgeId = this.getDataset().getVertexById(vertexId).getEdgesOut()[i].getId();
+		var svgEdgeId = this.getSVGEdgeId(edgeId);
+		var edgeFormatter = this.getFormatter().getEdgeById(edgeId);
+		if (edgeFormatter instanceof LineEdgeGraphFormatter) {
+			DOM.select(svgEdgeId + &quot;_shadow&quot;).setAttribute(&quot;x2&quot;, x);
+			DOM.select(svgEdgeId + &quot;_shadow&quot;).setAttribute(&quot;y2&quot;, y);
+			DOM.select(svgEdgeId).setAttribute(&quot;x2&quot;, x);
+			DOM.select(svgEdgeId).setAttribute(&quot;y2&quot;, y);
+		}
+
+		if ((edgeFormatter instanceof DirectedLineEdgeGraphFormatter) || (edgeFormatter instanceof OdirectedLineEdgeGraphFormatter)
+				|| (edgeFormatter instanceof OdotDirectedLineEdgeGraphFormatter) || (edgeFormatter instanceof DotDirectedLineEdgeGraphFormatter)
+				|| (edgeFormatter instanceof CutDirectedLineEdgeGraphFormatter)) {
+			this.removeEdge(edgeId);
+			this.renderEdge(edgeId);
+		}
+	}
+
+	/** Moving edges in **/
+	for ( var i = 0; i &lt; this.getDataset().getVertexById(vertexId).getEdgesIn().length; i++) {
+		var edgeId = this.getDataset().getVertexById(vertexId).getEdgesIn()[i].getId();
+		var svgEdgeId = this.getSVGEdgeId(edgeId);
+		var edgeFormatter = this.getFormatter().getEdgeById(edgeId);
+		if (edgeFormatter instanceof LineEdgeGraphFormatter) {
+			DOM.select(svgEdgeId).setAttribute(&quot;x1&quot;, x);
+			DOM.select(svgEdgeId).setAttribute(&quot;y1&quot;, y);
+			DOM.select(svgEdgeId + &quot;_shadow&quot;).setAttribute(&quot;x1&quot;, x);
+			DOM.select(svgEdgeId + &quot;_shadow&quot;).setAttribute(&quot;y1&quot;, y);
+		}
+
+		if ((edgeFormatter instanceof DirectedLineEdgeGraphFormatter) || (edgeFormatter instanceof OdirectedLineEdgeGraphFormatter)
+				|| (edgeFormatter instanceof OdotDirectedLineEdgeGraphFormatter) || (edgeFormatter instanceof DotDirectedLineEdgeGraphFormatter)
+				|| (edgeFormatter instanceof CutDirectedLineEdgeGraphFormatter)) {
+			this.removeEdge(edgeId);
+			this.renderEdge(edgeId);
+		}
+
+		if (edgeFormatter instanceof BezierEdgeGraphFormatter) {
+			var radius = this.getFormatter().getVertexById(vertexId).getDefault().getSize() * this.getFormatter().getNodesMaxSize();
+			var d = this.calculateCoordenatesBezier(radius, x, y);
+			DOM.select(svgEdgeId).setAttribute(&quot;d&quot;, d);
+		}
+	}
+};
+
+GraphCanvas.prototype.moveNode = function(vertexId) {
+	var x = this.getLayout().getNodeById(vertexId).x * this.getFormatter().getWidth();
+	var y = this.getLayout().getNodeById(vertexId).y * this.getFormatter().getHeight();
+	var svgNodeElement = DOM.select(this.getSVGNodeId(vertexId));
+
+	svgNodeElement.setAttribute(&quot;dragx&quot;, x);
+	svgNodeElement.setAttribute(&quot;dragy&quot;, y);
+	svgNodeElement.setAttribute(&quot;transform&quot;, &quot;translate(&quot; + x + &quot;,&quot; + y + &quot;)&quot;);
+
+	if (this.getDataset().getVertexById(vertexId).getEdges().length &lt; this.args.maxNumberEdgesMoving) {
+		this.moveEdge(vertexId);
+	}
+};
+
+GraphCanvas.prototype._movingNode = function(svgNodeElement, x, y) {
+	var vertexId = this.getVertexIdFromSVGId(svgNodeElement.getAttribute(&quot;id&quot;));
+	this.getLayout().getNodeById(vertexId).setCoordinates(x / this.getFormatter().getWidth(), y / this.getFormatter().getHeight());
+	this.desplazamientoX = 0;
+	this.desplazamientoY = 0;
+	this.removeLabel(vertexId);
+	this.renderLabel(vertexId);
+};
+
+/** INIT **/
+GraphCanvas.prototype.init = function() {
+
+	this._svg = this.createSVGDom(this.targetID, this.id, this.getFormatter().getWidth(), this.getFormatter().getHeight(), this.getFormatter()
+			.getBackgroundColor());
+	this.GraphGroup = SVG.drawGroup(this._svg, [ [ &quot;id&quot;, this.args.idGraph ], [ &quot;transform&quot;, &quot;translate(0,0), scale(1)&quot; ] ]);
+	this.GraphBackground = SVG.drawGroup(this.GraphGroup, [ [ &quot;id&quot;, this.args.idBackground ] ]);
+	this.GraphEdgeGroup = SVG.drawGroup(this.GraphGroup, [ [ &quot;id&quot;, this.args.idEdgesGraph ] ]);
+	this.GraphNodeGroup = SVG.drawGroup(this.GraphGroup, [ [ &quot;id&quot;, this.args.idNodesGraph ] ]);
+	this.GraphLabelGroup = SVG.drawGroup(this.GraphGroup, [ [ &quot;id&quot;, this.args.idLabelGraph ] ]);
+
+	if ((this.getFormatter().getBackgroundImage() != null) &amp;&amp; (this.getFormatter().getBackgroundImage() != &quot;&quot;)) {
+		this.setBackgroundImage(this.getFormatter().getBackgroundImage());
+	}
+	/** SVG Events listener */
+	var _this = this;
+	this._svg.addEventListener(&quot;click&quot;, function(event) {
+		_this.mouseClick(event);
+	}, false);
+	this._svg.addEventListener(&quot;mousemove&quot;, function(event) {
+		_this.mouseMove(event, _this);
+	}, false);
+	this._svg.addEventListener(&quot;mousedown&quot;, function(event) {
+		_this.mouseDown(event, _this);
+	}, false);
+	this._svg.addEventListener(&quot;mouseup&quot;, function(event) {
+		_this.mouseUp(event, _this);
+	}, false);
+};
+
+/*
+ GraphCanvas.prototype.backgroungToSVG = function(){
+ var _this = this;
+ var canvas = document.createElement(&#039;canvas&#039;);
+ canvas.setAttribute(&quot;id&quot;, &quot;canvas&quot;);
+ canvas.width = this.formatter.getWidth();
+ canvas.height = this.formatter.getHeight();
+
+ this._svg.parentNode.parentNode.appendChild(canvas);
+ var ctx = document.getElementById(&#039;canvas&#039;).getContext(&#039;2d&#039;);
+ var img = new Image();
+
+ img.src = this.formatter.getBackgroundImage();
+ ctx.drawImage(img,0,0 ,_this.formatter.getWidth(), _this.formatter.getHeight()); 
+
+
+ img.onload  = function() { 
+ canvas.parentNode.removeChild(canvas);
+ }
+
+ this.NodeSVGbackgroundImage.setAttribute(&quot;xlink:href&quot;, document.getElementById(&quot;canvas&quot;).toDataURL());
+ this.NodeSVGbackgroundImage.removeAttribute(&quot;href&quot;);
+
+ //
+
+ };*/
+
+GraphCanvas.prototype.setBackgroundImage = function() {
+	if (this.NodeSVGbackgroundImage != null) {
+		this.NodeSVGbackgroundImage.parentNode.removeChild(this.NodeSVGbackgroundImage);
+	}
+	$(&#039;#&#039; + this.targetID).svg();
+	$(&#039;#&#039; + this.targetID).svg(&quot;get&quot;);
+
+	$(&#039;#&#039; + this.targetID).svg(&quot;get&quot;)._svg = document.getElementById(this.id);
+
+	var svg = $(&#039;#&#039; + this.targetID).svg(&quot;get&quot;);
+	this.NodeSVGbackgroundImage = svg.image(0, 0, this.getFormatter().getWidth(), this.getFormatter().getHeight(), this.getFormatter()
+			.getBackgroundImage());
+	this.NodeSVGbackgroundImage.setAttribute(&quot;id&quot;, this.args.idBackgroundNode);
+
+	this.NodeSVGbackgroundImage.setAttribute(&quot;x&quot;, 0);
+	this.NodeSVGbackgroundImage.setAttribute(&quot;y&quot;, 0);
+
+	this.NodeSVGbackgroundImage.setAttribute(&quot;dragx&quot;, 0);
+	this.NodeSVGbackgroundImage.setAttribute(&quot;dragy&quot;, 0);
+
+	if (this.getFormatter().args.backgroundImageHeight != null) {
+		this.NodeSVGbackgroundImage.setAttribute(&quot;height&quot;, this.getFormatter().args.backgroundImageHeight);
+	}
+	if (this.getFormatter().args.backgroundImageWidth != null) {
+		this.NodeSVGbackgroundImage.setAttribute(&quot;width&quot;, this.getFormatter().args.backgroundImageWidth);
+	}
+
+	if (this.getFormatter().args.backgroundImageX != null) {
+		this.NodeSVGbackgroundImage.setAttribute(&quot;x&quot;, this.getFormatter().args.backgroundImageX);
+	}
+	if (this.getFormatter().args.backgroundImageY != null) {
+		this.NodeSVGbackgroundImage.setAttribute(&quot;y&quot;, this.getFormatter().args.backgroundImageY);
+	}
+
+	this.GraphBackground.appendChild(this.NodeSVGbackgroundImage);
+	this.NodeSVGbackgroundImage.removeAttribute(&quot;href&quot;);
+	this.NodeSVGbackgroundImage.setAttribute(&quot;xlink:href&quot;, this.getFormatter().getBackgroundImage());
+};
+
+GraphCanvas.prototype.removeBackgroundImage = function() {
+	if (this.NodeSVGbackgroundImage != null) {
+		this.NodeSVGbackgroundImage.parentNode.removeChild(this.NodeSVGbackgroundImage);
+	}
+};
+
+GraphCanvas.prototype._setBackgroundColor = function(color) {
+	var attributes = [ [ &quot;fill&quot;, color ] ];
+	SVG.drawRectangle(0, 0, this.getFormatter().getWidth(), this.getFormatter().getHeight(), this.GraphBackground, attributes);
+};
+
+/** Serialize **/
+GraphCanvas.prototype.toJSON = function() {
+	var json = {};
+	json.dataset = {};
+	json.formatter = {};
+	json.layout = {};
+	json.dataset = this.getDataset().toJSON();
+	json.formatter = this.getFormatter().toJSON();
+	json.layout = this.getLayout().toJSON();
+	return json;
+};
+
+GraphCanvas.prototype.toHTML = function() {
+	//this.backgroungToSVG();
+	var html = this._svg.parentElement.innerHTML;
+
+	var start = html.indexOf(&quot;&lt;svg&quot;);
+	var end = html.indexOf(&quot;&lt;/svg&gt;&quot;) + 6;
+
+	return html.substr(start, end);
+};
+
+/** DRAW **/
+GraphCanvas.prototype.draw = function(graphdataset, graphformatter, graphlayout) {
+	this.setDataset(graphdataset);
+	this.setFormatter(graphformatter);
+	this.setLayout(graphlayout);
+
+	var _this = this;
+	this.getFormatter().changed.attach(function(sender, item) {
+		_this.removeNode(item.getId());
+		_this.renderNode(item.getId());
+		if (_this.args.labeled) {
+			_this.removeLabel(item.getId());
+			_this.renderLabel(item.getId());
+		}
+
+	});
+	//TODO
+	this.getFormatter().edgeChanged.attach(function(sender, item) {
+		_this.removeEdge(item.getId());
+		_this.renderEdge(item.getId());
+	});
+
+	this.getFormatter().resized.attach(function(sender, item) {
+		_this.resize(_this.getFormatter().getWidth(), _this.getFormatter().getHeight());
+	});
+
+	this.getFormatter().backgroundImageChanged.attach(function(sender, item) {
+		_this.setBackgroundImage(_this.getFormatter().getBackgroundImage());
+	});
+
+	this.getFormatter().backgroundColorChanged.attach(function(sender, item) {
+		_this._setBackgroundColor(_this.getFormatter().getBackgroundColor());
+	});
+
+	this.getLayout().changed.attach(function(sender, item) {
+		_this.moveNode(item.getId());
+		_this.moveEdge(item.getId());
+		if (_this.args.labeled) {
+			_this.removeLabel(item.getId());
+			_this.renderLabel(item.getId());
+		}
+	});
+
+	this.getDataset().newVertex.attach(function(sender, item) {
+
+		_this.renderNode(item.getId());
+		if (_this.args.labeled) {
+			_this.renderLabel(item.getId());
+		}
+	});
+
+	this.getDataset().newEdge.attach(function(sender, item) {
+		_this.renderEdge(item.getId());
+	});
+
+	this.getDataset().vertexDeleted.attach(function(sender, item) {
+		_this.removeNode(item.getId());
+		if (_this.args.labeled) {
+			_this.removeLabel(item.getId());
+		}
+	});
+
+	this.getDataset().edgeDeleted.attach(function(sender, item) {
+		_this.removeEdge(item.getId());
+	});
+
+	this.getDataset().vertexNameChanged.attach(function(sender, args) {
+		if (_this.args.labeled) {
+			_this.removeLabel(args.item.getId());
+			_this.removeLabel(args.item.getId());
+			_this.renderLabel(args.item.getId());
+		}
+	});
+	this.init();
+	this.render();
+};
+
+GraphCanvas.prototype.render = function() {
+	for ( var id in this.getDataset().getVertices()) {
+		this.renderNode(id);
+	}
+	this.renderLabels();
+	this.renderEdges();
+};
+
+GraphCanvas.prototype.renderLabels = function() {
+	if (this.args.labeled) {
+		for ( var id in this.getDataset().getVertices()) {
+			this.renderLabel(id);
+		}
+	}
+};
+
+GraphCanvas.prototype.removeLabels = function() {
+	for ( var id in this.getDataset().getVertices()) {
+		this.removeLabel(id);
+	}
+};
+
+/** Utilities method for nodes **/
+GraphCanvas.prototype.isNodeCanvas = function(node) {
+	return ((node.id == this.args.idGraph) || (node.id == this.id));
+};
+
+GraphCanvas.prototype.isNodeBackground = function(node) {
+	return ((node.id == this.args.idBackgroundNode));
+};
+
+GraphCanvas.prototype.isVertex = function(node) {
+	if (node.getAttribute(&quot;id&quot;) != null) {
+		if (node.getAttribute(&quot;id&quot;).indexOf(&quot;_v_&quot;) != -1) {
+			return true;
+		}
+	}
+	return false;
+};
+
+GraphCanvas.prototype.isLabel = function(node) {
+	if (node.getAttribute(&quot;id&quot;) != null) {
+		if (node.getAttribute(&quot;id&quot;).indexOf(&quot;_l_&quot;) != -1) {
+			return true;
+		}
+	}
+	return false;
+};
+
+GraphCanvas.prototype.isEdge = function(node) {
+	if (node.getAttribute(&quot;id&quot;) != null) {
+		if (node.getAttribute(&quot;id&quot;).indexOf(&quot;_e_&quot;) != -1) {
+			return true;
+		}
+	}
+	return false;
+};
+
+/** Resize **/
+GraphCanvas.prototype.resize = function(width, height) {
+	//	this._svg.setAttribute(&quot;width&quot;, width);
+	//	this._svg.setAttribute(&quot;height&quot;, height);
+	if (this.NodeSVGbackgroundImage != null) {
+		this.NodeSVGbackgroundImage.setAttribute(&quot;width&quot;, width);
+		this.NodeSVGbackgroundImage.setAttribute(&quot;height&quot;, height);
+	}
+
+	this._svg.setAttribute(&quot;width&quot;, width);
+	this._svg.setAttribute(&quot;height&quot;, height);
+
+	this.clearCanvas();
+	this.render();
+};
+
+GraphCanvas.prototype.clearCanvas = function() {
+	DOM.removeChilds(this.GraphEdgeGroup.getAttribute(&quot;id&quot;));
+	DOM.removeChilds(this.GraphNodeGroup.getAttribute(&quot;id&quot;));
+	this.clearLabels();
+};
+
+GraphCanvas.prototype.clearLabels = function() {
+	DOM.removeChilds(this.GraphLabelGroup.getAttribute(&quot;id&quot;));
+};
+
+/** ID&#039;S converter **/
+GraphCanvas.prototype.getSVGNodeId = function(nodeId) {
+	return this.id + &quot;_v_&quot; + nodeId;
+};
+
+GraphCanvas.prototype.getSVGEdgeId = function(edgeId) {
+	return this.id + &quot;_e_&quot; + edgeId;
+};
+
+GraphCanvas.prototype.getSVGArrowEdgeId = function(edgeId) {
+	return this.id + &quot;_arrow_&quot; + edgeId;
+};
+
+GraphCanvas.prototype.getSVGLabelId = function(edgeId) {
+	return this.id + &quot;_l_&quot; + edgeId;
+};
+
+GraphCanvas.prototype.blinkVertexById = function(vertexId) {
+	$(&quot;#&quot; + this.getSVGNodeId(vertexId)).fadeIn().fadeOut().fadeIn().fadeOut().fadeIn().fadeOut();
+};
+
+GraphCanvas.prototype.getVertexIdFromSVGId = function(svgVertexId) {
+	return svgVertexId.replace(this.id, &quot;&quot;).replace(&quot;_v_&quot;, &quot;&quot;);
+};
+
+GraphCanvas.prototype.getEdgeIdFromSVGId = function(svgEdgeId) {
+	return svgEdgeId.replace(this.id, &quot;&quot;).replace(&quot;_e_&quot;, &quot;&quot;);
+};
+
+/** VERTEX **/
+GraphCanvas.prototype.getVertexById = function(id) {
+	return document.getElementById(this.getSVGNodeId(id));
+};
+
+GraphCanvas.prototype.renderNodes = function() {
+	for ( var id in this.getDataset().getVertices()) {
+		this.renderNode(id);
+	}
+};
+
+GraphCanvas.prototype.overNode = function(nodeId) {
+	if (!this.args.interactive) {
+		return;
+	}
+	/** If selected we don&#039;t change the format **/
+	if (this.args.isVertexSelected[nodeId] == null) {
+		var args = this.getFormatter().getVertexById(nodeId).getOver();
+		args.args[&quot;cursor&quot;] = &#039;pointer&#039;;
+		this.changeVertexFormat(nodeId, args);
+	}
+};
+
+GraphCanvas.prototype.outNode = function(nodeId) {
+	if (!this.args.interactive) {
+		return;
+	}
+
+	/** If selected we don&#039;t change the format **/
+	if (this.args.isVertexSelected[nodeId] == null) {
+		this.changeVertexFormat(nodeId, this.getFormatter().getVertexById(nodeId).getDefault());
+	}
+};
+
+GraphCanvas.prototype.overLabel = function(nodeId) {
+	this.overNode(nodeId);
+	//	this.svgLabels[nodeId].setAttribute(&quot;cursor&quot;, &quot;pointer&quot;);
+};
+
+GraphCanvas.prototype.outLabel = function(nodeId) {
+	this.outNode(nodeId);
+	//	this.svgLabels[nodeId].setAttribute(&quot;cursor&quot;, &quot;&quot;);
+};
+
+GraphCanvas.prototype.clickNode = function(nodeId) {
+	if (!this.args.interactive) {
+		return;
+	}
+
+	/** si el evento se dispara oprque estaba dragging entonces no activo nada **/
+	if (this.args.isVertexSelected[nodeId] == null) {
+		this.selectNode(nodeId);
+	} else {
+		this.deselectNode(nodeId);
+	}
+};
+
+GraphCanvas.prototype.selectNode = function(nodeId) {
+	for ( var i = 0; i &lt; this.args.selectedVertices.length; i++) {
+		var format = this.getFormatter().getVertexById(nodeId).getSelected();
+		format.opacity = 0.2;
+		this.changeVertexFormat(nodeId, this.getFormatter().getVertexById(nodeId).getSelected());
+	}
+
+	if (this.args.isVertexSelected[nodeId] == null) {
+		var format = this.getFormatter().getVertexById(nodeId).getSelected();
+		format.opacity = 1;
+		this.changeVertexFormat(nodeId, this.getFormatter().getVertexById(nodeId).getSelected());
+		this.args.selectedVertices.push(nodeId);
+		this.args.isVertexSelected[nodeId] = this.args.selectedVertices.length - 1;
+		this.onVertexSelect.notify(nodeId);
+	}
+};
+
+GraphCanvas.prototype.selectAllEdges = function() {
+	this.deselectNodes();
+	this.deselectEdges();
+
+	for ( var edgesId in this.getDataset().edges) {
+		this.selectEdge(edgesId);
+	}
+};
+
+GraphCanvas.prototype.selectAllNodes = function() {
+	this.deselectNodes();
+	this.deselectEdges();
+
+	for ( var vertexId in this.getDataset().vertices) {
+		this.selectNode(vertexId);
+	}
+};
+
+GraphCanvas.prototype.selectAll = function() {
+	this.deselectNodes();
+	this.deselectEdges();
+
+	for ( var vertexId in this.getDataset().vertices) {
+		this.selectNode(vertexId);
+	}
+
+	for ( var edgesId in this.getDataset().edges) {
+		this.selectEdge(edgesId);
+	}
+};
+
+GraphCanvas.prototype.selectEdge = function(edgeId) {
+	if (this.args.isEdgeSelected[edgeId] == null) {
+		this.changeEdgeFormat(edgeId, this.getFormatter().getEdgeById(edgeId).getSelected());
+		//this.args.selectedEdges.push(edgeId);
+		this.args.isEdgeSelected[edgeId] = true; //this.args.selectedEdges.length - 1;
+		this.onEdgeSelect.notify(edgeId);
+	}
+};
+
+GraphCanvas.prototype.selectEdges = function(edges) {
+
+	for ( var i = 0; i &lt; edges.length; i++) {
+		this.selectEdge(edges[i]);
+	}
+};
+
+GraphCanvas.prototype.deselectNode = function(nodeId) {
+	if (this.args.isVertexSelected[nodeId] != null) {
+		this.changeVertexFormat(nodeId, this.getFormatter().getVertexById(nodeId).getDefault());
+		this.args.selectedVertices.splice(this.args.isVertexSelected[nodeId], 1);
+		var index = this.args.isVertexSelected[nodeId];
+		delete this.args.isVertexSelected[nodeId];
+
+		for ( var vertex in this.args.isVertexSelected) {
+			if (this.args.isVertexSelected[vertex] &gt; index) {
+				this.args.isVertexSelected[vertex] = this.args.isVertexSelected[vertex] - 1;
+			}
+		}
+	}
+};
+
+GraphCanvas.prototype.deselectNodes = function() {
+	var selected = JSON.parse(JSON.stringify(this.getSelectedVertices()));
+	for ( var i = 0; i &lt; selected.length; i++) {
+		this.deselectNode(selected[i]);
+	}
+};
+GraphCanvas.prototype.selectNodes = function(idNodes) {
+
+	for ( var i = 0; i &lt; idNodes.length; i++) {
+		this.selectNode(idNodes[i]);
+	}
+
+	//	for ( var vertex in this.args.isVertexSelected) {
+	//		if (this.args.isVertexSelected[vertex] &gt; index){
+	//			this.args.isVertexSelected[vertex] = this.args.isVertexSelected[vertex] - 1;
+	//		}
+	//	}
+
+};
+
+GraphCanvas.prototype.changeVertexFormat = function(nodeId, format) {
+	var svgNode = DOM.select(this.getSVGNodeId(nodeId));
+	if (svgNode != null) {
+		var properties = format.toJSON();
+		for ( var item in properties) {
+			svgNode.setAttribute(item, properties[item]);
+		}
+
+		if (this.getFormatter().getVertexById(nodeId) instanceof CircleVertexGraphFormatter) {
+			var transform = &quot;translate(&quot; + svgNode.getAttribute(&quot;dragx&quot;) + &quot;,&quot; + svgNode.getAttribute(&quot;dragy&quot;) + &quot;), scale(&quot; + format.getSize() + &quot;)&quot;;
+			svgNode.setAttribute(&quot;transform&quot;, transform);
+		}
+	}
+};
+
+GraphCanvas.prototype.renderLabel = function(nodeId) {
+	var x = Math.ceil(this.getLayout().getNodeById(nodeId).x * this.getFormatter().getWidth());
+	var y = Math.ceil(this.getLayout().getNodeById(nodeId).y * this.getFormatter().getHeight());
+
+	var svgAttributesNode = JSON.parse(JSON.stringify(this.getFormatter().getVertexById(nodeId).getDefault().toJSON().title));
+	svgAttributesNode.id = this.getSVGLabelId(this.getDataset().getVertexById(nodeId).getId());
+	svgAttributesNode.dx = (-1) * (this.getDataset().getVertexById(nodeId).getName().length * svgAttributesNode[&quot;font-size&quot;]) / 4 - 4;
+
+	svgAttributesNode.dy = parseFloat((this.getFormatter().getVertexById(nodeId).getDefault().getSize()))
+			+ parseFloat(svgAttributesNode[&quot;font-size&quot;]) + parseFloat(this.getFormatter().getVertexById(nodeId).getDefault().getStrokeWidth()) - 4;
+	svgAttributesNode.dragx = Math.ceil(this.getLayout().getNodeById(nodeId).x * this.getFormatter().getWidth());
+
+	var gragy = parseFloat(this.getFormatter().getVertexById(nodeId).getDefault().getSize())
+			+ Math.ceil(this.getLayout().getNodeById(nodeId).y * this.getFormatter().getHeight());
+	svgAttributesNode.dragy = gragy;
+	svgAttributesNode.transform = &quot;translate(&quot; + svgAttributesNode.dragx + &quot;,&quot; + svgAttributesNode.dragy + &quot;)&quot;;//, scale(&quot;+this.formatter.getVertexById(nodeId).getDefault().getSize()+&quot;)&quot;;
+
+	var nodeSVG = SVG.drawText(0, 0, this.getDataset().getVertexById(nodeId).getName(), this.GraphLabelGroup, svgAttributesNode);
+
+	this.svgLabels[nodeId] = nodeSVG;
+
+	/** Events for the SVG node **/
+	var _this = this;
+	if (nodeSVG != null) {
+		nodeSVG.addEventListener(&quot;mouseover&quot;, function() {
+			_this.overLabel(nodeId);
+		}, false);
+		nodeSVG.addEventListener(&quot;mouseout&quot;, function() {
+			_this.outLabel(nodeId);
+		}, false);
+	}
+
+};
+
+GraphCanvas.prototype.removeLabel = function(labelId) {
+	if (DOM.select(this.getSVGLabelId(labelId)) != null) {
+		DOM.select(this.getSVGLabelId(labelId)).parentNode.removeChild(DOM.select(this.getSVGLabelId(labelId)));
+	}
+};
+
+GraphCanvas.prototype.renderNode = function(nodeId) {
+	var svgAttributesNode = JSON.parse(JSON.stringify(this.getFormatter().getVertexById(nodeId).getDefault().toJSON()));
+	svgAttributesNode.dragx = Math.ceil(this.getLayout().getNodeById(nodeId).x * this.getFormatter().getWidth());
+	svgAttributesNode.dragy = Math.ceil(this.getLayout().getNodeById(nodeId).y * this.getFormatter().getHeight());
+	svgAttributesNode.transform = &quot;translate(&quot; + svgAttributesNode.dragx + &quot;,&quot; + svgAttributesNode.dragy + &quot;)&quot;;
+	svgAttributesNode.id = this.getSVGNodeId(nodeId);
+	/*svgAttributesNode[&quot;stroke-width&quot;] = 3 ;
+	svgAttributesNode[&quot;stroke-opacity&quot;] = 1 ;
+	svgAttributesNode[&quot;fill-opacity&quot;] = svgAttributesNode[&quot;opacity&quot;] ;
+	svgAttributesNode[&quot;opacity&quot;] = 1 ;*/
+	this.circleDefaultRadius = this.getFormatter().getVertexById(nodeId).getDefault().getSize();
+	var nodeSVG;
+
+	if (this.getFormatter().getVertexById(nodeId) instanceof CircleVertexGraphFormatter) {
+		nodeSVG = SVG.drawCircle(0, 0, this.circleDefaultRadius, this.GraphNodeGroup, svgAttributesNode);
+	}
+
+	if (this.getFormatter().getVertexById(nodeId) instanceof SquareVertexGraphFormatter) {
+		//nodeSVG = SVG.drawRectangle(0 - (this.circleDefaultRadius) ,0 - (this.formatter.getVertexById(nodeId).getDefault().getSize()) , (this.getFormatter().getVertexById(nodeId).getDefault().getSize()*2),  (this.getFormatter().getVertexById(nodeId).getDefault().getSize()*2), this.GraphNodeGroup, svgAttributesNode);
+		nodeSVG = SVG.drawRectangle(0 - (this.circleDefaultRadius), 0 - (this.circleDefaultRadius), (this.circleDefaultRadius * 2),
+				(this.circleDefaultRadius * 2), this.GraphNodeGroup, svgAttributesNode);
+	}
+
+	if (this.getFormatter().getVertexById(nodeId) instanceof EllipseVertexGraphFormatter) {
+		nodeSVG = SVG.drawEllipse(0, 0, this.circleDefaultRadius * 1.5, this.circleDefaultRadius, this.GraphNodeGroup, svgAttributesNode);
+	}
+
+	if (this.getFormatter().getVertexById(nodeId) instanceof RectangleVertexGraphFormatter) {
+		//nodeSVG = SVG.drawRectangle(0 - (this.circleDefaultRadius) ,0 - ((this.circleDefaultRadius*2)/2) , (this.circleDefaultRadius*2),  (this.circleDefaultRadius), this.GraphNodeGroup, svgAttributesNode);
+		nodeSVG = SVG.drawRectangle(0 - (this.circleDefaultRadius * 1.5), 0 - (this.circleDefaultRadius), (this.circleDefaultRadius * 2 * 1.5),
+				(this.circleDefaultRadius * 2), this.GraphNodeGroup, svgAttributesNode);
+
+	}
+
+	if (this.getFormatter().getVertexById(nodeId) instanceof RoundedVertexGraphFormatter) {
+		svgAttributesNode.ry = 2;// this.formatter.getVertexById(nodeId).getDefault().getSize()/4;
+		svgAttributesNode.rx = 2;// this.formatter.getVertexById(nodeId).getDefault().getSize()/4;
+		nodeSVG = SVG.drawRectangle(0 - (this.circleDefaultRadius * 1.5), 0 - (this.circleDefaultRadius), (this.circleDefaultRadius * 2 * 1.5),
+				(this.circleDefaultRadius * 2), this.GraphNodeGroup, svgAttributesNode);
+	}
+
+	//&lt;polygon fill=&quot;violet&quot; stroke=&quot;violet&quot; points=&quot;935.972,-363.757 935.972,-380.243 914.9,-391.9 885.1,-391.9 864.028,-380.243 864.028,-363.757 885.1,-352.1 914.9,-352.1 935.972,-363.757&quot;/&gt; 
+
+	if (this.getFormatter().getVertexById(nodeId) instanceof OctagonVertexGraphFormatter) {
+		svgAttributesNode.ry = 2;
+		svgAttributesNode.rx = 2;
+		nodeSVG = SVG.drawRectangle(0 - (this.circleDefaultRadius * 1.5), 0 - (this.circleDefaultRadius), (this.circleDefaultRadius * 2 * 1.5),
+				(this.circleDefaultRadius * 2), this.GraphNodeGroup, svgAttributesNode);
+	}
+
+	nodeSVG.internalId = nodeId;
+	//
+	var _this = this;
+
+	/** Events for the SVG node **/
+	if (nodeSVG != null) {
+		nodeSVG.addEventListener(&quot;mouseover&quot;, function() {
+			_this.onVertexOver.notify(nodeId);
+			_this.overNode(nodeId);
+		}, false);
+		nodeSVG.addEventListener(&quot;mouseout&quot;, function() {
+			_this.onVertexOut.notify(nodeId);
+			_this.outNode(nodeId);
+		}, false);
+		//nodeSVG.addEventListener(&quot;click&quot;, function(){_this.clickNode(nodeId);}, false);
+		//
+		nodeSVG.addEventListener(&quot;mouseup&quot;, function() {
+			_this.onVertexUp.notify(nodeId);
+		}, false);
+	}
+};
+
+GraphCanvas.prototype.removeNode = function(nodeId) {
+	DOM.select(this.getSVGNodeId(nodeId)).parentNode.removeChild(DOM.select(this.getSVGNodeId(nodeId)));
+	if (this.args.labeled) {
+		this.removeLabel(nodeId);
+	}
+};
+
+/** REMOVING **/
+GraphCanvas.prototype.removeSelected = function() {
+	/** El orden importa **/
+	this.removeSelectedEdges();
+	this.removeSelectedNode();
+
+};
+
+GraphCanvas.prototype.removeSelectedNode = function() {
+	var selected = JSON.parse(JSON.stringify(this.getSelectedVertices()));
+	this.deselectNodes();
+	var sorted = selected.sort(function(a, b) {
+		return a - b
+	});
+	for ( var i = 0; i &lt; sorted.length; i++) {
+		if (this.getDataset().getVertexById(sorted[i]) != null) {
+			this.getDataset().getVertexById(sorted[i]).remove();
+		}
+	}
+};
+
+/** EDGES **/
+GraphCanvas.prototype.removeEdge = function(edgeId) {
+	if (DOM.select(this.getSVGEdgeId(edgeId)) != null) {
+		DOM.select(this.getSVGEdgeId(edgeId)).parentNode.removeChild(DOM.select(this.getSVGEdgeId(edgeId)));
+	}
+
+	if (DOM.select(this.getSVGEdgeId(edgeId) + &quot;_shadow&quot;) != null) {
+		DOM.select(this.getSVGEdgeId(edgeId) + &quot;_shadow&quot;).parentNode.removeChild(DOM.select(this.getSVGEdgeId(edgeId) + &quot;_shadow&quot;));
+	}
+
+	if (DOM.select(this.getSVGArrowEdgeId(edgeId)) != null) {
+		DOM.select(this.getSVGArrowEdgeId(edgeId)).parentNode.removeChild(DOM.select(this.getSVGArrowEdgeId(edgeId)));
+	}
+};
+
+GraphCanvas.prototype.overEdge = function(edgeId) {
+	if ((!this.args.interactive) || this.dragging || this.selecting) {
+		return;
+	}
+
+	/** If selected we don&#039;t change the format **/
+	if (this.args.isEdgeSelected[edgeId] == null) {
+		var format = this.getFormatter().getEdgeById(edgeId).getOver();
+		format.args[&quot;cursor&quot;] = &quot;pointer&quot;;
+		this.changeEdgeFormat(edgeId, format);
+	}
+};
+
+GraphCanvas.prototype.outEdge = function(edgeId) {
+	if (!this.args.interactive) {
+		return;
+	}
+
+	/** If selected we don&#039;t change the format **/
+	if (this.args.isEdgeSelected[edgeId] == null) {
+		this.changeEdgeFormat(edgeId, this.getFormatter().getEdgeById(edgeId).getDefault());
+	}
+};
+
+GraphCanvas.prototype.changeEdgeFormat = function(edgeId, format) {
+	var svgEdge = DOM.select(this.getSVGEdgeId(edgeId) + &quot;_shadow&quot;);
+	if (svgEdge != null) {
+		var properties = format.toJSON();
+		for ( var item in properties) {
+			svgEdge.setAttribute(item, properties[item]);
+		}
+	}
+};
+
+GraphCanvas.prototype.deselectEdge = function(edgeID) {
+	if (this.args.isEdgeSelected[edgeID] != null) {
+		this.changeEdgeFormat(edgeID, this.getFormatter().getEdgeById(edgeID).getDefault());
+		var index = this.args.isEdgeSelected[edgeID];
+		delete this.args.isEdgeSelected[edgeID];
+	}
+};
+
+GraphCanvas.prototype.deselectEdges = function() {
+	var selected = JSON.parse(JSON.stringify(this.getSelectedEdges()));
+	for ( var i = 0; i &lt; selected.length; i++) {
+		this.deselectEdge(selected[i]);
+	}
+};
+
+GraphCanvas.prototype.removeSelectedEdges = function() {
+	var selected = JSON.parse(JSON.stringify(this.getSelectedEdges()));
+	this.deselectEdges();
+	for ( var i = 0; i &lt; selected.length; i++) {
+		if (this.getDataset().getEdgeById(selected[i]) != null) {
+			this.getDataset().getEdgeById(selected[i]).remove();
+		}
+	}
+};
+
+GraphCanvas.prototype.renderEdge = function(edgeId) {
+	var svgAttributesEdge = this.getFormatter().getEdgeById(edgeId).getDefault().toJSON();
+	var edge = this.getDataset().getEdgeById(edgeId);
+
+	var svgNodeTarget = this.getVertexById(edge.getNodeTarget().getId());
+	var svgNodeSource = this.getVertexById(edge.getNodeSource().getId());
+	svgAttributesEdge.id = this.getSVGEdgeId(edge.getId()) + &quot;_shadow&quot;;
+
+	var svgEdge = null;
+
+	if (this.getFormatter().getEdgeById(edgeId) instanceof LineEdgeGraphFormatter) {
+		var coordenateSourceX = svgNodeSource.getAttribute(&quot;dragx&quot;);
+		var coordenateSourceY = svgNodeSource.getAttribute(&quot;dragy&quot;);
+		var coordenateTargetX = svgNodeTarget.getAttribute(&quot;dragx&quot;);
+		var coordenateTargetY = svgNodeTarget.getAttribute(&quot;dragy&quot;);
+
+		SVG.drawLine(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, this.GraphEdgeGroup, svgAttributesEdge);
+		var attributesShadow = {};
+		attributesShadow.id = this.getSVGEdgeId(edge.getId());
+		attributesShadow[&quot;stroke-opacity&quot;] = 0;
+		attributesShadow[&quot;stroke-width&quot;] = 4;
+		attributesShadow[&quot;stroke&quot;] = &quot;black&quot;;
+		svgEdge = SVG.drawLine(svgNodeSource.getAttribute(&quot;dragx&quot;), svgNodeSource.getAttribute(&quot;dragy&quot;), svgNodeTarget.getAttribute(&quot;dragx&quot;),
+				svgNodeTarget.getAttribute(&quot;dragy&quot;), this.GraphEdgeGroup, attributesShadow);
+	}
+
+	if (this.getFormatter().getEdgeById(edgeId) instanceof BezierEdgeGraphFormatter) {
+		var nodeId = edge.getNodeTarget().getId();
+		var nodeSize = this.formatter.getVertexById(nodeId).getDefault().getSize() * this.getFormatter().getNodesMaxSize();
+		svgAttributesEdge.fill = &quot;none&quot;;
+		svgAttributesEdge.id = this.getSVGEdgeId(edgeId);
+		var d = this.calculateCoordenatesBezier(nodeSize, svgNodeSource.getAttribute(&quot;dragx&quot;), svgNodeSource.getAttribute(&quot;dragy&quot;));
+		svgEdge = SVG.drawPath(d, this.GraphEdgeGroup, svgAttributesEdge);
+	}
+	;
+
+	if ((this.getFormatter().getEdgeById(edgeId) instanceof DirectedLineEdgeGraphFormatter)
+			|| (this.getFormatter().getEdgeById(edgeId) instanceof CutDirectedLineEdgeGraphFormatter)
+			|| (this.getFormatter().getEdgeById(edgeId) instanceof DotDirectedLineEdgeGraphFormatter)
+			|| (this.getFormatter().getEdgeById(edgeId) instanceof OdotDirectedLineEdgeGraphFormatter)
+			|| (this.getFormatter().getEdgeById(edgeId) instanceof OdirectedLineEdgeGraphFormatter)) {
+		var coordenateSourceX = svgNodeSource.getAttribute(&quot;dragx&quot;);
+		var coordenateSourceY = svgNodeSource.getAttribute(&quot;dragy&quot;);
+		var coordenateTargetX = svgNodeTarget.getAttribute(&quot;dragx&quot;);
+		var coordenateTargetY = svgNodeTarget.getAttribute(&quot;dragy&quot;);
+
+		var offset = parseFloat(this.getFormatter().getVertexById(this.getDataset().getEdgeById(edgeId).getNodeTarget().getId()).getDefault()
+				.getSize()
+				* this.circleDefaultRadius);
+		var point = this._calculateEdgePointerPosition(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, offset);
+		coordenateTargetX = point.x;
+		coordenateTargetY = point.y;
+		SVG.drawLine(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, this.GraphEdgeGroup, svgAttributesEdge);
+
+		var attributesShadow = {};
+		attributesShadow.id = this.getSVGEdgeId(edge.getId());
+		attributesShadow[&quot;stroke-opacity&quot;] = 0;
+		attributesShadow[&quot;stroke-width&quot;] = 4;
+		attributesShadow[&quot;stroke&quot;] = &quot;black&quot;;
+		svgEdge = SVG.drawLine(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, this.GraphEdgeGroup, attributesShadow);
+	}
+
+	if (this.getFormatter().getEdgeById(edgeId) instanceof DirectedLineEdgeGraphFormatter
+			|| (this.getFormatter().getEdgeById(edgeId) instanceof OdirectedLineEdgeGraphFormatter)) {
+		var coordenateSourceX = svgNodeSource.getAttribute(&quot;dragx&quot;);
+		var coordenateSourceY = svgNodeSource.getAttribute(&quot;dragy&quot;);
+		var coordenateTargetX = svgNodeTarget.getAttribute(&quot;dragx&quot;);
+		var coordenateTargetY = svgNodeTarget.getAttribute(&quot;dragy&quot;);
+
+		var point = this._calculateEdgePointerPosition(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, offset);
+		coordenateTargetX = point.x;
+		coordenateTargetY = point.y;
+
+		var angle = Geometry.toDegree(point.angle) + 90;
+		this.arrowDefaultSize = this.getFormatter().getEdgeById(edgeId).getArrowSize(); //getDefault().getArrowSize();
+		var d = &quot;-&quot; + this.arrowDefaultSize + &quot;,0 0,-&quot; + parseFloat(this.arrowDefaultSize) * 2 + &quot; &quot; + this.arrowDefaultSize + &quot;,0&quot;;
+
+		var attributes;
+
+		if (this.getFormatter().getEdgeById(edgeId) instanceof DirectedLineEdgeGraphFormatter) {
+			attributes = [
+				[ &quot;fill&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ],
+				[ &quot;stroke&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ], [ &quot;id&quot;, this.getSVGArrowEdgeId(edgeId) ] ];
+		} else {
+			attributes = [
+				[ &quot;fill&quot;, &quot;#FFFFFF&quot; ], [ &quot;stroke&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ],
+				[ &quot;id&quot;, this.getSVGArrowEdgeId(edgeId) ] ];
+		}
+
+		var flechaSVGNode = SVG.drawPoligon(d, this.GraphEdgeGroup, attributes);//, [&quot;transform&quot;, &quot;rotate(&quot;+angle+&quot;), translate(0,0)&quot;]]);
+		flechaSVGNode.setAttribute(&quot;transform&quot;, &quot; translate(&quot; + coordenateTargetX + &quot;, &quot; + coordenateTargetY + &quot;), rotate(&quot; + angle + &quot;)&quot;);
+	}
+	;
+
+	if (this.getFormatter().getEdgeById(edgeId) instanceof CutDirectedLineEdgeGraphFormatter) {
+		var coordenateSourceX = svgNodeSource.getAttribute(&quot;dragx&quot;);
+		var coordenateSourceY = svgNodeSource.getAttribute(&quot;dragy&quot;);
+		var coordenateTargetX = svgNodeTarget.getAttribute(&quot;dragx&quot;);
+		var coordenateTargetY = svgNodeTarget.getAttribute(&quot;dragy&quot;);
+
+		var point = this._calculateEdgePointerPosition(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, offset);
+		coordenateTargetX = point.x;
+		coordenateTargetY = point.y;
+
+		var angle = Geometry.toDegree(point.angle) + 90;
+
+		//this.arrowDefaultSize = 2; //getDefault().getArrowSize();
+		var d = &quot;-4,0 4,0 4,-2 -4,-2&quot;;
+
+		var flechaSVGNode = SVG.drawPoligon(d, this.GraphEdgeGroup, [
+			[ &quot;fill&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ],
+			[ &quot;stroke&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ], [ &quot;id&quot;, this.getSVGArrowEdgeId(edgeId) ] ]);//, [&quot;transform&quot;, &quot;rotate(&quot;+angle+&quot;), translate(0,0)&quot;]]);
+		flechaSVGNode.setAttribute(&quot;transform&quot;, &quot; translate(&quot; + coordenateTargetX + &quot;, &quot; + coordenateTargetY + &quot;), rotate(&quot; + angle + &quot;)&quot;);
+	}
+	;
+
+	if ((this.getFormatter().getEdgeById(edgeId) instanceof DotDirectedLineEdgeGraphFormatter)
+			|| (this.getFormatter().getEdgeById(edgeId) instanceof OdotDirectedLineEdgeGraphFormatter)) {
+		var coordenateSourceX = svgNodeSource.getAttribute(&quot;dragx&quot;);
+		var coordenateSourceY = svgNodeSource.getAttribute(&quot;dragy&quot;);
+		var coordenateTargetX = svgNodeTarget.getAttribute(&quot;dragx&quot;);
+		var coordenateTargetY = svgNodeTarget.getAttribute(&quot;dragy&quot;);
+		var point = this._calculateEdgePointerPosition(coordenateSourceX, coordenateSourceY, coordenateTargetX, coordenateTargetY, offset);
+		coordenateTargetX = point.x;
+		coordenateTargetY = point.y;
+		var angle = Geometry.toDegree(point.angle) + 90;
+		//	this.arrowDefaultSize = this.formatter.getEdgeById(edgeId).getArrowSize(); //getDefault().getArrowSize();
+		var attributes = [];
+		if (this.getFormatter().getEdgeById(edgeId) instanceof OdotDirectedLineEdgeGraphFormatter) {
+			attributes = [
+				[ &quot;fill&quot;, &quot;#FFFFFF&quot; ], [ &quot;stroke&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ],
+				[ &quot;id&quot;, this.getSVGArrowEdgeId(edgeId) ] ];
+		} else {
+			attributes = [
+				[ &quot;fill&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ],
+				[ &quot;stroke&quot;, this.getFormatter().getEdgeById(edgeId).getDefault().getStroke() ], [ &quot;id&quot;, this.getSVGArrowEdgeId(edgeId) ] ];
+		}
+		var flechaSVGNode = SVG.drawCircle(0, 0, 4, this.GraphEdgeGroup, attributes);
+		flechaSVGNode.setAttribute(&quot;transform&quot;, &quot; translate(&quot; + coordenateTargetX + &quot;, &quot; + coordenateTargetY + &quot;), rotate(&quot; + angle + &quot;)&quot;);
+	}
+	;
+
+	var _this = this;
+	/** Events for the SVG edge **/
+	if (svgEdge != null) {
+		if (this.getDataset().getEdgesCount() &lt; this.args.maxNumberEdgesFiringEvents) {
+			svgEdge.addEventListener(&quot;mouseover&quot;, function() {
+				_this.overEdge(edgeId);
+			}, false);
+			svgEdge.addEventListener(&quot;mouseout&quot;, function() {
+				_this.outEdge(edgeId);
+			}, false);
+		}
+	}
+};
+
+GraphCanvas.prototype._calculateEdgePointerPosition = function(sourceX, sourceY, targetX, targetY, radius) {
+	var angle = Geometry.getAngleBetweenTwoPoints(sourceX, sourceY, targetX, targetY);
+
+	/** Suponiendo el node source que este a la derecha **/
+	if ((targetX - sourceX) &lt; 0) {
+		var b = Geometry.getAdjacentSideOfRectangleRight(angle, radius);
+		targetX = parseFloat(targetX) + parseFloat(b);
+		arrowX = parseFloat(targetX) + parseFloat(b) + this.arrowDefaultSize / 2;
+	} else {
+		var b = Geometry.getAdjacentSideOfRectangleRight(angle, radius);
+		targetX = parseFloat(targetX) - parseFloat(b);
+		arrowX = parseFloat(targetX) - parseFloat(b) - this.arrowDefaultSize / 2;
+	}
+
+	/** Suponiendo el node source que este a la arriba **/
+	if ((targetY - sourceY) &gt; 0) {
+		var a = Geometry.getOppositeSideOfRectangleRight(angle, radius);
+		targetY = parseFloat(targetY) - parseFloat(a);
+		arrowY = parseFloat(targetY) - parseFloat(a) - this.arrowDefaultSize / 2;
+	} else {
+		var a = Geometry.getOppositeSideOfRectangleRight(angle, radius);
+		targetY = parseFloat(targetY) + parseFloat(a);
+		arrowY = parseFloat(targetY) + parseFloat(a) - this.arrowDefaultSize / 2;
+
+	}
+
+	return {
+		&quot;x&quot; : arrowX,
+		&quot;y&quot; : arrowY,
+		&quot;angle&quot; : angle
+	};
+};
+
+GraphCanvas.prototype.calculateCoordenatesBezier = function(nodeSize, x1, y1) {
+	var x11 = x1 - (nodeSize / 2);
+	var y11 = y1 - (nodeSize / 2);
+
+	var x12 = parseFloat(x1) + parseFloat(nodeSize / 2);
+	var y12 = y1 - (nodeSize / 2);
+
+	var curvePointX = (x12 - x11) / 2 + x11;
+	var curvePointY = y1 - (nodeSize * 2);
+	var d = &quot;M&quot; + x11 + &quot;,&quot; + y11 + &quot; T&quot; + curvePointX + &quot;,&quot; + curvePointY + &quot; &quot; + x12 + &quot;,&quot; + y12;
+	return d;
+
+};
+
+GraphCanvas.prototype.renderEdges = function() {
+	for ( var edge in this.getDataset().getEdges()) {
+		this.renderEdge(this.getDataset().getEdgeById(edge).getId());
+
+	}
+};
+
+GraphCanvas.prototype.getLastSelectedNode = function() {
+	var node = null;
+	if (this.getSelectedVertices().length &gt; 0) {
+		var nodeId = this.getSelectedVertices()[this.getSelectedVertices().length - 1];
+		node = this.getDataset().getVertexById(nodeId);
+	}
+	return node;
+};
+/*
+ GraphCanvas.prototype.getNodeByNameAndIndex = function(node, index){
+ var nodeId = this.getDataset().verticesIndex[node][index];
+ var nodeItem = this.getDataset().getVertexById(nodeId);
+ return nodeItem;
+ };
+ */
+
+GraphCanvas.prototype.setDataset = function(dataset) {
+	this.dataset = dataset;
+};
+
+GraphCanvas.prototype.setFormatter = function(formatter) {
+	this.formatter = formatter;
+};
+
+GraphCanvas.prototype.setLayout = function(layout) {
+	this.layout = layout;
+};
+
+/** API **/
+GraphCanvas.prototype.getDataset = function() {
+	return this.dataset;
+};
+
+GraphCanvas.prototype.getFormatter = function() {
+	return this.formatter;
+};
+
+GraphCanvas.prototype.getLayout = function() {
+	return this.layout;
+};
+
+/** API DATASET **/
+GraphCanvas.prototype.addVertex = function(name, args) {
+	this.getDataset().addNode(name, args);
+};
+
+GraphCanvas.prototype.removeVertex = function(vertexId) {
+	this.getDataset().getVertexById(vertexId).remove();
+};
+
+GraphCanvas.prototype.addEdge = function(edgeName, nodeSourceId, nodeTargetId, args) {
+	this.getDataset().addEdge(edgeName, nodeSourceId, nodeTargetId, args);
+};
+/*
+ GraphCanvas.prototype.removeEdge = function(edgeId){
+ this.getDataset().getEdgeById(edgeId).remove();
+ };
+ */
+
+/** API FORMATTER **/
+GraphCanvas.prototype.getWidth = function() {
+	return this.getFormatter().getWidth();
+};
+
+GraphCanvas.prototype.getHeight = function() {
+	return this.getFormatter().getHeight();
+};
+
+GraphCanvas.prototype.getBackgroundImage = function() {
+	return this.getFormatter().getBackgroundImage();
+};
+
+//GraphCanvas.prototype.setBackgroundImage = function(value){
+//	this.getFormatter().setBackgroundImage(value); 
+//};
+
+GraphCanvas.prototype.getBackgroundColor = function() {
+	return this.getFormatter().getBackgroundColor();
+};
+
+GraphCanvas.prototype.setBackgroundColor = function() {
+	this.getFormatter().setBackgroundColor(value);
+};
+
+//GraphCanvas.prototype.setEdgeFill = function(edgeId, value){
+//	this.getFormatter().getEdgeById(edgeId).getDefault().setFill(value);
+//};
+//
+//GraphCanvas.prototype.getEdgeFill = function(edgeId){
+//	return this.getFormatter().getEdgeById(edgeId).getDefault().getFill();
+//};
+
+/** VERTICES FORMATTER **/
+GraphCanvas.prototype.setVertexSize = function(vertexId, value) {
+	this.getFormatter().getVertexById(vertexId).getDefault().setSize(value);
+};
+
+GraphCanvas.prototype.getVertexSize = function(vertexId) {
+	return this.getFormatter().getVertexById(vertexId).getDefault().getSize();
+};
+
+GraphCanvas.prototype.setVertexStroke = function(vertexId, value) {
+	this.getFormatter().getVertexById(vertexId).getDefault().setStroke(value);
+};
+
+GraphCanvas.prototype.getVertexStroke = function(vertexId) {
+	return this.getFormatter().getVertexById(vertexId).getDefault().getStroke();
+};
+
+GraphCanvas.prototype.setVertexStrokeOpacity = function(vertexId, value) {
+	this.getFormatter().getVertexById(vertexId).getDefault().setStrokeOpacity(value);
+};
+
+GraphCanvas.prototype.getVertexStrokeOpacity = function(vertexId) {
+	return this.getFormatter().getVertexById(vertexId).getDefault().getStrokeOpacity();
+};
+
+GraphCanvas.prototype.setVertexOpacity = function(vertexId, value) {
+	this.getFormatter().getVertexById(vertexId).getDefault().setOpacity(value);
+};
+
+GraphCanvas.prototype.getVertexOpacity = function(vertexId) {
+	return this.getFormatter().getVertexById(vertexId).getDefault().getOpacity();
+};
+
+GraphCanvas.prototype.setVertexFill = function(vertexId, color) {
+	this.getFormatter().getVertexById(vertexId).getDefault().setFill(color);
+};
+
+GraphCanvas.prototype.getVertexFill = function(vertexId) {
+	return this.getFormatter().getVertexById(vertexId).getDefault().getFill();
+};
+
+/** EDGES FORMATTER **/
+GraphCanvas.prototype.setEdgeSize = function(edgeId, value) {
+	this.getFormatter().getEdgeById(edgeId).getDefault().setSize(value);
+};
+
+GraphCanvas.prototype.getEdgeSize = function(edgeId) {
+	return this.getFormatter().getEdgeById(edgeId).getDefault().getSize();
+};
+
+GraphCanvas.prototype.setEdgeStroke = function(edgeId, value) {
+	this.getFormatter().getEdgeById(edgeId).getDefault().setStroke(value);
+};
+
+GraphCanvas.prototype.getEdgeStroke = function(edgeId) {
+	return this.getFormatter().getEdgeById(edgeId).getDefault().getStroke();
+};
+
+GraphCanvas.prototype.setEdgeStrokeOpacity = function(edgeId, value) {
+	this.getFormatter().getEdgeById(edgeId).getDefault().setStrokeOpacity(value);
+};
+
+GraphCanvas.prototype.getEdgeStrokeOpacity = function(edgeId) {
+	return this.getFormatter().getEdgeById(edgeId).getDefault().getStrokeOpacity();
+};
+
+GraphCanvas.prototype.setEdgeFill = function(edgeId, color) {
+	this.getFormatter().getEdgeById(edgeId).getDefault().setFill(color);
+};
+
+GraphCanvas.prototype.getEdgeFill = function(edgeId) {
+	return this.getFormatter().getEdgeById(edgeId).getDefault().getFill();
+};
+
+/** API LAYOUT **/
+GraphCanvas.prototype.setCoordinates = function(vertexId, x, y) {
+	return this.getLayout().getEdgeById(vertexId).setCoordinates(x, y);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

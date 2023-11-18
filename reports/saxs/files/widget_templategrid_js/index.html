@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/templategrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/templategrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">120.71</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">176</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">20.79</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.67</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function TemplateGrid(args) {
+	this.height = 500;
+}
+
+
+
+
+TemplateGrid.prototype.getTbar = function() {
+	var _this = this;
+	var actions = [];
+
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		icon: &#039;images/icon/add.png&#039;,
+		text : &#039;Add&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+			var wizardWidget = new WizardWidget({
+				windowMode : true,
+				width : 1200
+			});
+
+			wizardWidget.onFinished.attach(function(sender, result) {
+				var adapter = new DataAdapter();
+				adapter.onSuccess.attach(function(sender, experiment) {
+					wizardWidget.window.close();
+					location.hash = &quot;/experiment/experimentId/&quot; + experiment.experimentId + &quot;/main&quot;;
+				});
+				wizardWidget.current.setLoading();
+				adapter.saveTemplate(result.name, &quot;comments&quot;, result.data);
+			});
+
+			var manager = new ProposalUpdater(); 
+			manager.onSuccess.attach(function(sender, proposals){
+				wizardWidget.draw(this.targetId, new MeasurementCreatorStepWizardForm(ProposalManager.getMacromolecules(), ProposalManager.getBuffers()));
+			});
+			manager.get();
+			
+		}
+	}));
+	return actions;
+};
+
+TemplateGrid.prototype.deselectAll = function() {
+	this.grid.getSelectionModel().deselectAll();
+};
+
+TemplateGrid.prototype.selectById = function(macromoleculeId) {
+	this.grid.getSelectionModel().deselectAll();
+	for ( var i = 0; i &lt; this.grid.getStore().data.items.length; i++) {
+		var item = this.grid.getStore().data.items[i].raw;
+		if (item.macromoleculeId == macromoleculeId) {
+			this.grid.getSelectionModel().select(i);
+		}
+	}
+};
+
+TemplateGrid.prototype.load = function(macromolecules) {
+	this.store.loadData(macromolecules, false);
+};
+
+TemplateGrid.prototype.getColumns = function() {
+	var _this = this;
+	var columns = [
+	{
+		text : &#039;Name&#039;,
+		dataIndex : &#039;name&#039;,
+		id : this.id + &quot;name&quot;,
+		flex : 1,
+		hidden : false
+	},{
+        xtype:&#039;actioncolumn&#039;,
+        width:40,
+        text : &#039;Edit&#039;,
+        items: [{
+            icon: &#039;images/icon/edit.png&#039;,  // Use a URL in the icon config
+            tooltip: &#039;Edit&#039;,
+            handler: function(grid, rowIndex, colIndex) {
+            	location.hash = &quot;/experiment/experimentId/&quot; + grid.getStore().getAt(rowIndex).get(&quot;experimentId&quot;) + &quot;/main&quot;;
+            }
+        }]
+    }, {
+		id : _this.id + &#039;REMOVE&#039;,
+		width : 100,
+		sortable : false,
+		renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+			return BUI.getRedButton(&#039;REMOVE&#039;);
+		}
+	}  ];
+
+	if (this.btnRemoveVisible) {
+		columns.push({
+			id : _this.id + &#039;buttonRemoveMacromolecule&#039;,
+			width : 85,
+			sortable : false,
+			renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+				if (_this.btnRemoveVisible) {
+					return BUI.getRedButton(&#039;REMOVE&#039;);
+				}
+				return null;
+			}
+		});
+	}
+
+	return columns;
+};
+
+TemplateGrid.prototype._prepareData = function(macromolecules) {
+	return macromolecules;
+};
+
+/** Returns the grid **/
+TemplateGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;name&#039;,  &#039;comments&#039; ],
+		data : [],
+		sorters : [{property : &#039;experimentId&#039;, direction: &#039;desc&#039;}]
+	});
+
+
+	this.grid = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		id : this.id,
+		title : &#039;My Experiments&#039;,
+		store : this.store,
+		height : this.height,
+		maxHeight : this.maxHeight,
+		columns : this.getColumns(),
+		width : this.width,
+		viewConfig : {
+			stripeRows : true,
+			listeners : {
+				&#039;celldblclick&#039; : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+//					_this.edit(ProposalManager.getMacromoleculeById(record.data.macromoleculeId));
+					location.hash = &quot;/experiment/experimentId/&quot; + record.data.experimentId + &quot;/main&quot;;
+				},
+				&#039;cellclick&#039; : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+//					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonEditMacromolecule&#039;) {
+//						_this.edit(ProposalManager.getMacromoleculeById(record.data.macromoleculeId));
+//					}
+//					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonRemoveMacromolecule&#039;) {
+//						BUI.showBetaWarning();
+//					}
+				}
+
+			}
+		}
+	});
+
+	/** Adding the tbar **/
+	this.grid.addDocked({
+		xtype : &#039;toolbar&#039;,
+		height : 50,
+		items : this.getTbar()
+	});
+	return this.grid;
+};
+
+TemplateGrid.prototype.input = function() {
+	return {
+		proposal : DATADOC.getProposal_10()
+	};
+};
+
+TemplateGrid.prototype.test = function(targetId) {
+	var TemplateGrid = new TemplateGrid({
+		width : 800,
+		height : 350,
+		collapsed : false,
+		tbar : true
+	});
+
+	BIOSAXS.proposal = new Proposal(TemplateGrid.input().proposal);
+	var panel = TemplateGrid.getPanel(BIOSAXS.proposal.macromolecules);
+	panel.render(targetId);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

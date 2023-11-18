@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/navigation/sessionsaxslistview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/navigation/sessionsaxslistview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">128.53</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">74</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">15.60</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.48</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function SessionSaxsListView(){
+	this.sorters = [{property : &#039;experimentId&#039;, direction: &#039;DESC&#039;}];
+	ListView.call(this);
+}
+
+SessionSaxsListView.prototype.getPanel = ListView.prototype.getPanel;
+SessionSaxsListView.prototype.load = ListView.prototype.load;
+
+SessionSaxsListView.prototype.parseStatistics = function(done, total){
+    if (total){
+        if (done){
+            try{
+                return (done/total)*100;
+            }   
+            catch(err){
+                return 0;
+            }
+            
+        }        
+    }
+    return 0;
+};
+SessionSaxsListView.prototype.getRow = function(record){
+    var html = &#039;&#039;;
+   
+    record.data.measured = this.parseStatistics(record.data.measurementDoneCount, record.data.measurementCount);
+    record.data.averaged = this.parseStatistics(record.data.measurementAveragedCount, record.data.measurementCount);
+    record.data.subtracted = this.parseStatistics(record.data.dataCollectionDoneCount, record.data.dataCollectionCount);
+    
+    dust.render(&quot;sessionsaxslistview.template&quot;, record.data, function(err, out){
+        	html = out;
+     	});
+	return html;
+	/**
+     * var color = &quot;black&quot;;
+	 If experiment is empty then color is gray
+		if ((record.data.experimentType != &#039;HPLC&#039;)&amp;&amp;(record.data.measurementDoneCount == 0)&amp;&amp;(record.data.measurementAveragedCount == 0)&amp;&amp;(record.data.dataCollectionDoneCount == 0)){
+			color = &#039;#DEDEDE&#039;;
+		}
+		var html = &quot;&lt;table class=&#039;listView&#039; style=&#039;color:&quot; + color +&quot;;&#039;&gt;&quot;;
+			html = html + &quot;&lt;tr&gt;&lt;td colspan=&#039;4&#039;&gt;&quot; + record.data.creationDate+ &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+			html = html + &quot;&lt;tr&gt;&lt;td colspan=&#039;4&#039;&gt;&quot; + record.data.name+ &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+			html = html + &quot;&lt;tr&gt;&lt;td style=&#039;font-weight:bold;&#039; colspan=&#039;4&#039;&gt;&quot; + record.data.experimentType+ &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+			if ((record.data.experimentType == &#039;STATIC&#039;)||(record.data.experimentType == &#039;CALIBRATION&#039;)){
+				if ((record.data.measurementDoneCount == 0)&amp;&amp;(record.data.measurementAveragedCount == 0)&amp;&amp;(record.data.dataCollectionDoneCount == 0)){
+					html = html + &quot;&lt;tr &gt;&lt;td  style=&#039;width:180px;border:1px solid gray;text-align:center;color:&quot; + color +&quot;;font-weight:bold;&#039; colspan=&#039;4&#039;&gt;EMPTY&lt;/td&gt;&lt;/tr&gt;&quot;;
+					
+				}
+				else{
+					html = html + &quot;&lt;tr style=&#039;margin-left:5px;&#039;&gt;&lt;td style=&#039;width:10px;&#039;&gt;&lt;/td&gt;&lt;td&gt;Collected:&lt;/td&gt;&lt;td&gt;&quot;+ record.data.measurementDoneCount +&quot;/&quot; + record.data.measurementCount + &quot;&lt;/td&gt;&lt;td&gt;&quot; + new ProgressBar().getPanel(record.data.measurementDoneCount, record.data.measurementCount) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					html = html + &quot;&lt;tr&gt;&lt;td style=&#039;width:10px;&#039;&gt;&lt;/td&gt;&lt;td&gt;Averaged:&lt;/td&gt;&lt;td&gt;&quot;+ record.data.measurementAveragedCount +&quot;/&quot; + record.data.measurementCount + &quot;&lt;/td&gt;&lt;td&gt;&quot; + new ProgressBar().getPanel(record.data.measurementAveragedCount, record.data.measurementCount) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					html = html + &quot;&lt;tr&gt;&lt;td style=&#039;width:10px;&#039;&gt;&lt;/td&gt;&lt;td&gt;Subtracted:&lt;/td&gt;&lt;td&gt;&quot;+ record.data.dataCollectionDoneCount +&quot;/&quot; + record.data.dataCollectionCount + &quot;&lt;/td&gt;&lt;td&gt;&quot; + new ProgressBar().getPanel(record.data.dataCollectionDoneCount, record.data.dataCollectionCount) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+				}
+			}
+	return html + &quot;&lt;/table&gt;&quot;; **/
+};
+
+SessionSaxsListView.prototype.getFilter = function(value){
+	return [{property : &quot;name&quot;, value : value, anyMacth : true}];
+};
+
+SessionSaxsListView.prototype.getColumns = function(){
+	var _this = this;
+	return  [
+		        { text: &#039;Experiment&#039;,  flex: 1, dataIndex: &#039;sessionId&#039;, 
+		        	renderer : function(list, token, record){
+		        		return _this.getRow(record);
+		        } }
+		    ];
+};
+
+SessionSaxsListView.prototype.getFields = function(){
+	return  [&#039;creationDate&#039;, &#039;name&#039;, &#039;experimentType&#039;];
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

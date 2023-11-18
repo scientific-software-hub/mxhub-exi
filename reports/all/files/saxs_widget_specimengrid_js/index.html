@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/specimengrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/specimengrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">101.11</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">572</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">57.24</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">6.43</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function SpecimenGrid(args) {
+	this.id = BUI.id();
+	this.height = 500;
+	this.unitsFontSize = 9;
+	this.editEnabled = false;
+	this.isPositionColumnHidden = false;
+	this.removeBtnEnabled = false;
+
+//	this.selectionMode = &quot;MULTI&quot;;
+	this.updateRowEnabled = false;
+	this.grouped = true;
+	this.width = 900;
+	this.title = &#039;Specimens&#039;;
+	
+	this.margin = &quot;0 0 0 0&quot;;
+//	this.experimentColorBased = false;
+
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+
+		if (args.showTitle == false) {
+			this.title = null;
+		}
+		
+		if (args.margin == false) {
+			this.margin = args.margin;
+		}
+
+		if (args.grouped == false) {
+			this.grouped = null;
+		}
+
+		if (args.width != null) {
+			this.width = args.width;
+		}
+
+
+		if (args.editEnabled != null) {
+			this.editEnabled = args.editEnabled;
+		}
+		if (args.removeBtnEnabled != null) {
+			this.removeBtnEnabled = args.removeBtnEnabled;
+		}
+		if (args.isPositionColumnHidden != null) {
+			this.isPositionColumnHidden = args.isPositionColumnHidden;
+		}
+//		if (args.selectionMode != null) {
+//			this.selectionMode = args.selectionMode;
+//		}
+		if (args.updateRowEnabled != null) {
+			this.updateRowEnabled = args.updateRowEnabled;
+		}
+
+	}
+	this.onClick = new Event(this);
+	this.onSelected = new Event(this);
+	this.onRemoved = new Event(this);
+	this.onSpecimenChanged = new Event();
+}
+
+SpecimenGrid.prototype._prepareData = function(experiment) {
+	var data = [];
+
+	var samples = experiment.getSamples();
+	for ( var i = 0; i &lt; samples.length; i++) {
+		var sample = samples[i];
+		if (sample.macromolecule3VO != null) {
+			sample.macromolecule = sample.macromolecule3VO.acronym;
+			sample.exposureTemperature = [];
+			sample.macromoleculeId = sample.macromolecule3VO.macromoleculeId;
+		}
+
+		if (sample.sampleplateposition3VO != null) {
+			if (sample.sampleplateposition3VO.samplePlateId != null) {
+				sample.samplePlateId = sample.sampleplateposition3VO.samplePlateId;
+				sample.rowNumber = sample.sampleplateposition3VO.rowNumber;
+				sample.columnNumber = sample.sampleplateposition3VO.columnNumber;
+				if (experiment.getSamplePlateById(sample.sampleplateposition3VO.samplePlateId).plategroup3VO != null) {
+					sample.plateGroupName = experiment.getSamplePlateById(sample.sampleplateposition3VO.samplePlateId).plategroup3VO.name;
+					sample.samplePlateName = experiment.getSamplePlateById(sample.sampleplateposition3VO.samplePlateId).name + &quot;  [&quot; + sample.plateGroupName + &quot;]&quot;;
+					sample.slotPositionColumn = experiment.getSamplePlateById(sample.sampleplateposition3VO.samplePlateId).slotPositionColumn;
+				}
+			}
+		} else {
+			sample.samplePlateName = &quot;Unallocated Specimens&quot;;
+		}
+
+		/** For grouping, because sencha has not option for multiple grouping I add a field to your store with a convert function that concatenates these two fields and then group by that field.**/
+		sample.groupIndex = sample.bufferId + sample.macromoleculeId;
+		var macromolecule = EXI.proposalManager.getMacromoleculeById(sample.macromoleculeId);
+
+		sample.acronym = &quot;Buffers&quot;;
+		if (macromolecule != null) {
+			sample.acronym = EXI.proposalManager.getMacromoleculeById(sample.macromoleculeId).acronym;
+		}
+
+		sample.buffer = experiment.getBufferById(sample.bufferId);
+
+		sample.volumeToLoad = experiment.getVolumeToLoadBySampleId(sample.sampleId);
+		data.push(sample);
+	}
+	return data;
+};
+
+SpecimenGrid.prototype.deselectAll = function() {
+	this.grid.getSelectionModel().deselectAll();
+};
+
+SpecimenGrid.prototype.selectById = function(specimenId) {
+	this.grid.getSelectionModel().deselectAll();
+	for ( var i = 0; i &lt; this.grid.getStore().data.items.length; i++) {
+		var item = this.grid.getStore().data.items[i].data;
+		if (item.specimenId == specimenId) {
+			this.grid.getSelectionModel().select(i);
+		}
+	}
+};
+
+SpecimenGrid.prototype.getStore = function() {
+	return this.store;
+};
+
+SpecimenGrid.prototype.getPlugins = function() {
+	var _this = this;
+
+	var plugins = [];
+
+	if (this.updateRowEnabled) {
+		plugins.push(Ext.create(&#039;Ext.grid.plugin.RowEditing&#039;, {
+			clicksToEdit : 1,
+			listeners : {
+				validateedit : function(grid, e) {
+					var measurements = [];
+
+					if (e.newValues.bufferId != e.record.data.bufferId) {
+						/** If buffer has changed we have to change all the specimens sharing same datacollection **/
+						var dataCollections = [];
+						if (e.record.data.macromoleculeId == null) {
+							dataCollections = dataCollections.concat(_this.experiment.getDataCollectionsBySpecimenId(e.record.data.specimenId));
+						} else {
+							var sampleDataCollections = _this.experiment.getDataCollectionsBySpecimenId(e.record.data.specimenId);
+							for ( var i = 0; i &lt; sampleDataCollections.length; i++) {
+								var sampleDataCollection = sampleDataCollections[i];
+								if (sampleDataCollection != null) {
+									for ( var j = 0; j &lt; sampleDataCollection.measurementtodatacollection3VOs.length; j++) {
+										var measurementTODc = sampleDataCollection.measurementtodatacollection3VOs[j];
+										if (measurementTODc.dataCollectionOrder == 1) {
+											dataCollections = dataCollections.concat(_this.experiment.getDataCollectionsBySpecimenId(_this.experiment
+													.getMeasurementById(measurementTODc.measurementId).specimenId));
+										}
+									}
+								}
+							}
+						}
+						var i = null;
+						for ( i = 0; i &lt; dataCollections.length; i++) {
+							var dataCollection = dataCollections[i];
+							var specimens = _this.experiment.getSpecimenByDataCollectionId(dataCollection.dataCollectionId);
+							measurements = measurements.concat(specimens);
+						}
+
+						for ( i = 0; i &lt; measurements.length; i++) {
+							var measurement = measurements[i];
+							var specimen = _this.experiment.getSpecimenById(measurement.specimenId);
+							specimen.bufferId = e.newValues.bufferId;
+							new DataAdapter().saveSpecimen(specimen, _this.experiment);
+						}
+					}
+
+					/** Setting values **/
+					e.record.data.concentration = e.newValues.concentration;
+					e.record.data.volume = e.newValues.volume;
+
+					/** Position **/
+					if (e.record.data.sampleplateposition3VO != null) {
+						var samplePlate = _this.experiment.getSamplePlateBySlotPositionColumn(e.newValues.slotPositionColumn);
+						if (samplePlate != null) {
+							e.record.data.sampleplateposition3VO = {
+								columnNumber : e.newValues.columnNumber,
+								rowNumber : e.newValues.rowNumber,
+								samplePlateId : samplePlate.samplePlateId
+							};
+						}
+					} else {
+						if (e.newValues.slotPositionColumn != null) {
+							var samplePlate = _this.experiment.getSamplePlateBySlotPositionColumn(e.newValues.slotPositionColumn);
+							if (samplePlate != null) {
+								e.record.data.sampleplateposition3VO = {
+									columnNumber : e.newValues.columnNumber,
+									rowNumber : e.newValues.rowNumber,
+									samplePlateId : samplePlate.samplePlateId
+								};
+							}
+						}
+					}
+
+					var macromoleculeId = e.record.data.macromoleculeId;
+					
+					var onSuccess = (function(sender, specimen) {
+						debugger
+						/** Because macromolecule3VO is fecthed LAZY **/
+						if (macromoleculeId != null) {
+							specimen.macromolecule3VO = EXI.proposalManager.getMacromoleculeById(macromoleculeId);
+						}
+						_this.onSpecimenChanged.notify(specimen);
+						_this.grid.setLoading(false);
+					});
+					
+					_this.grid.setLoading();
+					EXI.getDataAdapter({onSuccess: onSuccess}).saxs.specimen.saveSpecimen(e.record.data);
+				}
+			}
+		}));
+	}
+	return plugins;
+};
+
+SpecimenGrid.prototype._getRowCombo = function() {
+	var data = [];
+	for ( var i = 1; i &lt;= 8; i++) {
+		data.push({
+			rowNumber : i,
+			name : BUI.getSamplePlateLetters()[i - 1]
+		});
+	}
+
+	var positionsStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;rowNumber&#039;, &#039;name&#039; ],
+		data : data
+	});
+
+	return Ext.create(&#039;Ext.form.ComboBox&#039;, {
+		store : positionsStore,
+		queryMode : &#039;local&#039;,
+		displayField : &#039;name&#039;,
+		valueField : &#039;rowNumber&#039;
+	});
+};
+
+SpecimenGrid.prototype._getColumnCombo = function() {
+	var data = [];
+	for ( var i = 1; i &lt;= 12; i++) {
+		data.push({
+			columnNumber : i
+		});
+	}
+
+	var positionsStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;columnNumber&#039; ],
+		data : data
+	});
+
+	return Ext.create(&#039;Ext.form.ComboBox&#039;, {
+		store : positionsStore,
+		queryMode : &#039;local&#039;,
+		displayField : &#039;columnNumber&#039;,
+		valueField : &#039;columnNumber&#039;
+	});
+};
+
+SpecimenGrid.prototype._getSlotColumBombo = function() {
+	if (this.experiment){
+		var length = this.experiment.getSamplePlates().length;
+	
+		var data = [];
+		for ( var i = 1; i &lt;= length; i++) {
+			data.push({
+				slotPositionColumn : i
+			});
+		}
+	
+		var positionsStore = Ext.create(&#039;Ext.data.Store&#039;, {
+			fields : [ &#039;slotPositionColumn&#039; ],
+			data : data
+		});
+	
+		return Ext.create(&#039;Ext.form.ComboBox&#039;, {
+			store : positionsStore,
+			queryMode : &#039;local&#039;,
+			displayField : &#039;slotPositionColumn&#039;,
+			valueField : &#039;slotPositionColumn&#039;
+		});
+	}
+};
+
+SpecimenGrid.prototype.getPanelByExperiment = function(experiment) {
+	this.experiment = experiment;
+	var data = this._prepareData(experiment);
+	return this.getPanel(data);
+};
+
+SpecimenGrid.prototype.refresh = function(experiment) {
+	this.experiment = experiment;
+	var data = this._prepareData(experiment);
+	this.store.loadData(data);
+};
+
+SpecimenGrid.prototype.getPanel = function() {
+	var _this = this;
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [
+			&#039;buffer&#039;, &#039;bufferId&#039;, &#039;code&#039;, &#039;macromolecule&#039;, &#039;acronym&#039;, &#039;macromoleculeId&#039;, &#039;concentration&#039;, &#039;volume&#039;, &#039;samplePlateId&#039;,
+			&#039;slotPositionColumn&#039;, &#039;rowNumber&#039;, &#039;columnNumber&#039;, &#039;groupIndex&#039; ],
+		data : [],
+		groupField : &#039;acronym&#039;
+	});
+	this.store.sort([ {
+		property : &#039;concentration&#039;,
+		direction : &#039;ASC&#039;
+	}, {
+		property : &#039;buffer&#039;,
+		direction : &#039;ASC&#039;
+	} ]);
+
+	var selModel = Ext.create(&#039;Ext.selection.RowModel&#039;, {
+		allowDeselect : true,
+//		mode : this.selectionMode,
+		listeners : {
+			select : function(sm, record, index, eOpts ) {
+//				debugger
+//				var selected = [];
+//				for ( var i = 0; i &lt; selections.length; i++) {
+//					selected.push(selections[i].data);
+//				}
+				_this.onSelected.notify([record.data]);
+			}
+		}
+	});
+
+	var features = [];
+
+	if (this.grouped) {
+		features.push({
+			ftype : &#039;grouping&#039;,
+			groupHeaderTpl : &#039;{name}&#039;,
+			hideGroupedHeader : false,
+			startCollapsed : false,
+			id : &#039;myGroupedStore&#039;
+		});
+	}
+	this.grid = Ext.create(
+					&#039;Ext.grid.Panel&#039;,
+					{
+						title 		: this.title,
+						height 		: this.height,
+						width 		: this.width,
+//						layout : &#039;fit&#039;,
+						selModel 	: selModel,
+						store 		: this.store,
+						features 	: features,
+						margin 		: this.margin,
+						plugins	 	: this.getPlugins(),
+						cls 		: &#039;border-grid&#039;,
+						columns : [
+							{
+								text : &#039;&#039;,
+								dataIndex : &#039;macromolecule&#039;,
+								width : 20,
+								renderer : function(val, y, sample) {
+									var macromoleculeId = null;
+									if (sample.data.macromolecule3VO != null) {
+										macromoleculeId = sample.data.macromolecule3VO.macromoleculeId;
+									}
+									else{
+										macromoleculeId = sample.data.macromoleculeId;
+									}
+									
+									if (macromoleculeId == null) return; 
+									return BUI.getRectangleColorDIV(_this.experiment.macromoleculeColors[macromoleculeId], 10, 10);
+								}
+							},
+							{
+								text : &#039;Macromolecule&#039;,
+								dataIndex : &#039;macromolecule&#039;,
+								width : 100
+							},
+							{
+								text : &#039;&#039;,
+								dataIndex : &#039;buffer&#039;,
+								width : 20,
+								renderer : function(val, y, sample) {
+									var color = &quot;black&quot;;
+									if (sample.data.bufferId != null) {
+										if (_this.experiment.getDataCollectionsBySpecimenId(sample.data.specimenId)[0] != null){
+											color = _this.experiment.getSpecimenColorByBufferId(_this.experiment.getMeasurementById(_this.experiment.getDataCollectionsBySpecimenId(sample.data.specimenId)[0].measurementtodatacollection3VOs[0].measurementId).specimenId);
+										}
+										return BUI.getRectangleColorDIV(color, 10, 10);
+									}
+								}
+							}
+							, {
+								text : &#039;Buffer&#039;,
+								dataIndex : &#039;bufferId&#039;,
+								width : 140,
+								editor : BIOSAXS_COMBOMANAGER.getComboBuffers(EXI.proposalManager.getBuffers(), {
+									noLabel : true,
+									width : 300
+								}),
+								renderer : function(val, y, sample) {
+									if (sample.data.bufferId != null) {
+										return EXI.proposalManager.getBufferById(val).acronym;
+									}
+								}
+							}, 
+							{
+								text : &#039;Conc.&#039;,
+								dataIndex : &#039;concentration&#039;,
+								width : 100,
+								editor : {
+									allowBlank : false
+								},
+								renderer : function(val, meta, sample) {
+									if (isNaN(val)) {
+										meta.tdCls = &#039;yellow-cell&#039;;
+										return val;
+									} else {
+										if (val != 0) {
+											return BUI.formatValuesUnits(val, &#039;mg/ml&#039;, {
+												fontSize : 16,
+												decimals : 3,
+												unitsFontSize : this.unitsFontSize
+											});
+										} else {
+											return;
+										}
+									}
+								}
+							},
+							{
+								text : &#039;Vol. Well&#039;,
+								dataIndex : &#039;volume&#039;,
+								width : 70,
+								editor : {
+									allowBlank : true
+								},
+								renderer : function(val, y, sample) {
+									return BUI.formatValuesUnits(sample.data.volume, &#039;&amp;#181l&#039;, {
+										fontSize : 12,
+										decimals : 2,
+										unitsFontSize : this.unitsFontSize
+									});
+								}
+							}, 
+							{
+								text : &#039;Position&#039;,
+								hidden : true,
+								flex : 1,
+								renderer : function(val, y, sample) {
+									return BUI.getSamplePositionHTML(sample.data, _this.experiment);
+								}
+							}, {
+								text : &#039;samplePlateId&#039;,
+								dataIndex : &#039;samplePlateId&#039;,
+								hidden : true
+							}, 
+							{
+								text : &#039;Plate&#039;,
+								hidden : this.isPositionColumnHidden,
+								dataIndex : &#039;slotPositionColumn&#039;,
+								editor : _this._getSlotColumBombo(),
+								flex : 1,
+								renderer : function(val, meta, sample) {
+									if ((val != null) &amp; (val != &quot;&quot;)) {
+										return val;
+									} else {
+										meta.tdCls = &#039;yellow-cell&#039;;
+									}
+								}
+							}, {
+								text : &#039;Row&#039;,
+								hidden : this.isPositionColumnHidden,
+								dataIndex : &#039;rowNumber&#039;,
+								editor : this._getRowCombo(),
+								flex : 1,
+								renderer : function(val, meta, sample) {
+									if ((val != null) &amp;&amp; (val != &quot;&quot;)) {
+										return BUI.getSamplePlateLetters()[val - 1];
+									} else {
+										meta.tdCls = &#039;yellow-cell&#039;;
+									}
+								}
+							}, {
+								text : &#039;Well&#039;,
+								hidden : this.isPositionColumnHidden,
+								dataIndex : &#039;columnNumber&#039;,
+								editor : this._getColumnCombo(),
+								flex : 1,
+								renderer : function(val, meta, sample) {
+									if ((val != null) &amp;&amp; (val != &quot;&quot;)) {
+										return val;
+									} else {
+										meta.tdCls = &#039;yellow-cell&#039;;
+									}
+								}
+							}, {
+								id : _this.id + &#039;buttonEditSample&#039;,
+								text : &#039;Edit&#039;,
+								width : 80,
+								sortable : false,
+								hidden : !_this.editEnabled,
+								renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+									if (_this.editEnabled) {
+										return BUI.getGreenButton(&#039;EDIT&#039;);
+									}
+								}
+							}, {
+								id : _this.id + &#039;buttonRemoveSample&#039;,
+								text : &#039;&#039;,
+								hidden : !_this.removeBtnEnabled,
+								width : 100,
+								sortable : false,
+								renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+									if (_this.removeBtnEnabled) {
+										return BUI.getRedButton(&#039;REMOVE&#039;);
+									}
+								}
+							}
+
+						],
+						viewConfig : {
+							preserveScrollOnRefresh : true,
+							stripeRows : true,
+							getRowClass : function(record) {
+								var specimens = _this.experiment.getSampleByPosition(record.data.samplePlateId, record.data.rowNumber,
+										record.data.columnNumber);
+								if (specimens.length &gt; 1) {
+									return &#039;red-row&#039;;
+
+								}
+							},
+							listeners : {
+								selectionchange : function(grid, selected) {
+									_this.onClick.notify(record.data);
+								},
+								cellclick : function(grid, td, cellIndex, record, tr) {
+									if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonEditSample&#039;) {
+									}
+									if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonRemoveSample&#039;) {
+										grid.getStore().removeAt(rowIndex);
+										_this.onRemoved.notify();
+									}
+
+								}
+
+							}
+						}
+					});
+	return this.grid;
+};
+
+SpecimenGrid.prototype.input = function() {
+	return {
+		experiment : DATADOC.getExperiment_10(),
+		proposal : DATADOC.getProposal_10()
+	};
+};
+
+SpecimenGrid.prototype.test = function(targetId) {
+	var specimenGrid = new SpecimenGrid({
+		height : 400,
+		maxHeight : 400,
+		width : 1000
+	});
+	BIOSAXS.proposal = new Proposal(specimenGrid.input().proposal);
+
+	var experiment = new Experiment(specimenGrid.input().experiment);
+	var panel = specimenGrid.getPanelByExperiment(experiment);
+	panel.render(targetId);
+
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

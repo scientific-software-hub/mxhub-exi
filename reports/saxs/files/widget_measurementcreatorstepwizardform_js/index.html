@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/measurementcreatorstepwizardform.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/measurementcreatorstepwizardform.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">81.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">737</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">87.45</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">8.80</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/** MEASUREMENTS SELECTOR **/
+function MeasurementCreatorStepWizardForm(macromolecules, buffers,args) {
+	var _this = this;
+
+	this.height = 700;
+	this.noNext = false;
+
+	this.macromolecules = macromolecules;
+	this.buffers= buffers;
+	
+	GenericStepWizardForm.call(this, &quot;Define Measurements&quot;, {
+		margin : &quot;0 0 0 0&quot;,
+		width : 800,
+		border : 0,
+		html : &quot;Define only the macromolecule&#039;s measurement you want to make. This wizard will add &lt;span style=&#039;font-weight:bold;&#039;&gt; buffers&#039; measurement needed for substraction automatically. &lt;/span&gt;&quot;
+	}, {
+		measurementsSelected : null
+	},
+	/** Fuction next **/
+	function() {
+//		if (_this.noNext) {
+			var result = {
+				name : Ext.getCmp(_this.id + &quot;name&quot;).getValue(),
+				comments :Ext.getCmp(_this.id + &quot;comments&quot;).getValue(),
+				data : JSON.stringify(_this.parseMeasurements(_this.data.measurementsSelected))
+			};
+			_this.onWizardFinished.notify(result);
+//		}
+	}, function() {
+	});
+
+	if (args != null) {
+		if (args.noNext != null) {
+			this.noNext = args.noNext;
+		}
+	}
+
+	if (this.noNext) {
+		this.onWizardFinished = new Event(this);
+	}
+	
+	this.onWizardFinished = new Event(this);
+}
+
+MeasurementCreatorStepWizardForm.prototype.setData = function(data) {
+	this.data.measurementsSelected = data;
+	var buffers = {};
+	var macromolecules = {};
+	for ( var i = 0; i &lt; this.data.measurementsSelected.length; i++) {
+		var record = this.data.measurementsSelected[i];
+		if (buffers[record.bufferId] == null) {
+			buffers[record.bufferId] = {
+				buffer : record.buffer_acronym,
+				bufferId : record.bufferId,
+				volume : 0,
+				concentration : 0
+			};
+		}
+
+		var macromoleculeId = record.macromoleculeId + &quot;_&quot; + record.bufferId + &quot;_&quot; + record.concentration;
+		if (macromolecules[macromoleculeId] == null) {
+			macromolecules[macromoleculeId] = {
+				macromolecule : record.acronym,
+				macromoleculeId : record.macromoleculeId,
+				buffer : record.buffer_acronym,
+				bufferId : record.bufferId,
+				volume : 0,
+				concentration : record.concentration
+			};
+		}
+
+		buffers[record.bufferId].volume = Number(buffers[record.bufferId].volume) + (2 * record.volumeToLoad);
+		macromolecules[macromoleculeId].volume = Number(macromolecules[macromoleculeId].volume) + (record.volumeToLoad);
+	}
+
+};
+
+MeasurementCreatorStepWizardForm.prototype.getSingleMeasurementForm = function() {
+	var macromoleculesComboManager = BIOSAXS_COMBOMANAGER.getComboMacromoleculeByMacromolecules(this.macromolecules, {
+		width : 250,
+		labelWidth : 100
+	});
+	var buffersCombo = BIOSAXS_COMBOMANAGER.getComboBuffers(this.buffers, {
+		margin : &quot;0 0 0 50&quot;,
+		width : 250,
+		labelWidth : 100
+	});
+
+	var addButton = Ext.create(&#039;Ext.Button&#039;, {
+		width : 200,
+		height : 25,
+		margin : &quot;0 0 20 300&quot;,
+		text : &#039;Add&#039;,
+		scope : this,
+		handler : function() {
+			var quantity = Ext.getCmp(this.id + &quot;quantity&quot;).getValue();
+			var measurements = [];
+			for (var i = 0; i &lt; quantity; i++) {
+				measurements.push(
+						{
+//							acronym : BIOSAXS.proposal.getMacromoleculeById(macromoleculesComboManager.getValue()).acronym,
+							acronym : EXI.proposalManager.getMacromoleculeById(macromoleculesComboManager.getValue()).acronym,
+							
+							macromoleculeId : macromoleculesComboManager.getValue(),
+							bufferId : buffersCombo.getValue(),
+							buffer_acronym :EXI.proposalManager.getBufferById(buffersCombo.getValue()).acronym,
+							concentration : Ext.getCmp(this.id + &quot;conc&quot;).getValue(),
+							volumeToLoad : Ext.getCmp(this.id + &quot;volume&quot;).getValue(),
+							exposureTemperature : Ext.getCmp(this.id + &quot;seu&quot;).getValue(),
+							transmission : Ext.getCmp(this.id + &quot;transmission&quot;).getValue(),
+							waitTime : Ext.getCmp(this.id + &quot;waitTime&quot;).getValue(),
+							viscosity : Ext.getCmp(this.id + &quot;viscosity&quot;).getValue(),
+							flow : Ext.getCmp(this.id + &quot;flow&quot;).getValue()
+						});
+			}
+//			this.measurementGrid.load(measurements);
+			this.measurementGrid.store.loadData(measurements, true);
+
+			this.setData(JSON.parse(Ext.encode(Ext.pluck(this.measurementGrid.grid.getStore().data.items, &#039;data&#039;))));
+		}
+	});
+
+	return Ext.create(&#039;Ext.panel.Panel&#039;, {
+		padding : &quot;0 0 0 0&quot;,
+		margin : &quot;0 10 0 0&quot;,
+		height : 240,
+		width : 1150,
+		cls : &#039;border-grid&#039;,
+		items : [ {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;10 10 0 10&quot;,
+			items : [ 
+			    macromoleculesComboManager, 
+			    buffersCombo,  
+			    {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;quantity&quot;,
+				fieldLabel : &#039;Repeat&#039;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;5 0 0 120&quot;,
+				minValue : 0,
+				maxValue : 300,
+				value : 1
+			} ]
+		}, {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;10 10 0 10&quot;,
+			items : [ {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;conc&quot;,
+				fieldLabel : &#039;Conc. (mg/ml)&#039;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;5 0 0 0&quot;,
+				minValue : 0,
+				maxValue : 300,
+				value : 1
+			}, {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;seu&quot;,
+				fieldLabel : &#039;Exposure. Temp.&#039;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;5 0 0 80&quot;,
+				value : 4,
+				minValue : 4,
+				maxValue : 60
+			} ]
+		}, {
+			xtype : &#039;container&#039;,
+			margin : &quot;10 10 0 10&quot;,
+			layout : &#039;hbox&#039;,
+			items : [ {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;volume&quot;,
+				fieldLabel : &#039;Vol. To Load (&amp;#181l)&#039;,
+				labelWidth : 100,
+				width : 220,
+				value : 40,
+				margin : &quot;5 0 0 0&quot;,
+				minValue : 10,
+				maxValue : 300
+			},
+
+			{
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;transmission&quot;,
+				fieldLabel : &#039;Transmission (%)&#039;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;5 0 0 80&quot;,
+				value : 100,
+				minValue : 0,
+				maxValue : 100
+			}
+
+			]
+		}, {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;10 10 0 10&quot;,
+			items : [ {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;waitTime&quot;,
+				fieldLabel : &#039;Wait Time&#039;,
+				labelWidth : 100,
+				width : 220,
+				value : 0,
+				minValue : 0,
+				maxValue : 100
+			}, {
+				xtype : &#039;combo&#039;,
+				id : this.id + &quot;viscosity&quot;,
+				store : [ &quot;low&quot;, &quot;medium&quot;, &quot;high&quot; ],
+				fieldLabel : &#039;SC Viscosity&#039;,
+				value : &quot;low&quot;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;0 0 0 80&quot;
+			}, {
+				xtype : &#039;checkbox&#039;,
+				id : this.id + &quot;flow&quot;,
+				checked : true,
+				fieldLabel : &#039;Flow&#039;,
+				labelWidth : 100,
+				width : 250,
+				margin : &quot;0 0 0 80&quot;
+			} ]
+		}, {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;10 0 0 0&quot;,
+			items : [ addButton ]
+		} ]
+	});
+};
+
+
+MeasurementCreatorStepWizardForm.prototype.getConcentrationMeasurementForm = function() {
+	
+	var macromoleculesComboManager = BIOSAXS_COMBOMANAGER.getComboMacromoleculeByMacromolecules(this.macromolecules, {
+		width : 300,
+		labelWidth : 100
+	});
+	var buffersCombo = BIOSAXS_COMBOMANAGER.getComboBuffers(this.buffers, {
+//		margin : &quot;0 0 0 80&quot;,
+		width : 300,
+		labelWidth : 100
+	});
+
+	var addButton = Ext.create(&#039;Ext.Button&#039;, {
+		width : 200,
+		height : 25,
+		margin : &quot;0 0 20 300&quot;,
+		text : &#039;Add&#039;,
+		scope : this,
+		handler : function() {
+			var macromoleculeId = macromoleculesComboManager.getValue();
+			var bufferId = buffersCombo.getValue();
+			var concentrationCount = Ext.getCmp(this.id + &quot;_cs_conc&quot;).getValue();
+			var volume = Ext.getCmp(this.id + &quot;_cs_volume&quot;).getValue();
+
+			var transmission = Ext.getCmp(this.id + &quot;_cs_transmission&quot;).getValue();
+			var seu = Ext.getCmp(this.id + &quot;_cs_seu&quot;).getValue();
+			var waitTime = Ext.getCmp(this.id + &quot;_cs_waitTime&quot;).getValue();
+			var viscosity = Ext.getCmp(this.id + &quot;_cs_viscosity&quot;).getValue();
+			var flow = Ext.getCmp(this.id + &quot;_cs_flow&quot;).getValue();
+
+			var dataToBeLoaded = [];
+			for ( var i = 1; i &lt;= concentrationCount; i++) {
+				dataToBeLoaded.push({
+					acronym : EXI.proposalManager.getMacromoleculeById(macromoleculeId).acronym,
+					macromoleculeId : macromoleculeId,
+					bufferId : bufferId,
+					buffer_acronym : EXI.proposalManager.getBufferById(bufferId).acronym,
+					concentration : i,
+					volumeToLoad : volume,
+					exposureTemperature : seu,
+					transmission : transmission,
+					waitTime : waitTime,
+					viscosity : viscosity,
+					flow : flow
+
+				});
+			}
+			this.measurementGrid.store.loadData(dataToBeLoaded, true);
+			this.setData(JSON.parse(Ext.encode(Ext.pluck(this.measurementGrid.store.data.items, &#039;data&#039;))));
+		}
+	});
+
+	return Ext.create(&#039;Ext.panel.Panel&#039;, {
+//		padding : &quot;0 0 0 0&quot;,
+		margin : &quot;0 10 0 0&quot;,
+		height : 200,
+		width : 1150,
+		cls : &#039;border-grid&#039;,
+		items : [
+		 {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			items : [ 
+			          {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;_cs_conc&quot;,
+				fieldLabel : &#039;How many unknow concentrations do you have?&#039;,
+				labelWidth : 300,
+				width : 500,
+				margin : &quot;5 0 0 10&quot;,
+				minValue : 1,
+				maxValue : 20,
+				value : 1
+			} ]
+		}, {
+			xtype : &#039;container&#039;,
+			margin : &quot;10 0 0 10&quot;,
+			layout : &#039;hbox&#039;,
+			items : [macromoleculesComboManager ,{
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;_cs_seu&quot;,
+				fieldLabel : &#039;Exposure. Temp.&#039;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;5 0 0 20&quot;,
+				value : 4,
+				minValue : 4,
+				maxValue : 60
+			}, {
+				xtype : &#039;numberfield&#039;,
+				margin : &quot;5 0 0 50&quot;,
+				id : this.id + &quot;_cs_volume&quot;,
+				fieldLabel : &#039;Vol. To Load (&amp;#181l)&#039;,
+				labelWidth : 100,
+				width : 220,
+				value : 40,
+				minValue : 10,
+				maxValue : 300
+			},
+
+			{
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;_cs_transmission&quot;,
+				fieldLabel : &#039;Transmission (%)&#039;,
+				labelWidth : 100,
+				width : 220,
+				margin : &quot;5 0 0 50&quot;,
+				value : 100,
+				minValue : 0,
+				maxValue : 100
+			}
+
+			]
+		}, {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;5 0 0 10&quot;,
+			items : [ buffersCombo, {
+				xtype : &#039;numberfield&#039;,
+				id : this.id + &quot;_cs_waitTime&quot;,
+				fieldLabel : &#039;Wait Time&#039;,
+				labelWidth : 100,
+				width : 220,
+				value : 0,
+				minValue : 0,
+				maxValue : 100,
+				margin : &quot;5 0 0 20&quot;
+			}, {
+				xtype : &#039;combo&#039;,
+				id : this.id + &quot;_cs_viscosity&quot;,
+				store : [ &quot;low&quot;, &quot;medium&quot;, &quot;high&quot; ],
+				fieldLabel : &#039;SC Viscosity&#039;,
+				value : &quot;low&quot;,
+				margin : &quot;5 0 0 50&quot;,
+				labelWidth : 100,
+				width : 220
+			}, {
+				xtype : &#039;checkbox&#039;,
+				id : this.id + &quot;_cs_flow&quot;,
+				fieldLabel : &#039;Flow&#039;,
+				checked : true,
+				labelWidth : 100,
+				width : 250,
+				margin : &quot;0 0 0 80&quot;
+			} ]
+		}, {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;20 0 0 0&quot;,
+			items : [ addButton ]
+		} ]
+	}
+	);
+};
+
+MeasurementCreatorStepWizardForm.prototype.getHeaderForm = function() {
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		layout : &#039;hbox&#039;,
+		height : 100,
+		items : [ {
+			xtype : &#039;textfield&#039;,
+			name : &#039;Name&#039;,
+			id : this.id + &quot;name&quot;,
+			width : 400,
+			labelWidth : 50,
+			fieldLabel : &#039;Name&#039;,
+			margin : &#039;20 20 20 20&#039;,
+			value : &#039;&#039;
+		}, {
+			id : this.id + &quot;comments&quot;,
+			xtype : &#039;textareafield&#039;,
+			name : &#039;comments&#039;,
+			fieldLabel : &#039;Comments&#039;,
+			height : 75,
+			labelWidth : 100,
+			margin : &#039;20 20 20 50&#039;,
+			width : 600
+		} ]
+	});
+	return this.panel;
+};
+
+
+MeasurementCreatorStepWizardForm.prototype.getForm = function() {
+	var _this = this;
+
+	this.formPanel = Ext.create(&#039;Ext.tab.Panel&#039;, {
+		padding : &quot;0 0 0 0&quot;,
+		plain : true,
+		margin : &quot;20 5 20 10&quot;,
+		height : 290,
+		items : [ 
+      {
+			tabConfig : {
+				title : &#039;Concentration Series&#039;
+			},
+			items : this.getConcentrationMeasurementForm()
+		},{
+			tabConfig : {
+				title : &#039;Individual Measurement&#039;
+			},
+			items : [ this.getSingleMeasurementForm() ]
+		} ]
+
+
+	});
+	this.measurementGrid = new MeasurementGrid({
+		height : 250,
+		maxHeight : 250,
+		minHeight : 250,
+		width : 1150,
+		tbar : false,
+		maxWidth : 870,
+		resizable : false,
+		margin : &quot;0 10 10 10&quot;,
+		isStatusColumnHidden : true,
+		isTimeColumnHidden : true,
+		removeBtnEnabled : true,
+		isPriorityColumnHidden : true
+	});
+
+	this.measurementGrid.onRemoved.attach(function(sender, data) {
+		_this.setData(JSON.parse(Ext.encode(Ext.pluck(_this.measurementGrid.grid.getStore().data.items, &#039;data&#039;))));
+	});
+
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		plain : true,
+		frame : false,
+		border : 0,
+		items : [ this.getHeaderForm(), this.formPanel, this.addButton, this.measurementGrid.getPanel([]) ]
+	});
+
+	if (this.data.measurementsSelected != null) {
+		/** Recover Data **/
+		this.measurementGrid.grid.getStore().loadData(this.data.measurementsSelected, false);
+		this.setData(JSON.parse(Ext.encode(Ext.pluck(this.measurementGrid.grid.getStore().data.items, &#039;data&#039;))));
+	}
+	return this.panel;
+};
+
+MeasurementCreatorStepWizardForm.prototype.getBuffers = function(measurements) {
+	var buffers = {};
+	var macromolecules = {};
+	var record = null;
+	for ( var i = 0; i &lt; measurements.length; i++) {
+		record = measurements[i];
+		if (buffers[record.bufferId] == null) {
+			buffers[record.bufferId] = {
+				buffer : record.buffer_acronym,
+				bufferId : record.bufferId,
+				volumeToLoad : record.volumeToLoad,
+				volume : 0,
+				concentration : 0,
+				transmission : record.transmission,
+				flow : record.flow,
+				viscosity : record.viscosity,
+			};
+		}
+
+		buffers[record.bufferId].volume = Number(buffers[record.bufferId].volume) + (2 * record.volumeToLoad);
+	}
+
+	/** Removing all **/
+	var bufferSpecimens = [];
+	for ( var buffer in buffers) {
+		if (buffers.hasOwnProperty(buffer)) {
+			record = buffers[buffer];
+			bufferSpecimens.push({
+				bufferId : record.bufferId,
+				buffer : EXI.proposalManager.getBufferById(record.bufferId).acronym,
+				concentration : record.concentration,
+				volume : record.volume,
+				volumeToLoad : record.volumeToLoad,
+				transmission : record.transmission,
+				flow : record.flow,
+				viscosity : record.viscosity
+	
+			});
+		}
+	}
+	return bufferSpecimens;
+};
+
+MeasurementCreatorStepWizardForm.prototype.parseMeasurements = function(measurements) {
+	var _this = this;
+	var parsed = [];
+	var measurement = null;
+	var i = null;
+	/** For buffers **/
+	var specimenBuffers = this.getBuffers(measurements);
+	for (  i = 0; i &lt; specimenBuffers.length; i++) {
+		measurement = specimenBuffers[i];
+		parsed.push({
+			SEUtemperature 	: &quot;&quot;,
+			buffer 			: measurement.buffer,
+			buffername 		: measurement.buffer,
+			code 			: measurement.buffer,
+			comments 		: &quot;&quot;,
+			concentration 	: 0,
+			enable 			: true,
+			flow 			: measurement.flow,
+			recuperate 		: false,
+			title 			: &quot;&quot;,
+			transmission 	: measurement.transmission,
+			macromolecule 	: measurement.buffer,
+			type 			: &quot;Buffer&quot;,
+			typen 			: 1,
+			viscosity 		: measurement.viscosity,
+			volume 			: measurement.volume,
+			volumeToLoad 	: measurement.volumeToLoad,
+			waittime 		: 0,
+			plate 			: null,
+			row 			: null,
+			well 			: null
+		});
+	}
+
+	for ( i = 0; i &lt; measurements.length; i++) {
+		measurement = measurements[i];
+		var type = &quot;Buffer&quot;;
+		var macromolecule = &quot;&quot;;
+		if (measurement.macromoleculeId != null) {
+			type = &quot;Sample&quot;;
+			macromolecule = EXI.proposalManager.getMacromoleculeById(measurement.macromoleculeId).acronym;
+		}
+
+		parsed.push({
+			SEUtemperature : measurement.exposureTemperature,
+			buffer : measurement.buffer_acronym,
+			buffername : measurement.buffer_acronym,
+			code : macromolecule,
+			comments : &quot;&quot;,
+			concentration : measurement.concentration,
+			enable : true,
+			flow : measurement.flow,
+			recuperate : false,
+			title : &quot;&quot;,
+			transmission : measurement.transmission,
+			macromolecule : macromolecule,
+			type : type,
+			typen : 1,
+			viscosity : measurement.viscosity,
+			volume : measurement.volumeToLoad,
+			volumeToLoad : measurement.volumeToLoad,
+			waittime : measurement.waitTime,
+			plate : null,
+			row : null,
+			well : null
+		});
+	}
+	
+	var automatic = new SampleAutomaticPositionFactory(parsed);
+	return automatic.setPosition();
+};
+
+MeasurementCreatorStepWizardForm.prototype.getNextForm = function() {
+	return new FinalStepWizardForm(JSON.stringify(this.parseMeasurements(this.data.measurementsSelected)));
+//	return null;
+//	var measurements = JSON.stringify(this.parseMeasurements(this.data.measurementsSelected));
+//	debugger
+};
+
+
+
+/**
+ * Given a set of measurements this class will set the a priori right position for each specimen
+ * @sampleParsed Array of:{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;CaCl2&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;CaCl2&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:null,&quot;row&quot;:null,&quot;well&quot;:null}
+ */
+function SampleAutomaticPositionFactory(sampleParsed){
+	this.samples = sampleParsed;
+//	this.samples  = JSON.parse(&#039;[{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;CaCl2&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;CaCl2&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:9},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;B2dtt&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;B2dtt&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:10},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;BSA&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;BSA&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:11},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;AE&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;AE&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:9},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;ATP&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;ATP&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:10},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;B1&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;B1&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:11},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;B2&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;B2&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:9},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;CB-RE&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;CB-RE&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:10},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;HEPES7&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;HEPES7&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:11},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;FUR&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;FUR&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:9},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;BTris&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;BTris&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:10},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;AA&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;AA&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:11},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;CVCBuf&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;CVCBuf&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:9},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;BufferMax&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;BufferMax&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:10},{&quot;SEUtemperature&quot;:&quot;&quot;,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;BufferCicine&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:0,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;BufferCicine&quot;,&quot;type&quot;:&quot;Buffer&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:800,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:11},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:1,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AA&quot;,&quot;buffername&quot;:&quot;AA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:2,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;AE&quot;,&quot;buffername&quot;:&quot;AE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:3,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;ATP&quot;,&quot;buffername&quot;:&quot;ATP&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:4,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B1&quot;,&quot;buffername&quot;:&quot;B1&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:5,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:6,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2&quot;,&quot;buffername&quot;:&quot;B2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:7,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;B2dtt&quot;,&quot;buffername&quot;:&quot;B2dtt&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:8,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BSA&quot;,&quot;buffername&quot;:&quot;BSA&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:9,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BTris&quot;,&quot;buffername&quot;:&quot;BTris&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:10,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:11,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferCicine&quot;,&quot;buffername&quot;:&quot;BufferCicine&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:12,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;BufferMax&quot;,&quot;buffername&quot;:&quot;BufferMax&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:13,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CB-RE&quot;,&quot;buffername&quot;:&quot;CB-RE&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:14,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CVCBuf&quot;,&quot;buffername&quot;:&quot;CVCBuf&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:15,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:16,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;CaCl2&quot;,&quot;buffername&quot;:&quot;CaCl2&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:17,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;FUR&quot;,&quot;buffername&quot;:&quot;FUR&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:1,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:2,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:6},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:3,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:7},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:4,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:18,&quot;well&quot;:8},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:5,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:19,&quot;well&quot;:1},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:6,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:19,&quot;well&quot;:2},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:7,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:19,&quot;well&quot;:3},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:8,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:19,&quot;well&quot;:4},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:9,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:19,&quot;well&quot;:5},{&quot;SEUtemperature&quot;:4,&quot;buffer&quot;:&quot;HEPES7&quot;,&quot;buffername&quot;:&quot;HEPES7&quot;,&quot;code&quot;:&quot;A&quot;,&quot;comments&quot;:&quot;&quot;,&quot;concentration&quot;:10,&quot;enable&quot;:true,&quot;flow&quot;:true,&quot;recuperate&quot;:false,&quot;title&quot;:&quot;&quot;,&quot;transmission&quot;:100,&quot;macromolecule&quot;:&quot;A&quot;,&quot;type&quot;:&quot;Sample&quot;,&quot;typen&quot;:1,&quot;viscosity&quot;:&quot;low&quot;,&quot;volume&quot;:40,&quot;volumeToLoad&quot;:40,&quot;waittime&quot;:0,&quot;plate&quot;:2,&quot;row&quot;:19,&quot;well&quot;:6}]&#039;);
+};
+
+SampleAutomaticPositionFactory.prototype.getAvailablePlates = function() {
+	var plates = EXI.proposalManager.getPlateByFlavour();
+	var bufferPositions = [];
+	var samplePositions = [];
+	
+	/** is there a 4x(8x3) Block **/
+	for (var i = 0; i &lt; plates.length; i++) {
+		if (plates[i].plateTypeId == 2){
+			/** Booking place for buffers **/
+			for (var index = 0; index &lt; 12; index++) {
+				bufferPositions.push({
+										plate : 2,
+										row : Math.floor(index / 3) + 1,
+										well : Number(Number(index % 3) + 9)
+									});
+			}
+			/** Booking place for macromolecules **/
+			var savedPositions = 0;
+			var positionHash = {};
+			for (var index = 0; index &lt; 32; index++) {
+					var position = {
+						plate : 2,
+						row : Math.floor(index / 8) + 1,
+						well : Number(index % 8) + 1 - savedPositions
+					};
+					samplePositions.push(position);
+			}
+		}
+	}
+
+	/** Rest of the plates **/
+	for (var i = 0; i &lt; plates.length; i++) {
+		if (plates[i].plateTypeId != 2){
+			/** Booking place for buffers **/
+			for (var indexRow = 0; indexRow &lt; plates[i].rowCount; indexRow++) {
+				for (var indexColumn = 0; indexColumn &lt; plates[i].columnCount; indexColumn++) {
+					bufferPositions.push({
+											plate 	: i + 1, 
+											row 	: indexRow + 1,
+											well 	: indexColumn + 1
+										});
+				}
+			}
+			
+			/** Booking place for samples **/
+			for (var indexRow = 0; indexRow &lt; plates[i].rowCount; indexRow++) {
+				for (var indexColumn = 0; indexColumn &lt; plates[i].columnCount; indexColumn++) {
+					samplePositions.push({
+											plate 	: i + 1,
+											row 	: indexRow + 1,
+											well 	: indexColumn + 1
+										});
+				}
+			}
+		}
+	}
+	return {
+		buffer : bufferPositions.reverse(),
+		sample : samplePositions.reverse()
+	};
+};
+
+SampleAutomaticPositionFactory.prototype._getKey = function(plate, row, well) {
+	return plate + &quot;:&quot; +  row + &quot;-&quot; + well;
+};
+
+SampleAutomaticPositionFactory.prototype.setPosition = function() {
+	var positions = (this.getAvailablePlates());
+	
+	var occupied = {};
+	/** First, we set positions for buffers **/
+	for (var i = 0; i &lt; this.samples.length; i++) {
+		if (this.samples[i].type == &#039;Buffer&#039;){
+			var key = this._getKey(this.samples[i].plate, this.samples[i].row, this.samples[i].well);
+			this.samples[i].plate = positions.buffer[ positions.buffer.length - 1].plate,
+			this.samples[i].row = positions.buffer[ positions.buffer.length - 1].row;
+			this.samples[i].well =  positions.buffer[ positions.buffer.length - 1].well;
+			occupied[key] = true;
+			positions.buffer.pop();
+		}
+	}
+	
+	var positionHash = {};
+	
+	for (var i = 0; i &lt; this.samples.length; i++) {
+		if (this.samples[i].type == &#039;Sample&#039;){
+			var key = this._getKey(positions.sample[ positions.sample.length - 1].plate,  positions.sample[ positions.sample.length - 1].row, positions.sample[ positions.sample.length - 1].well);
+			
+			/** If this position is already occupied by a buffer we pop the stack **/
+			while (occupied[key] != null){
+				positions.sample.pop();
+				key = this._getKey(positions.sample[ positions.sample.length - 1].plate,  positions.sample[ positions.sample.length - 1].row, positions.sample[ positions.sample.length - 1].well);
+			}
+			
+			/**
+			 * Position is important as it is the way to distiguish between same sample 
+			 * For temperatures series two measurements pointing to the same macromolecule and buffer and concentration
+			 * means that it is the same specimen
+			 * **/
+			var positionId = this.samples[i].macromolecule + &quot;_&quot; + this.samples[i].buffer + &quot;_&quot; + this.samples[i].concentration;
+			if (positionHash[positionId] == null) {
+				positionHash[positionId] = {
+						plate : positions.sample[ positions.sample.length - 1].plate,
+						row : positions.sample[ positions.sample.length - 1].row,
+						well : positions.sample[ positions.sample.length - 1].well,
+				};
+			} else {
+				/** There is already a specimen so we point out to its position **/
+				this.samples[i].plate = positionHash[positionId].plate,
+				this.samples[i].row = positionHash[positionId].row;
+				this.samples[i].well =  positionHash[positionId].well;
+				continue;
+			}
+			
+			this.samples[i].plate = positions.sample[ positions.sample.length - 1].plate,
+			this.samples[i].row = positions.sample[ positions.sample.length - 1].row;
+			this.samples[i].well =  positions.sample[ positions.sample.length - 1].well;
+			
+			occupied[key] = true;
+			positions.sample.pop();
+		}
+	}
+	return this.samples;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+//
+//function FinalStepWizardForm(measurements) {
+//	this.result = {};
+//
+//	this.id = BUI.id();
+//	this.title = &quot;Confirmation&quot;;
+//	this.description = &quot;This is the last step of this wizard. Write a name and a description (optional) for your experiment. Remember you are able to add new measurements later on&quot;;
+//	this.height = 500;
+//
+//	this.data = {
+//		measurements : measurements
+//	};
+//	var _this = this;
+//	this.onNext = function(data) {
+//
+//		this.result = {
+//			name : Ext.getCmp(_this.id + &quot;name&quot;).getValue(),
+//			comments : Ext.getCmp(_this.id + &quot;description&quot;).getValue(),
+//			data : _this.data.measurements
+//		};
+//
+//		_this.onWizardFinished.notify(this.result);
+//	};
+//	this.onBack = function() {
+//	};
+//	this.onWizardFinished = new Event(this);
+//}
+//
+//FinalStepWizardForm.prototype.getForm = function() {
+//	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+//		plain : true,
+//		frame : false,
+//		border : 1,
+//		margin : &quot;100 100 100 100&quot;,
+//
+//		fieldDefaults : {
+//			labelAlign : &#039;left&#039;,
+//			labelWidth : 90,
+//			anchor : &#039;100%&#039;
+//		},
+//		items : [ {
+//			xtype : &#039;textfield&#039;,
+//			name : &#039;Name&#039;,
+//			id : this.id + &quot;name&quot;,
+//			width : 600,
+//			fieldLabel : &#039;Name&#039;,
+//			margin : &#039;20 20 20 20&#039;,
+//			value : &#039;&#039;
+//		}, {
+//			xtype : &#039;textareafield&#039;,
+//			name : &#039;textarea1&#039;,
+//			id : this.id + &quot;description&quot;,
+//			margin : &#039;20 20 20 20&#039;,
+//			width : 600,
+//			fieldLabel : &#039;Description&#039;,
+//			value : &#039;&#039;
+//		} ]
+//	});
+//	return this.panel;
+//};
+//
+//FinalStepWizardForm.prototype.getNextForm = function() {
+//	return null;
+//};
+//
+//FinalStepWizardForm.prototype.input = function() {
+//	return [];
+//};
+//
+//FinalStepWizardForm.prototype.test = function(targetId) {
+//	var experimentTypeWizardForm = new FinalStepWizardForm();
+//	var form = experimentTypeWizardForm.getForm();
+//	form.render(targetId);
+//};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

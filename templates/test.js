@@ -1,0 +1,12 @@
+<table>
+{#.}
+<tr>
+<td>
+{.count}
+</td>
+<td>
+{.step}
+</td>
+</tr>
+{/.}
+</table>

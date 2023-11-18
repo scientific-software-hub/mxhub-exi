@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/volumegrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/volumegrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">103.86</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">250</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">30.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.39</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function VolumeGrid() {
+	this.id = BUI.id();
+}
+
+VolumeGrid.prototype.load= function(experiment) {
+	this.experiment = experiment;
+	this.store.loadData(this._prepareData(experiment));
+};
+
+VolumeGrid.prototype.getPanel = function(data, title) {
+	var _this = this;
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;name&#039;, &#039;volume&#039;, &#039;macromoleculeId&#039;, &#039;bufferId&#039; ]
+//		data : data
+	});
+	this.store.sort([ {
+		property : &#039;name&#039;,
+		direction : &#039;ASC&#039;
+	} ]);
+
+	var grid = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : &quot;Sample Requirements and existing stock solutions&quot;,
+		cls : &#039;border-grid&#039;,
+		height : 400,
+		maxHeight : 400,
+		width : 900,
+		store : this.store,
+		margin : &#039;10 0 50 10&#039;,
+//		tbar : [ 
+//         {
+//			text : &#039;Go to Shipment&#039;,
+//			icon : &#039;../images/plane-small.gif&#039;,
+//			handler : function() {
+//				window.location = BUI.getCreateShipmentList();
+//			}
+//		} ],
+		viewConfig : {
+			stripeRows : true,
+			listeners : {
+				cellclick : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonCreate&#039;) {
+						var stockSolutionWindow = new StockSolutionWindow();
+						/** On stock solution SAVED **/
+						stockSolutionWindow.onSaved.attach(function(sender) {
+							/** Proposal should be refreshed **/
+							
+						});
+						var acronym = &quot;ST&quot;;
+						if (record.data.macromoleculeId != null) {
+							acronym = acronym + &quot;_&quot; + EXI.proposalManager.getMacromoleculeById(record.data.macromoleculeId).acronym;
+						}
+						if (record.data.bufferId != null) {
+							acronym = acronym + &quot;_&quot; + EXI.proposalManager.getBufferById(record.data.bufferId).acronym;
+						}
+						stockSolutionWindow.draw({
+							concentration : record.data.concentration,
+							macromoleculeId : record.data.macromoleculeId,
+							bufferId : record.data.bufferId,
+							name : acronym,
+							volume : record.data.volume
+						});
+					}
+
+					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;buttonStockSolutions&#039;) {
+						var stockSolutionGrid = new StockSolutionGrid({
+							btnAddVisible : false,
+							btnEditVisible : false,
+							btnRemoveVisible : false,
+							btnAddExisting : false,
+							isPackedVisible : true,
+							multiselect : false
+						});
+
+						var window = Ext.create(&#039;Ext.window.Window&#039;, {
+							title : &#039;Stock solutions by specimen&#039;,
+							height : 400,
+							width : 800,
+							layout : &#039;fit&#039;,
+							items : [ stockSolutionGrid.getPanel() ],
+							buttons : [ {
+								text : &#039;Close&#039;,
+								handler : function() {
+									window.close();
+								}
+							} ]
+
+						}).show();
+						stockSolutionGrid.refresh(EXI.proposalManager.getStockSolutionsBySpecimen(record.data.macromoleculeId, record.data.bufferId));
+					}
+				}
+			}
+		},
+		columns : [
+//			{
+//				text : &#039;&#039;,
+//				dataIndex : &#039;macromoleculeId&#039;,
+//				width : 20,
+//				renderer : function(val, y, sample) {
+//					if (val != null) {
+////						return BUI.getRectangleColorDIV(BIOSAXS.proposal.macromoleculeColors[val], 10, 10);
+//						return BUI.getRectangleColorDIV(_this.experiment.macromoleculeColors[val], 10, 10);
+//					}
+//				}
+//			},
+//			{
+//				text : &#039;&#039;,
+//				dataIndex : &#039;bufferId&#039;,
+//				width : 20,
+//				renderer : function(val, y, sample) {
+//					if (val != null) {
+//						return BUI.getRectangleColorDIV(_this.experiment.getSpecimenColorByBufferId(val), 10, 10);
+//					}
+//				}
+//			},
+			{
+				text : &#039;Specimen&#039;,
+				dataIndex : &#039;name&#039;,
+				flex : 0.5
+			},
+			{
+				text : &#039;Estimated Volume&#039;,
+				dataIndex : &#039;volume&#039;,
+				tooltip : &#039;Estimation of the maximum volume needed for making this experiment&#039;,
+				flex : 0.5,
+				editor : {
+					allowBlank : true
+				},
+				renderer : function(val, y, sample) {
+					return BUI.formatValuesUnits(sample.data.volume, &#039;&amp;#181l&#039;, {
+						fontSize : 16,
+						decimals : 2,
+						unitsFontSize : this.unitsFontSize
+					});
+				}
+			},
+			{
+				text : &#039;Stock Solution&#039;,
+//				id : _this.id + &#039;buttonStockSolutions&#039;,
+//				dataIndex : &#039;name&#039;,
+				flex : 0.5,
+				tooltip : &#039;Stock Solutions containing this specimen in this proposal&#039;,
+				renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+					var macromoleculeId = record.data.macromoleculeId;
+					var bufferId = record.data.bufferId;
+					var stockSolutions = EXI.proposalManager.getStockSolutionsBySpecimen(macromoleculeId, bufferId);
+					if (stockSolutions.length &gt; 0) {
+//						icon : &#039;images/icon/testtube.png&#039;,
+						return &quot;&lt;div&gt;&lt;span style=&#039;font-size:18px&#039;&gt;&quot; + stockSolutions.length + &quot;&lt;/span&gt; x&lt;img height=&#039;15px&#039; src=&#039;images/icon/testtube.png&#039;&gt;&lt;/div&gt;&quot;;
+					}
+
+				}
+			}, {
+				id : _this.id + &#039;buttonCreate&#039;,
+				text : &#039;&#039;,
+				hidden : true,
+				tooltip : &#039;Create a new stock solution for shipping&#039;,
+				width : 170,
+				sortable : false,
+				renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+					return BUI.getGreenButton(&#039;CREATE STOCK SOLUTION&#039;, {
+						width : 160
+					});
+				}
+			} ]
+	});
+	return grid;
+
+};
+
+VolumeGrid.prototype._prepareData = function(experiment) {
+	var keys = {};
+	for ( var i = 0; i &lt; experiment.getSamples().length; i++) {
+		var sample = experiment.getSamples()[i];
+		var key = &quot;&quot;;
+		if (sample.macromoleculeId == null) {
+			key = experiment.getBufferById(sample.bufferId).acronym;
+			if (keys[key] == null) {
+				keys[key] = {
+					macromoleculeId : sample.macromoleculeId,
+					name : key,
+					bufferId : sample.bufferId,
+					volume : 0
+				};
+			}
+			keys[key].volume = Number(sample.volume) + Number(keys[key].volume);
+		}
+
+		if ((sample.macromolecule3VO != null) || (sample.macromoleculeId != null)) {
+			macromoleculeId = sample.macromoleculeId;
+			if (sample.macromoleculeId == null) {
+				sample.macromoleculeId = sample.macromolecule3VO.macromoleculeId;
+			}
+			key = EXI.proposalManager.getMacromoleculeById(sample.macromoleculeId).acronym + &quot; + &quot; + experiment.getBufferById(sample.bufferId).acronym;
+			if (keys[key] == null) {
+				keys[key] = {
+					macromoleculeId : sample.macromoleculeId,
+					name : key,
+					bufferId : sample.bufferId,
+					volume : 0
+				};
+			}
+			keys[key].volume = Number(sample.volume) + Number(keys[key].volume);
+		}
+	}
+	var data = [];
+	for (var keyId in keys) {
+		data.push(keys[keyId]);
+	}
+
+	return data;
+};
+
+VolumeGrid.prototype.refresh = function(experiment) {
+	this.experiment = experiment;
+	this.macromoleculeGrid.getStore().loadData(this._prepareData(this.experiment), false);
+};
+
+VolumeGrid.prototype.render = function() {
+	this.macromoleculeGrid = this.getPanel([], &quot;Estimation of required Volume&quot;);
+
+	return {
+		xtype : &#039;container&#039;,
+		layout : &#039;vbox&#039;,
+		margin : &quot;0, 0, 0, 5&quot;,
+		items : [ {
+			xtype : &#039;container&#039;,
+			layout : &#039;hbox&#039;,
+			margin : &quot;0, 0, 0, 0&quot;,
+			items : [ this.macromoleculeGrid ]
+		} ]
+	};
+};
+
+VolumeGrid.prototype.input = function(experiment) {
+	return {
+		experiment : DATADOC.getExperiment_10()
+	};
+};
+
+VolumeGrid.prototype.test = function(targetId) {
+	var volumeGrid = new VolumeGrid();
+	BIOSAXS.proposal = new Proposal(new MeasurementGrid().input().proposal);
+	var panel = volumeGrid.getPanel(new Experiment(new VolumeGrid().input().experiment));
+	Ext.create(&#039;Ext.panel.Panel&#039;, {
+		height : 500,
+		width : 1000,
+		renderTo : targetId,
+		items : [ panel ]
+	});
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

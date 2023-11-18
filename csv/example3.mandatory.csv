@@ -1,0 +1,12 @@
+parcel ,container,Unipuck,1,5HT3,sample1,barcode,Default,P1,90,90,90,0,0,0,beam,1,111,11,1,P121,smiles,comments
+parcel ,container,Unipuck,2,5HT3,sample2,barcode,Default,P1,90,90,90,0,0,0,beam,2,112,12,2,P121,smiles,comments
+parcel ,container,Unipuck,3,,sample3,barcode,,P1,90,90,90,0,0,0,beam,3,113,13,3,P121,smiles,comments
+parcel ,container,Unipuck,4,,sample4,barcode,,P1,90,90,90,0,0,0,beam,4,114,14,4,P121,smiles,comments
+parcel ,container,Unipuck,5,5HT3,sample5,barcode,,P1,90,90,90,0,0,0,beam,5,115,15,5,P121,smiles,comments
+parcel ,container,Unipuck,6,5HT3,sample6,barcode,,P1,90,90,90,0,0,0,beam,6,116,16,6,P121,smiles,comments
+parcel ,container,Unipuck,7,5HT3,sample7,barcode,,,90,90,90,0,0,0,beam,7,117,17,7,P121,smiles,comments
+parcel ,container,Unipuck,8,5HT3,sample8,barcode,Default,,90,90,90,0,0,0,beam,8,118,18,8,P121,smiles,comments
+parcel ,container,Unipuck,9,5HT3,sample9,barcode,Default,,90,90,90,0,0,0,beam,9,119,19,9,P121,smiles,comments
+parcel ,container,Unipuck,10,5HT3,sample10,barcode,Default,,90,90,90,0,0,0,beam,10,120,20,10,P121,smiles,comments
+parcel ,container,Unipuck,11,5HT3,sample11,barcode,Default,P1,90,90,90,0,0,0,beam,11,121,21,11,P121,smiles,comments
+parcel ,container,Unipuck,12,5HT3,sample12,barcode,Default,P1,90,90,90,0,0,0,beam,12,122,22,12,P121,smiles,comments

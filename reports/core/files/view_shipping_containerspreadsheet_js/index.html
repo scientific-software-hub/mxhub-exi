@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/shipping/containerspreadsheet.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/shipping/containerspreadsheet.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">100.13</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">318</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">35.84</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.84</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function ContainerSpreadSheet(args){
+	this.id = BUI.id();
+	this.height = 380;
+	this.width = 500;
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+	}
+	
+	this.onModified = new Event(this);
+}
+
+ContainerSpreadSheet.prototype.getPanel = function(){
+	var _this = this;
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		layout : &#039;vbox&#039;,
+		height 		: this.height+ 50,
+		items : [ 
+				  {
+						html 		: &#039;&lt;div  style=&quot;overflow: auto;overflow-y: hidden; border:1px solid gray;background-color:white;height:500px;width:&#039; + (_this.width - 20) +&#039;px&quot;; id=&quot;&#039; + this.id + &#039;_samples&quot;; &gt;&lt;/div&gt;&#039;,
+						margin 		: &#039;20 0 20 10&#039;,
+						height 		: this.height,
+						width 		: this.width,
+						autoScroll 	: true,
+						resizable 	: true
+					}]
+	});
+    return this.panel;
+};
+
+
+ContainerSpreadSheet.prototype.getSamplesData = function(puck) {
+	var samples = puck.sampleVOs;
+	var data = [];
+	/** Sorting samples by location * */
+	samples.sort(function(a,b){return Number(a.location) - Number(b.location);});
+	function getSampleByLocation(samples, location){
+		for (var i = 0; i &lt; samples.length; i++) {
+			if (samples[i].location == Number(location)){
+				return samples[i];
+			}
+		}
+	}
+
+	function getValue(value){
+		if (!value){return &quot;&quot;;}
+        return value;
+	}
+	
+	for (var i = 0; i &lt; puck.capacity; i++) {
+		var sample = getSampleByLocation(samples, i + 1);
+		if (sample!= null){
+				var crystal = sample.crystalVO;
+				var protein = crystal.proteinVO;
+				var diffraction = sample.diffractionPlanVO;
+				if (diffraction == null){
+					diffraction = {};
+				}
+				data.push(
+					[(i+1), protein.acronym, sample.name, crystal.spaceGroup, diffraction.experimentKind, sample.code,  getValue(diffraction[&quot;observedResolution&quot;]),  diffraction.requiredResolution, diffraction.preferredBeamDiameter, 
+					 diffraction.numberOfPositions, diffraction.radiationSensitivity, diffraction.requiredMultiplicity, diffraction.requiredCompleteness,
+					 crystal.cellA, crystal.cellB, crystal.cellC, crystal.cellAlpha, crystal.cellBeta, crystal.cellGamma, sample.smiles, sample.comments
+					 ]
+				);
+		}
+		else{
+			data.push([(i+1)]);
+		}
+	}
+	return data;
+};
+
+
+ContainerSpreadSheet.prototype.getSpaceGroups = function() {
+	return [&quot;P1&quot;,&quot;P2&quot;,&quot;P21&quot;,&quot;C2&quot;,&quot;P222&quot;,&quot;P2221&quot;,&quot;P21212&quot;,&quot;P212121&quot;,&quot;C222&quot;,&quot;C2221&quot;,&quot;F222&quot;,&quot;I222&quot;,&quot;I212121&quot;,&quot;P4&quot;,&quot;P41&quot;,&quot;P42&quot;,&quot;P43&quot;,&quot;P422&quot;,&quot;P4212&quot;,&quot;P4122&quot;,&quot;P41212&quot;,&quot;P4222&quot;,&quot;P42212&quot;,&quot;P4322&quot;,&quot;P43212&quot;,
+                	&quot;I4&quot;,&quot;I41&quot;,&quot;I422&quot;,&quot;I4122&quot;,&quot;P3&quot;,&quot;P31&quot;,&quot;P32&quot;,&quot;P31&quot;,&quot;P321&quot;,&quot;P3112&quot;,&quot;P3121&quot;,&quot;P3212&quot;,&quot;P3221&quot;,&quot;P6&quot;,&quot;P61&quot;,&quot;P65&quot;,&quot;P62&quot;,&quot;P64&quot;,&quot;P63&quot;,&quot;P622&quot;,&quot;P6122&quot;,&quot;P6522&quot;,&quot;P6222&quot;,&quot;P6422&quot;,&quot;P6322&quot;,&quot;R3&quot;,&quot;R32&quot;,&quot;P23&quot;,&quot;P213&quot;,
+                	&quot;P432&quot;,	&quot;P4232&quot;,&quot;P4332&quot;,&quot;P4132&quot;,&quot;F23&quot;,&quot;F432&quot;,&quot;F4132&quot;,&quot;I23&quot;,	&quot;I213&quot;,&quot;I432&quot;,&quot;I4132&quot;, &quot;UNKNOWN&quot;];
+};
+
+
+ContainerSpreadSheet.prototype.getAcronyms = function() {
+	var proteins = EXI.proposalManager.getProteins();
+	var acronyms = [];
+	for (var i = 0; i &lt; proteins.length; i++) {
+		acronyms.push(proteins[i].acronym);
+	}
+	return acronyms;
+};
+
+
+ContainerSpreadSheet.prototype.getHeader = function() {
+	return  [
+	         { text : &#039;#&#039;, 	id: &#039;position&#039;, column : {width : 20}}, 
+	         { text :&#039;Protein &lt;br /&gt;Acronym&#039;, id :&#039;Protein Acronym&#039;, 	column :  {
+																						width : 60,
+																						type: &#039;dropdown&#039;,
+																						source: this.getAcronyms()
+																					}
+	         }, 
+	         { text :&#039;Sample&lt;br /&gt; Name&#039;, id :&#039;Sample Name&#039;, column : {width : 120}}, 
+	         { text :&#039;Space&lt;br /&gt; Group&#039;, id : &#039;Space Group&#039;,column : {
+			        	 													width : 90,
+			        	 													type: &#039;dropdown&#039;,
+			        	 													source: this.getSpaceGroups()
+			         								}
+	         }, 
+	         { text :&#039;Exp.&lt;br /&gt; Type&#039;, id : &#039;Experiment Type&#039;, column : {
+							        	 								width : 80,  
+							        	 								type: &#039;dropdown&#039;,
+							        	 								source: [ &quot;Default&quot;, &quot;MXPressE&quot;, &quot;MXPressO&quot;, &quot;MXPressI&quot;, &quot;MXPressE_SAD&quot;, &quot;MXScore&quot;, &quot;MXPressM&quot; ]
+							         								}
+	         }, 
+	         { text :&#039;Pin &lt;br /&gt;BarCode&#039;, id : &#039;Pin BarCode&#039;, column : {width : 45}},  
+	         { text :&#039;Pre-observed &lt;br /&gt;resolution&#039;, id : &#039;Pre-observed resolution&#039;, column : {width : 45}}, 
+	         { text :&#039;Needed&lt;br /&gt; resolution&#039;,  id :&#039;Needed resolution&#039;, column : {width : 45}}, 
+	         { text :&#039;Pref. &lt;br /&gt;Diameter&#039;, id :&#039;Pref. Diameter&#039;,column : {width : 45}}, 
+	         { text :&#039;Number Of&lt;br /&gt; positions&#039;, id :&#039;Number Of positions&#039;, column : {width : 45}}, 
+	         { text :&#039;Radiation&lt;br /&gt; Sensitivity&#039;, id :&#039;Radiation Sensitivity&#039;, column : {width : 60}}, 
+	         { text :&#039;Required&lt;br /&gt; multiplicity&#039;, id :&#039;Required multiplicity&#039;, column : {width : 60}}, 
+	         { text :&#039;Required&lt;br /&gt; Completeness&#039;, id :&#039;Required Completeness&#039;, column : {width : 60}}, 
+	         { text :&#039;A&#039;, id :&#039;Unit cell A&#039;, column : {width : 40}}, 
+	         { text :&#039;B&#039;, id :&#039;Unit cell B&#039;, column : {width : 40}}, 
+	         { text :&#039;C&#039;, id : &#039;Unit cell C&#039;, column : {width : 40}}, 
+	         { text :&#039;&amp;#945;&#039;, id :&#039;Unit cell Alpha&#039;, column : {width : 40}}, 
+	         { text :&#039;&amp;#946;&#039;, id :&#039;Unit cell Beta&#039;, column : {width : 40}}, 
+	         { text :&#039;&amp;#947;&#039;, id :&#039;Unit cell Gamma&#039;, column : {width : 40}}, 
+	         { text :&#039;Smiles&#039;, id :&#039;Required Completeness&#039;, column : {width : 45}}, 
+	         { text :&#039;Comments&#039;, id :&#039;Comments&#039;, column : {width : 45}}
+	         ];
+};
+
+ContainerSpreadSheet.prototype.getHeaderWidth = function() {
+	var header = this.getHeader();
+	var text = [];
+	for (var i =0; i &lt; header.length; i++){
+		text.push(header[i].column.with);
+	}
+	return text;
+};
+
+ContainerSpreadSheet.prototype.getHeaderId = function() {
+	var header = this.getHeader();
+	var text = [];
+	for (var i =0; i &lt; header.length; i++){
+		text.push(header[i].id);
+	}
+	return text;
+};
+
+ContainerSpreadSheet.prototype.getHeaderText = function() {
+	var header = this.getHeader();
+	var text = [];
+	for (var i =0; i &lt; header.length; i++){
+		text.push(header[i].text);
+	}
+	return text;
+};
+
+
+ContainerSpreadSheet.prototype.getColumns = function() {
+	var columns = [];
+	for (var i = 0; i &lt; this.getHeader().length; i++) {
+		columns.push(this.getHeader()[i].column);
+	}
+	return columns;
+};
+
+
+ContainerSpreadSheet.prototype.getPuck = function() {
+	var myPuck = JSON.parse(JSON.stringify(this.puck));
+	var rows = this.parseTableData();
+    
+	//myPuck.sampleVOs = [];
+    var aux = [];
+    
+    function filterByLocation(samples){
+        return _.filter(samples, function(b){return b.location == rows[i].location;} );
+    }
+	for (var i = 0; i &lt; rows.length; i++) {
+        
+        var sample = {};
+        var sampleByLocation = filterByLocation(myPuck.sampleVOs);
+        if (sampleByLocation.length &gt; 0){
+            /** new sample */
+		    sample = sampleByLocation[0];
+        } 
+        
+		sample[&quot;name&quot;] = rows[i][&quot;Sample Name&quot;];
+		sample[&quot;smiles&quot;] = rows[i][&quot;Smiles&quot;];
+		sample[&quot;location&quot;]= rows[i][&quot;location&quot;];
+		sample[&quot;comments&quot;] = rows[i][&quot;Comments&quot;];
+        var proteins = [];
+		if (sample[&quot;crystalVO&quot;] == null){
+			sample[&quot;crystalVO&quot;] = {};
+			proteins = EXI.proposalManager.getProteinByAcronym(rows[i][&quot;Protein Acronym&quot;]);
+			if (proteins != null){
+				sample[&quot;crystalVO&quot;][&quot;proteinVO&quot;] = proteins[0];
+			}
+		}
+        else{
+            proteins = EXI.proposalManager.getProteinByAcronym(rows[i][&quot;Protein Acronym&quot;]);
+			if (proteins != null){
+				sample[&quot;crystalVO&quot;][&quot;proteinVO&quot;] = proteins[0];
+			}
+        }
+		sample[&quot;crystalVO&quot;][&quot;spaceGroup&quot;] = rows[i][&quot;Space Group&quot;];
+		sample[&quot;crystalVO&quot;][&quot;cellA&quot;] = Number(rows[i][&quot;Unit cell A&quot;]);
+		sample[&quot;crystalVO&quot;][&quot;cellB&quot;] = Number(rows[i][&quot;Unit cell B&quot;]);
+		sample[&quot;crystalVO&quot;][&quot;cellC&quot;] = Number(rows[i][&quot;Unit cell C&quot;]);
+		sample[&quot;crystalVO&quot;][&quot;cellAlpha&quot;] = Number(rows[i][&quot;Unit cell Alpha&quot;]);
+		sample[&quot;crystalVO&quot;][&quot;cellBeta&quot;] = Number(rows[i][&quot;Unit cell Beta&quot;]);
+		sample[&quot;crystalVO&quot;][&quot;cellGamma&quot;] = Number(rows[i][&quot;Unit cell Gamma&quot;]);
+		
+		sample[&quot;diffractionPlanVO&quot;] = {};
+		sample[&quot;diffractionPlanVO&quot;][&quot;radiationSensitivity&quot;]= Number(rows[i][&quot;Radiation Sensitivity&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;requiredCompleteness&quot;]= Number(rows[i][&quot;Required Completeness&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;requiredMultiplicity&quot;]= Number(rows[i][&quot;Required multiplicity&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;requiredResolution&quot;]= Number(rows[i][&quot;Needed resolution&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;observedResolution&quot;]= Number(rows[i][&quot;Pre-observed resolution&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;preferredBeamDiameter&quot;]= Number(rows[i][&quot;Pref. Diameter&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;numberOfPositions&quot;]= Number(rows[i][&quot;Number Of positions&quot;]);
+		sample[&quot;diffractionPlanVO&quot;][&quot;experimentKind&quot;]= rows[i][&quot;Experiment Type&quot;];
+		aux.push(sample);
+		
+	}
+    myPuck.sampleVOs = aux;
+    
+	return myPuck;
+};
+
+
+ContainerSpreadSheet.prototype.parseTableData = function() {
+	var parsed = [];
+	var data = this.spreadSheet.getData();
+	for (var j = 0; j &lt; data.length; j++) {
+		var row = {};
+		row[&quot;location&quot;] = j + 1;
+			for (var k = 0; k &lt; data[j].length; k++) {
+				var key = this.getHeaderId()[k];
+				var value = data[j][k];
+				row[key] = value;
+			}
+			if (row[&quot;Protein Acronym&quot;]){
+				if (row[&quot;Protein Acronym&quot;].length &gt; 0){
+					parsed.push(row);
+				}
+			}
+	}
+	
+	/** Curated contains the whole-data rows * */
+	var curated = [];
+	for (var i = 0; i &lt; parsed.length; i++) {
+		if (parsed[i][&quot;Protein Acronym&quot;] != null){
+			curated.push(parsed[i]);
+		}
+	}
+	
+	return curated;
+};
+
+ContainerSpreadSheet.prototype.load = function(puck){
+	this.puck = puck;
+	var container = document.getElementById(this.id + &#039;_samples&#039;);
+    
+	  function firstRowRenderer(instance, td, row, col, prop, value, cellProperties) {
+	    Handsontable.renderers.TextRenderer.apply(this, arguments);
+	    td.style.fontWeight = &#039;bold&#039;;
+	    td.style.color = &#039;green&#039;;
+	    td.style.fontSize = &#039;9px&#039;;
+	    td.style.background = &#039;#CEC&#039;;
+	  }
+	  
+	  function ValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+	    Handsontable.renderers.TextRenderer.apply(this, arguments);
+	    if (!instance.getDataAtRow(row)[1]){
+	    	td.style.background = &#039;#EEE&#039;;
+	    	return;
+	    }
+	    
+	    if ((col == 2)){
+		    	if (!value || value == &#039;&#039;) {
+		    		td.className = &#039;custom-row-text-required&#039;;
+		  	    }
+	    }
+	  }
+	  // maps function to lookup string
+	  Handsontable.renderers.registerRenderer(&#039;ValueRenderer&#039;, ValueRenderer);
+	  var _this = this;
+	  this.spreadSheet = new Handsontable(container, {
+		beforeChange: function (changes, source) {
+		      lastChange = changes;
+		      
+		},
+	    data: this.getSamplesData(puck),
+	 
+	    height : this.height,
+	    width : this.width,
+	    manualColumnResize: true,
+	    colWidths: this.getHeaderWidth(),
+	    colHeaders: this.getHeaderText(),
+	    stretchH: &#039;last&#039;,
+	    columns: this.getColumns()
+	  });
+
+	  
+	 /*this.spreadSheet.updateSettings({
+		  afterChange: function (changes, source) {              
+				_this.onModified.notify(_this.getPuck());
+			
+		  }
+		});*/
+	
+	
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

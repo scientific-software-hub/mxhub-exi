@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dengue Virus Methyl Transferase</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+<div id=viewer></div>
+</body>
+
+
+   <script type='text/javascript' src='bio-pv.min.js'></script>
+
+
+    <style>
+      body {
+        padding:0px;
+        margin:0px;
+        height: 100%;
+      }
+      #viewer {
+        position:absolute;
+        top : 0px; 
+        left: 0px;
+        bottom : 0px;
+        right : 0px;
+        margin : 0px;
+        padding:0px;
+        overflow:hidden;
+      }
+      #traj-widget {
+        width: 200px;
+        height: 20px;
+        background: #aaa;
+        position: absolute;
+        top: 50px;
+        left: 50px;
+        display: none;
+      }
+    </style>
+    </head>
+    <body>
+<script type='text/javascript'>
+// override the default options with something less restrictive.
+var parent = document.getElementById('viewer');
+var viewer = pv.Viewer(parent,
+                      { width : 300, height : 300, antialias : true });
+pv.io.fetchPdb('_static/1r6a.pdb', function(structure) {
+  // select the two ligands contained in the methyl transferase by name, so
+  // we can display them as balls and sticks.
+  viewer.on('viewerReady', function() {
+   
+   
+    // display the whole protein as cartoon
+    viewer.cartoon('protein', structure);
+
+  
+  });
+});
+
+
+</script>
+
+<div id="viewer"> 
+
+</div>
+
+</body>
+<script type='text/javascript'>
+
+function loadMethylTransferase() {
+  // asynchronously load the PDB file for the dengue methyl transferase
+  // from the server and display it in the viewer.
+  pv.io.fetchPdb('1r6a.pdb', function(s) {
+       viewer.on('viewerReady', function() {
+		    viewer.cartoon('crambin', s);
+		    viewer.autoZoom();
+  	});
+  });
+}
+
+// load the methyl transferase once the DOM has finished loading. That's
+// the earliest point the WebGL context is available.
+document.addEventListener('DOMContentLoaded', loadMethylTransferase);
+</script>
+</html>
+

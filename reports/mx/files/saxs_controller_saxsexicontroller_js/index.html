@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/controller/saxsexicontroller.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/controller/saxsexicontroller.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">125.83</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">409</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">56.85</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.94</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function SAXSExiController() {
+	this.init();
+}
+
+SAXSExiController.prototype.loadNavigationPanel = ExiController.prototype.loadNavigationPanel;
+
+SAXSExiController.prototype.routeNavigation = function() {
+	var _this = this;
+	function loadNavigationPanel(listView) {
+		return _this.loadNavigationPanel(listView);
+	}
+
+	/**
+	 * Loading navigation panel
+	 * 
+	 * #/session/nav #/experiment/nav #/macromolecule/nav
+	 * 
+	 */
+	Path.map(&quot;#/saxs/:navigation/nav&quot;).to(function() {
+		var listView = null;
+		
+		if (this.params[&#039;navigation&#039;] == &quot;buffer&quot;) {
+			EXI.clearNavigationPanel();
+			EXI.setLoadingNavigationPanel(true);
+			listView = new BufferListView();
+			listView.onSelect.attach(function(sender, selected) {
+				location.hash = &quot;/buffer/&quot; + selected[0].bufferId + &quot;/main&quot;;
+			});
+			EXI.addNavigationPanel(listView);
+			listView.load(EXI.proposalManager.getBuffers());
+			EXI.setLoadingNavigationPanel(false);
+			
+			/** Loading welcome page **/
+			EXI.addMainPanel(new BufferWelcomeMainView());
+			
+		}
+		
+		if (this.params[&#039;navigation&#039;] == &quot;stocksolution&quot;) {
+			EXI.clearNavigationPanel();
+			EXI.setLoadingNavigationPanel(true);
+			listView = new StockSolutionListView();
+			listView.onSelect.attach(function(sender, selected) {
+				location.hash = &quot;/stocksolution/&quot; + selected[0].stockSolutionId + &quot;/main&quot;;
+			});
+			EXI.addNavigationPanel(listView);
+			listView.load(EXI.proposalManager.getStockSolutions());
+			EXI.setLoadingNavigationPanel(false);
+			
+			/** Loading welcome page **/
+			EXI.addMainPanel(new StockSolutionWelcomeMainView());
+			
+		}
+		
+		if (this.params[&#039;navigation&#039;] == &quot;macromolecule&quot;) {
+			EXI.clearNavigationPanel();
+			EXI.setLoadingNavigationPanel(true);
+			listView = new MacromoleculeListView();
+			listView.onSelect.attach(function(sender, selected) {
+				location.hash = &quot;/macromolecule/&quot; + selected[0].macromoleculeId + &quot;/main&quot;;
+			});
+			EXI.addNavigationPanel(listView);
+			listView.load(EXI.proposalManager.getMacromolecules());
+			EXI.setLoadingNavigationPanel(false);
+			
+			/** Loading welcome page **/
+			EXI.addMainPanel(new MacromoleculeWelcomeMainView());
+			
+		}
+		
+		if (this.params[&#039;navigation&#039;] == &quot;template&quot;) {
+			EXI.clearNavigationPanel();
+			EXI.setLoadingNavigationPanel(true);
+			
+			listView = new TemplateListView();
+			/** When selected move to hash * */
+			listView.onSelect.attach(function(sender, selected) {
+				location.hash = &quot;/experiment/templateId/&quot; + selected[0].experimentId + &quot;/main&quot;;
+			});
+			var adapter = loadNavigationPanel(listView);
+			adapter.saxs.experiment.getByExperimentByKey(&quot;experimentType&quot;, &quot;TEMPLATE&quot;);
+			
+			/** Loading welcome page **/
+			EXI.addMainPanel(new ExperimentWelcomeMainView());
+		}
+
+
+	}).enter(this.setPageBackground);
+
+	
+};
+
+SAXSExiController.prototype.setPageBackground = function() {
+
+};
+
+SAXSExiController.prototype.notFound = function() {
+
+};
+
+SAXSExiController.prototype.routeExperiment = function() {
+	Path.map(&quot;#/experiment/experimentId/:experimentId/main&quot;).to(function() {
+		var mainView = new ExperimentMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load(this.params[&#039;experimentId&#039;]);
+		/** Selecting data collections from experiment * */
+		mainView.onSelect.attach(function(sender, element) {
+			EXI.localExtorage.selectedSubtractionsManager.append(element);
+		});
+		mainView.onDeselect.attach(function(sender, element) {
+			EXI.localExtorage.selectedSubtractionsManager.remove(element);
+		});
+
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/experiment/hplc/:experimentId/main&quot;).to(function() {
+		var mainView = new HPLCMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load(this.params[&#039;experimentId&#039;]);
+		/** Selecting data collections from experiment * */
+		mainView.onSelect.attach(function(sender, element) {
+			EXI.localExtorage.selectedSubtractionsManager.append(element);
+		});
+		mainView.onDeselect.attach(function(sender, element) {
+			EXI.localExtorage.selectedSubtractionsManager.remove(element);
+		});
+
+	}).enter(this.setPageBackground);
+	
+
+	/** Loading Experiments * */
+	Path.map(&quot;#/experiment/:key/:value/main&quot;).to(function() {
+		EXI.setLoadingMainPanel();
+		var onSuccess = function(sender, data) {
+			EXI.setLoadingMainPanel(false);
+			if (data != null) {
+				if (data.length &gt; 0) {
+					var mainView = null;
+					if (data[0].experimentType == &quot;STATIC&quot;) {
+						mainView = new ExperimentMainView();
+
+					}
+					if (data[0].experimentType == &quot;HPLC&quot;) {
+						mainView = new HPLCMainView();
+					}
+
+					if (data[0].experimentType == &quot;TEMPLATE&quot;) {
+						mainView = new TemplateMainView();
+					}
+
+					EXI.addMainPanel(mainView);
+					mainView.load(data);
+					/** Selecting data collections from experiment * */
+					mainView.onSelect.attach(function(sender, element) {
+						EXI.localExtorage.selectedSubtractionsManager.append(element);
+					});
+					mainView.onDeselect.attach(function(sender, element) {
+						EXI.localExtorage.selectedSubtractionsManager.remove(element);
+					});
+
+				}
+			}
+		};
+		if ((this.params[&#039;key&#039;] == &quot;experimentId&quot;) || (this.params[&#039;key&#039;] == &quot;templateId&quot;)) {
+			EXI.getDataAdapter({onSuccess : onSuccess}).saxs.experiment.getByExperimentId([ this.params[&#039;value&#039;] ]);
+		} else {
+			EXI.getDataAdapter({onSuccess : onSuccess}).saxs.experiment.getByExperimentByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+		}
+
+	}).enter(this.setPageBackground);
+};
+
+
+
+
+
+SAXSExiController.prototype.routeDataCollection = function() {
+	Path.map(&quot;#/datacollection/macromoleculeAcronym/:value/main&quot;).to(function() {
+		/** Loading navidation menu **/
+		EXI.setLoadingMainPanel(&quot;Searching &quot; + this.params[&#039;value&#039;]+  &quot;...&quot;);
+		var onSuccess = function(sender, dataCollections) {
+			if (dataCollections != null){
+				if (dataCollections.length &gt; 0){
+					var mainView = new DataCollectionMainView();
+					EXI.addMainPanel(mainView);
+					mainView.load(dataCollections);
+					/** Selecting data collections from experiment * */
+					mainView.onSelect.attach(function(sender, element) {
+						EXI.localExtorage.selectedSubtractionsManager.append(element);
+					});
+					mainView.onDeselect.attach(function(sender, element) {
+						EXI.localExtorage.selectedSubtractionsManager.remove(element);
+					});
+					
+					var listView = new DataCollectionListView();
+					listView.onSelect.attach(function(sender, selected) {
+						mainView.filter( selected[0].macromoleculeId, selected[0].bufferAcronym);
+					});
+					EXI.addNavigationPanel(listView);
+					listView.load(dataCollections);
+					EXI.setLoadingNavigationPanel(false);
+				}
+				else{
+					BUI.showWarning(&quot;No macromolecule has been found&quot;);
+				}
+			}
+			else{
+				BUI.showWarning(&quot;No data to display&quot;);
+			}
+//			EXI.setLoadingNavigationPanel(false);
+			EXI.setLoadingMainPanel(false);
+		};
+		EXI.getDataAdapter({onSuccess : onSuccess}).saxs.dataCollection.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+
+	}).enter(this.setPageBackground);
+	
+	
+	Path.map(&quot;#/saxs/datacollection/:key/:value/main&quot;).to(function() {
+		EXI.setLoadingMainPanel();
+		var onSuccess = function(sender, data) {
+			var mainView = new DataCollectionMainView();
+			EXI.addMainPanel(mainView);
+			mainView.load(data);
+			EXI.setLoadingMainPanel(false);
+			/** Selecting data collections from experiment * */
+			mainView.onSelect.attach(function(sender, element) {
+				EXI.localExtorage.selectedSubtractionsManager.append(element);
+			});
+			mainView.onDeselect.attach(function(sender, element) {
+				EXI.localExtorage.selectedSubtractionsManager.remove(element);
+			});
+		};
+		EXI.getDataAdapter({onSuccess : onSuccess}).saxs.dataCollection.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+	}).enter(this.setPageBackground);
+
+	Path.map(&quot;#/saxs/datacollection/:key/:value/primaryviewer&quot;).to(function() {
+		var onSuccess = function(sender, data) {
+			var primaryMainView = new PrimaryDataMainView();
+			EXI.addMainPanel(primaryMainView);
+			primaryMainView.load(data);
+
+		};
+		EXI.getDataAdapter({onSuccess : onSuccess}).saxs.dataCollection.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/saxs/datacollection/:key/:value/merge&quot;).to(function() {
+		var onSuccess = function(sender, data) {
+			var primaryMainView = new MergeMainView();
+			EXI.addMainPanel(primaryMainView);
+			primaryMainView.load(data);
+
+		};
+		EXI.getDataAdapter({onSuccess : onSuccess}).saxs.dataCollection.getDataCollectionsByKey(this.params[&#039;key&#039;], this.params[&#039;value&#039;]);
+	}).enter(this.setPageBackground);
+};
+
+
+
+SAXSExiController.prototype.routePrepare = function() {
+	Path.map(&quot;#/buffer/:bufferId/main&quot;).to(function() {
+		var mainView = new BufferMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load(this.params[&#039;bufferId&#039;]);
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/buffer/add&quot;).to(function() {
+		var mainView = new BufferMainView();
+		EXI.addMainPanel(mainView);
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/macromolecule/:macromoleculeId/main&quot;).to(function() {
+		var mainView = new MacromoleculeMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load(this.params[&#039;macromoleculeId&#039;]);
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/macromolecule/add&quot;).to(function() {
+		var mainView = new MacromoleculeMainView();
+		EXI.addMainPanel(mainView);
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/stocksolution/:stocksolutionId/main&quot;).to(function() {
+		var mainView = new StockSolutionMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load(this.params[&#039;stocksolutionId&#039;]);
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/stocksolution/add&quot;).to(function() {
+		var mainView = new StockSolutionMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load();
+	}).enter(this.setPageBackground);
+	
+	
+	Path.map(&quot;#/prepare/stocksolution/main&quot;).to(function() {
+		var mainView = new StockSolutionMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load();
+	}).enter(this.setPageBackground);
+	
+	
+
+//	Path.map(&quot;#/prepare/macromolecule/main&quot;).to(function() {
+//		var mainView = new MacromoleculeMainView();
+//		EXI.addMainPanel(mainView);
+//		mainView.load();
+//	}).enter(this.setPageBackground);
+
+	Path.map(&quot;#/prepare/templates/main&quot;).to(function() {
+		var mainView = new ExperimentDesignerMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load();
+	}).enter(this.setPageBackground);
+	
+	Path.map(&quot;#/prepare/shipmentpreparation&quot;).to(function() {
+		var mainView = new ShipmentPreparationMainView();
+		EXI.addMainPanel(mainView);
+		mainView.load();
+	}).enter(this.setPageBackground);
+	
+	
+	
+//	Path.map(&quot;#/prepare/shipment&quot;).to(function() {
+//		var _this = this;
+//		var shipmentForm = new ShipmentForm({
+//			creationMode : true,
+//			showTitle : false
+//		});
+//		shipmentForm.onSaved.attach(function(sender, shipment) {
+//			location.hash = &quot;/shipping/&quot; + shipment.shippingId + &quot;/main&quot;;
+//			window.close();
+//		});
+//		var window = Ext.create(&#039;Ext.window.Window&#039;, {
+//			title : &#039;New Shipment&#039;,
+//			height : 600,
+//			width : 800,
+//			modal : true,
+//			layout : &#039;fit&#039;,
+//			items : [ shipmentForm.getPanel() ]
+//		}).show();
+//	}).enter(this.setPageBackground);
+	
+
+	Path.map(&quot;#/prepare/designer&quot;).to(function() {
+			var mainView = new DesignerMainView();
+			EXI.addMainPanel(mainView);
+			mainView.load();
+//			function() {
+//				var wizardWidget = new WizardWidget({
+//					windowMode : true,
+//					width : 1200 });
+//
+//				wizardWidget.onFinished.attach(function(sender, result) {
+//					wizardWidget.window.close();
+//					EXI.setLoading();
+//					var onSuccess = (function(sender, experiment) {
+//						location.hash = &quot;/experiment/templateId/&quot; + experiment.experimentId + &quot;/main&quot;;
+//					});
+//					wizardWidget.current.setLoading(&quot;ISPyB: Creating experiment&quot;);
+//					EXI.getDataAdapter({onSuccess : onSuccess}).saxs.template.saveTemplate(result.name, result.comments, result.data);
+//				});
+//
+//				wizardWidget.draw(this.targetId, new MeasurementCreatorStepWizardForm(EXI.proposalManager.getMacromolecules(),EXI.proposalManager.getBuffers()));
+
+			}).enter(this.setPageBackground);
+};
+
+SAXSExiController.prototype.init = function() {
+	var _this = this;
+
+	function setPageBackground() {
+		_this.setPageBackground();
+	}
+	function notFound() {
+		_this.notFound();
+	}
+
+	this.routeNavigation();
+	this.routeExperiment();
+	this.routeDataCollection();
+	this.routePrepare();
+
+	
+
+	Path.map(&quot;#/project/:projectId/run/:runId/main&quot;).to(function() {
+		var projectId = this.params[&#039;projectId&#039;];
+		var runId = this.params[&#039;runId&#039;];
+
+		var onSuccess = function(sender, runs) {
+			for (var i = 0; i &lt; runs.length; i++) {
+				if (runs[i].internalId == runId) {
+					var main = new RunMainView();
+					EXI.addMainPanel(main);
+					main.load(runs[i]);
+				}
+			}
+		};
+		
+		var onError = function(sender, runs) {
+			
+		};
+		
+		EXI.getDataAdapter({onSuccess : onSuccess, onError :onError}).exi.offline.getRuns(projectId);
+//		exidataAdapter.getRuns(projectId);
+	}).enter(this.setPageBackground);
+	
+
+	Path.rescue(notFound);
+
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

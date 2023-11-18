@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/navigation/phasinglistview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/navigation/phasinglistview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">110.67</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">237</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">44.10</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.69</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* PhasingListView displays the phasing steps as list on the navigation panels
+*
+* @class PhasingListView
+* @constructor
+*/
+function PhasingListView(){
+	this.title = &quot;Space Groups&quot;;
+	this.sorters = [{property : &#039;sessionId&#039;, direction: &#039;DESC&#039;}];
+	ListView.call(this);
+}
+
+
+PhasingListView.prototype.getPanel = ListView.prototype.getPanel;
+PhasingListView.prototype.load = ListView.prototype.load;
+PhasingListView.prototype.getFields = ListView.prototype.getFields;
+PhasingListView.prototype.getColumns = ListView.prototype.getColumns;
+PhasingListView.prototype.getFilter = ListView.prototype.getFilter;
+/**
+* Calls to the dust template in order to render to puck in HTML
+*
+* @class getRow
+* @constructor
+*/
+PhasingListView.prototype.getRow = function(record){
+    
+    
+    var html = &quot;&quot;;
+    dust.render(&quot;phasinglistview&quot;, record.data, function(err, out){
+        html = out;
+     }); 
+    return html;
+};
+
+PhasingListView.prototype.analysizeStep = function(step){
+        console.log(step);
+        return {
+            type : step.phasingStepType
+            
+        };
+};
+
+
+PhasingListView.prototype.parsePrepareNode = function(node){
+    
+    return  {
+                    type : &quot;PREPARE&quot;,
+                    spaceGroupShortName : node.spaceGroupShortName,
+                    spaceGroup          : node.spaceGroup,
+                    status              : &quot;Success&quot; ,
+                    phasingStepId       : node.phasingStepId
+                     
+                };
+};
+
+PhasingListView.prototype.parseSubstructureNode = function(node){
+   if (node){
+       if (node.children){
+            var status = &quot;Failure&quot;;
+            if (node.children.length &gt; 0){
+                status = &quot;Success&quot;;                
+            }
+            
+             if (node.children.length == 0){
+                status = &quot;Not found&quot;;                
+            }
+            
+            return  {
+                    type : &quot;SUBS. DETERMINATION&quot;,
+                    spaceGroupShortName : node.spaceGroupShortName,
+                    spaceGroup          : node.spaceGroup,  
+                    runs                : node.children.length,
+                    status              : status  
+                };
+       }
+   }
+};
+
+
+PhasingListView.prototype.getSubstructureStep = function(node){
+     if (node){
+       if (node.children){
+          return node.children;
+       }
+   }
+   return [];
+};
+
+PhasingListView.prototype.getPhasingSteps = function(node){
+    var phasing = [];
+     if (node){
+      var subtructures = this.getSubstructureStep(node);
+     
+      for(var i = 0; i &lt; subtructures.length; i++){
+         
+          phasing = _.concat(phasing, subtructures[i].children);
+      }
+   }
+   return phasing;
+};
+
+PhasingListView.prototype.getModelSteps = function(node){
+    var models = [];
+   var phasingSteps = this.getPhasingSteps(node); 
+  
+   for(var i = 0; i &lt; phasingSteps.length; i++){
+        if (phasingSteps[i].children){ 
+            models = _.concat(models, phasingSteps[i].children);    
+        }
+   } 
+   return models;
+};
+
+PhasingListView.prototype.decideGoodStatus = function(metrics, stats){
+    var ccPartial = false;
+    var pseudo = false;
+         
+    for(var i =0; i&lt; metrics.length; i++){     
+        if (metrics[i].indexOf(&quot;CC of partial&quot;) != -1){
+            if (Number(stats[i]) &gt; 24){
+                ccPartial = true;                
+            }
+        }  
+        
+         if (metrics[i].indexOf(&quot;Pseudo_free_CC&quot;) != -1){
+            if (Number(stats[i]) &gt; 65){
+                
+                pseudo = true;
+            }
+        } 
+        
+    }
+    
+    if (pseudo &amp;&amp; ccPartial){
+            return 1;
+    } 
+        
+    return 0;
+};
+
+PhasingListView.prototype.analizePhasingNodes = function(phasingNodes){
+    var records = {
+      withStatistics : 0,
+      withoutStatistics : 0,
+      successCondition : 0  
+        
+        
+    };
+    for(var i = 0; i &lt; phasingNodes.length; i++){
+     
+        if (phasingNodes[i].statisticsValue != null){
+            records.withStatistics = records.withStatistics + 1;
+            /** Parsing status */
+            try{
+            
+                var statistics = phasingNodes[i].statisticsValue.split(&quot;,&quot;);
+                var metrics = phasingNodes[i].metric.split(&quot;,&quot;);
+                
+                records.successCondition = records.successCondition + this.decideGoodStatus(metrics, statistics);
+             
+            }
+            catch(e){
+                
+                console.log(e);
+            }
+        }
+        else{
+             records.withoutStatistics = records.withoutStatistics + 1;
+        }
+       
+        
+    }
+    return records;
+};
+PhasingListView.prototype.parsePhasingNode = function(node){
+   if (node){
+       if (node.children){
+           
+           var phasingSteps = this.getPhasingSteps(node); 
+           
+            var status = &quot;Failure&quot;;
+            if (phasingSteps.length &gt; 0){
+                status = &quot;Success&quot;;                
+            }
+            
+             if (phasingSteps.length == 0){
+                status = &quot;Not found&quot;;                
+            }
+                    
+            return  {
+                    type : &quot;PHASING&quot;,
+                    runs                : phasingSteps.length ,
+                    status              : status,
+                    stats              : this.analizePhasingNodes(phasingSteps)
+                };
+       }
+   }
+};
+
+PhasingListView.prototype.parseModelNode = function(node){
+    
+    var models = this.getModelSteps(node);   
+    
+     var status = &quot;Failure&quot;;
+    if (models.length &gt; 0){
+        status = &quot;Success&quot;;                
+    }
+    
+        if (models.length == 0){
+        status = &quot;Not found&quot;;                
+    }
+                   
+    return  {
+            type : &quot;MODEL BUILDING&quot;,
+            //spaceGroupShortName : node.spaceGroupShortName,
+            // spaceGroup          : node.spaceGroup,  
+            runs                : models.length ,
+             status              : status
+        };
+     
+   
+};
+
+
+PhasingListView.prototype.formatData = function(data){
+    
+   
+    var records = [];
+    if (data){
+        for(var i =0; i &lt; data.length; i++){
+            
+            records.push({
+                prepare        : this.parsePrepareNode(data[i]),
+                substructure   : this.parseSubstructureNode(data[i]), 
+                phasing        : this.parsePhasingNode(data[i]), 
+                models         : this.parseModelNode(data[i]),   
+            });
+            
+        }
+    
+    }
+    return records;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/datacollection/grid/platesdatacollectiongrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/datacollection/grid/platesdatacollectiongrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">104.87</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">175</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">41.48</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.93</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* Displays the plates of the data collections by session or acronym of the protein
+*
+* @class PlatesDataCollectionGrid
+* @constructor
+*/
+function PlatesDataCollectionGrid(args) {
+    
+}
+
+PlatesDataCollectionGrid.prototype.getPanel = function (dataCollectionGroup) {
+    var _this = this;
+    this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+            fields: [&quot;dataCollectionGroup&quot;]
+    });
+        
+    this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+        border: 1,        
+        store: this.store,            
+        columns: this.getColumns(),
+        disableSelection: true,
+        viewConfig : {
+            trackOver : false
+        }
+    });
+    return this.panel;
+};
+
+PlatesDataCollectionGrid.prototype.getColumns = function() {
+    var _this = this;
+    var columns = [
+        {
+            dataIndex: &#039;dataCollectionGroup&#039;,
+            name: &#039;dataCollectionGroup&#039;,
+            flex: 1.5,
+            hidden: false,
+            renderer: function(grid, e, record) {
+
+                var data = record.data;  
+                var nContainers = data.containerIds.length;
+
+                var html = &quot;&quot;;          
+                
+                dust.render(&quot;plates.mxdatacollectiongrid.template&quot;, data, function(err, out) {                                                                       
+                    html = html + out;
+                }); 
+                
+                var onSuccess = function (sender, samples) {
+                    if (samples){
+                        var cells = {};
+                        for (var i = 0; i &lt; samples.length; i++) {
+                            var sample = samples[i];
+                            var selected = false;
+                            if (!_.isEmpty(pucks[sample.Container_containerId].initSelected)){
+                                selected = pucks[sample.Container_containerId].initSelected.includes(sample.BLSample_location);
+                            }
+                            var dataCollectionIds = pucks[sample.Container_containerId].dataCollectionIds[sample.BLSample_location];
+                            var state = &quot;FILLED&quot;;
+                            if (dataCollectionIds != null &amp;&amp; dataCollectionIds.length &gt; 0){
+                                state = &quot;COLLECTED&quot;;
+                            }
+                            // Parse data
+                            if (cells[sample.Container_containerId] == null){
+                                cells[sample.Container_containerId] = [];
+                            }
+                            
+                            cells[sample.Container_containerId].push({
+                                location : sample.BLSample_location,
+                                state : state,
+                                selected : selected,
+                                sample_name : sample.BLSample_name,
+                                protein_acronym : sample.Protein_acronym,
+                                protein_name : sample.Protein_name,
+                                containerId : sample.Container_containerId,
+                                container_code : sample.Container_code,
+                                dewarId : sample.Dewar_dewarId,
+                                dataCollectionIds : dataCollectionIds
+                            });
+                        }
+                        
+                        for (containerId in pucks){
+                            pucks[containerId].load(cells[containerId]);
+                            var infoHtml = &quot;&quot;;
+                            
+                            dust.render(&quot;plates.info.mxdatacollectiongrid.template&quot;, cells[containerId][0], function(err, out) {                                                                       
+                                infoHtml = infoHtml + out;
+                            }); 
+                            
+                            $(&quot;#puck-panel-&quot; + containerId + &quot;-info&quot;).html(infoHtml);
+                        }
+                    }
+                };
+                
+                if (data.containerIds.length &gt; 0){
+                    var pucksPanelHeight = 300;
+                    var pucks = {};
+                    var tree = $(&quot;&lt;div &gt;&lt;div id=&#039;a&#039; style=&#039;height:&quot; + (pucksPanelHeight)+&quot;px;&#039;&gt;&quot; + html + &quot;&lt;/div&gt;&lt;/div&gt;&quot;);
+                    for (id in data.containerIds){
+                        var containerIdNumber = Number(data.containerIds[id]);
+                        var container = _.filter(_this.dataCollectionGroup,{&quot;Container_containerId&quot; : containerIdNumber});
+                        
+                        if(container){
+                            var dataCollectionIds = {};
+                            for (var i = 1 ; i &lt;= container[0].Container_capacity ; i++) {
+                                var sampleByLocation = _.filter(container,{&quot;BLSample_location&quot;:i.toString()});
+                                if (sampleByLocation.length &gt; 0) {
+                                    var ids = [];
+                                    for (sample in sampleByLocation){
+                                        ids.push(sampleByLocation[sample].DataCollection_dataCollectionId);
+                                    }
+                                    dataCollectionIds[i] = ids.toString();
+                                }
+                            }
+                            
+                            pucks[containerIdNumber] = new UniPuckWidget({mainRadius : pucksPanelHeight/4, 
+                                                                        enableMouseOver : true, 
+                                                                        enableClick : true, 
+                                                                        containerId : containerIdNumber, 
+                                                                        initSelected : data.selected[containerIdNumber],
+                                                                        dataCollectionIds : dataCollectionIds
+                                                                    });
+                            if (container[0].Container_capacity == 10){
+                                pucks[containerIdNumber] = new SpinePuckWidget({mainRadius :  pucksPanelHeight/4, 
+                                                                                enableMouseOver : true, 
+                                                                                enableClick : true, 
+                                                                                containerId : containerIdNumber, 
+                                                                                dataCollectionId : container.DataCollection_dataCollectionId, 
+                                                                                initSelected : data.selected[containerIdNumber],
+                                                                                dataCollectionIds : dataCollectionIds
+                                                                            });
+                            }
+                            tree.find(&quot;#puck-panel-&quot; + data.containerIds[id]).html(pucks[containerIdNumber].getPanel());
+                        }
+                    }
+                    
+                    EXI.getDataAdapter({onSuccess : onSuccess}).mx.sample.getSamplesByContainerId(data.containerIds);
+                    html = tree.html();
+                };
+
+                return html;
+            }
+        },
+        {
+            header: &#039;IDs&#039;,
+            dataIndex: &#039;dataCollectionGroup&#039;,
+            name: &#039;dataCollectionGroup&#039;,
+            flex: 1.5,
+            hidden: true,
+            renderer: function(grid, e, record) {
+                var html = &quot;&quot;;
+                dust.render(&quot;ids.mxdatacollectiongrid.template&quot;, record.data, function(err, out) {
+                    html = out;
+                });
+                return html;
+
+            }
+        }
+    ];
+    return columns;
+};
+
+PlatesDataCollectionGrid.prototype.select = function(selectedDataCollectionGroup) {      
+    var selected = {};   
+    for (sample in selectedDataCollectionGroup){
+        if (selected[selectedDataCollectionGroup[sample].Container_containerId] == null){
+            selected[selectedDataCollectionGroup[sample].Container_containerId] = [selectedDataCollectionGroup[sample].BLSample_location];
+        } else {
+            selected[selectedDataCollectionGroup[sample].Container_containerId].push(selectedDataCollectionGroup[sample].BLSample_location);
+        }
+    }                                                                      
+    this.store.loadData([{containerIds : this.getContainersId(this.dataCollectionGroup), selected : selected}]);
+};
+
+PlatesDataCollectionGrid.prototype.getContainersId = function(dataCollectionGroup) {         
+   return _.filter(Object.keys(_.keyBy(dataCollectionGroup, &quot;Container_containerId&quot;)), function(element){return isNumber(element);});                                                              
+};
+
+PlatesDataCollectionGrid.prototype.load = function(dataCollectionGroup) {
+    this.dataCollectionGroup = dataCollectionGroup;    
+    this.store.loadData([{containerIds:  this.getContainersId(this.dataCollectionGroup), selected :{}}]);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

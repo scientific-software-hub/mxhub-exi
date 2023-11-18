@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/queuegrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/queuegrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">102.06</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">664</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">51.36</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">7.60</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function QueueGrid(args) {
+//	this.height = Ext.getBody().getHeight() - 500;
+
+	this.decimals = 3;
+	this.onSelect = new Event();
+
+	this.maxHeight = 600;
+	
+	this.id = BUI.id();
+	this.title = &#039;Data Collections&#039;;
+	this.key = {};
+	
+
+	this.selectionMode = &#039;MULTI&#039;;
+	
+	this.collapsible = true;
+	this.collapsed = false;
+	
+	var _this = this;
+	this.filters = [ function(item) {
+		if (item.data.dataCollectionId == null) {
+			return false;
+		}
+		if (_this.key[item.data.dataCollectionId] == null) {
+			_this.key[item.data.dataCollectionId] = [];
+		}
+		_this.key[item.data.dataCollectionId].push(item.data);
+		return item.data.macromoleculeId != null;
+	} ];
+	if (args!= null){
+		if (args.maxHeight != null){
+			this.maxHeight = args.maxHeight;
+		}
+		if (args.collapsible != null){
+			this.collapsible = args.collapsible;
+		}
+		if (args.collapsed != null){
+			this.collapsed = args.collapsed;
+		}
+		if (args.selectionMode != null){
+			this.selectionMode = args.selectionMode;
+		}
+		if (args.title != null){
+			if (args.title == false){
+				this.title = null;
+			}
+		}
+	}
+	
+	this.selected = []; 
+	this.onSelectionChange = new Event();
+	this.onDeselect = new Event(this);
+	this.onSelect = new Event(this);
+}
+
+QueueGrid.prototype.getSorters = function() {
+	return {};
+};
+
+QueueGrid.prototype.getSelected = function() {
+	return this.selected;
+};
+
+
+QueueGrid.prototype.getSelectedData = function() {
+	var elements = this.panel.getSelectionModel().selected.items;
+	var data = [];
+	for (var i = 0; i &lt; elements.length; i++) {
+		data.push(elements[i].data);
+	}
+	return data;
+};
+
+
+
+
+QueueGrid.prototype.getFields = function() {
+	return [ &#039;experimentId&#039;, &#039;subtractionId&#039;, &#039;macromoleculeAcronym&#039;, &#039;priorityLevelId&#039;, &#039;code&#039;, &#039;exposureTemperature&#039;, &#039;concentration&#039; ];
+};
+
+QueueGrid.prototype.getRunHTML = function(sample) {
+	var dataCollectionId = sample.data.dataCollectionId;
+	var table = document.createElement(&quot;table&quot;);
+	if (this.key[dataCollectionId] != null) {
+
+		this.key[dataCollectionId].sort(function(a, b) {
+			return b.measurementId - a.measurementId;
+		});
+
+		for (i in this.key[dataCollectionId]) {
+			var specimen = this.key[dataCollectionId][i];
+			var tr = document.createElement(&quot;tr&quot;);
+			var td = document.createElement(&quot;td&quot;);
+			if (specimen.measurementCode != null){
+				if (specimen.macromoleculeId == null) {
+					td.setAttribute(&quot;style&quot;, &quot;padding-top:1px;width:130px;color:gray;&quot;);
+					td.appendChild(document.createTextNode(&quot;# &quot; + specimen.measurementCode));
+				} else {
+					td.setAttribute(&quot;style&quot;, &quot;padding-top:1px;width:130px;font-weight:bold;&quot;);
+					td.appendChild(document.createTextNode(&quot;# &quot; + specimen.measurementCode));
+				}
+			}
+			else{
+				td.appendChild(document.createTextNode(&quot; - &quot;));
+			}
+			tr.appendChild(td);
+			table.appendChild(tr);
+		}
+
+	}
+	return &quot;&lt;table&gt;&quot; + table.innerHTML + &quot;&lt;/table&gt;&quot;;
+};
+
+QueueGrid.prototype.getPercentage = function(averaged, total) {
+	var tdFrames = document.createElement(&quot;td&quot;);
+	
+	var color = &quot;green&quot;;
+	if (averaged == null){
+		averaged = &quot;NA&quot;;
+		color = &quot;orange&quot;;
+	}
+	if (total == null){
+		total = &quot;NA&quot;;
+		color = &quot;orange&quot;;
+	}
+	
+	if ((averaged != &quot;NA&quot;)&amp;(total != &quot;NA&quot;)){
+		if (averaged/total &gt;= 0.3){
+			color = &quot;orange&quot;;
+		}
+		if (averaged/total &gt; 0.7){
+			color = &quot;#BCF5A9&quot;;
+		}
+		
+		if (averaged/total &lt; 0.3){
+			color = &quot;red&quot;;
+		}
+		
+		
+	}
+	
+	tdFrames.appendChild(document.createTextNode(averaged + &quot; / &quot; + total));
+	
+	tdFrames.setAttribute(&quot;style&quot;, &quot;background-color:&quot; + color +&quot;;&quot;);
+	return tdFrames;
+};
+
+QueueGrid.prototype.getFramesHTML = function(sample) {
+	var dataCollectionId = sample.data.dataCollectionId;
+	var table = document.createElement(&quot;table&quot;);
+	if (this.key[dataCollectionId] != null) {
+
+		this.key[dataCollectionId].sort(function(a, b) {
+			return b.measurementId - a.measurementId;
+		});
+
+		for (i in this.key[dataCollectionId]) {
+			var specimen = this.key[dataCollectionId][i];
+			var tr = document.createElement(&quot;tr&quot;);
+			var td = document.createElement(&quot;td&quot;);
+			if (specimen.macromoleculeId == null) {
+				td.setAttribute(&quot;style&quot;, &quot;width:130px;color:gray;&quot;);
+				td.appendChild(document.createTextNode(specimen.bufferAcronym));
+			} else {
+				td.setAttribute(&quot;style&quot;, &quot;width:130px;font-weight:bold;&quot;);
+				td.appendChild(document.createTextNode(specimen.macromoleculeAcronym));
+			}
+			tr.appendChild(td);
+			
+			tr.appendChild(this.getPercentage(specimen.framesMerge, specimen.framesCount));
+
+			var td = document.createElement(&quot;td&quot;);
+			var a = document.createElement(&quot;a&quot;);
+			if (specimen.macromoleculeId == null) {
+				a.setAttribute(&quot;href&quot;, BUI.getZipURLByAverageId(specimen.mergeId, specimen.measurementCode));
+			} else {
+				a.setAttribute(&quot;href&quot;, BUI.getZipURLBySubtractionId(specimen.subtractionId, specimen.measurementCode));
+			}
+
+			tr.appendChild(td);
+
+			table.appendChild(tr);
+		}
+
+	}
+	return &quot;&lt;table&gt;&quot; + table.innerHTML + &quot;&lt;/table&gt;&quot;;
+};
+
+QueueGrid.prototype.getHTMLTable = function(items) {
+	var html = &quot;&quot;;
+	for (var i = 0; i &lt; items.length; i++) {
+			html = html + &quot;&lt;tr&gt;&lt;td class=&#039;key_subgrid&#039;&gt;&quot; + items[i].key + &quot;&lt;/td&gt;&lt;td class=&#039;value_subgrid&#039;&gt;&quot; + items[i].value + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+	}
+	return &quot;&lt;table&gt;&quot; + html + &quot;&lt;/table&gt;&quot;;
+};
+
+QueueGrid.prototype.getImage = function(sample, name) {
+	if (sample.data.macromoleculeId != null) {
+		if (sample.data.subtractionId != null) {
+			var url = EXI.getDataAdapter().saxs.subtraction.getImage(sample.data.subtractionId, name);
+			return &#039;&lt;img src=&#039; + url + &#039;   height=&quot;70&quot; width=&quot;70&quot; &gt;&#039;;
+		}
+	}
+};
+
+QueueGrid.prototype.getColumns = function() {
+	var _this = this;
+	return [
+			{
+				header : &quot;dataCollectionId&quot;,
+				name : &quot;dataCollectionId&quot;,
+				dataIndex : &quot;dataCollectionId&quot;,
+				flex : 1,
+				hidden : true },
+			{
+				header : &quot;Exp. Id&quot;,
+				name : &quot;experimentId&quot;,
+				dataIndex : &quot;experimentId&quot;,
+				flex : 1,
+				hidden : true },
+			{
+				header : &quot;Exp. Name&quot;,
+				name : &quot;name&quot;,
+				dataIndex : &quot;name&quot;,
+				flex : 1,
+				hidden : true },
+			{
+				header : &quot;MeasurementId&quot;,
+				name : &quot;measurementId&quot;,
+				dataIndex : &quot;measurementId&quot;,
+				hidden : true,
+				flex : 1,
+				renderer : function(val, y, sample) {
+					return sample.raw.measurementId;
+				} },
+			{
+				header : &quot;Date&quot;,
+				name : &quot;date&quot;,
+				flex : 1,
+				dataIndex : &quot;runCreationDate&quot;,
+				hidden : true },
+
+			{
+				header : &quot;Run&quot;,
+				flex : 0.2,
+				name : &quot;runNumber&quot;,
+				dataIndex : &quot;measurementCode&quot;,
+				renderer : function(val, y, sample) {
+					return _this.getRunHTML(sample);//&quot;&lt;span style=&#039;font-weight:bold;&#039;&gt;#&quot; + val + &quot;&lt;/span&gt;&quot;;
+				} },
+			{
+				header : &quot;Frames (Average/Total)&quot;,
+				dataIndex : &quot;macromoleculeId&quot;,
+				name : &quot;macromoleculeAcronym&quot;,
+				flex : 1,
+				// locked : true,
+				hidden : false,
+				renderer : function(val, meta, sample) {
+					return _this.getFramesHTML(sample);
+
+				} },
+			{
+				text : &#039;Scattering&#039;,
+				dataIndex : &#039;subtractionId&#039;,
+				width : 110,
+				// locked : true,
+				name : &#039;subtractionId&#039;,
+				renderer : function(val, y, sample) {
+					return _this.getImage(sample, &quot;scattering&quot;);
+				} 
+			},
+			{
+				header : &quot;Macromolecule&quot;,
+				name : &quot;macromoleculeAcronym&quot;,
+				dataIndex : &quot;macromoleculeAcronym&quot;,
+				flex : 1,
+				hidden : true },
+			{
+				header : &quot;Concentration&quot;,
+				name : &quot;concentration&quot;,
+				flex : 0.5,
+				dataIndex : &quot;concentration&quot;,
+				hidden : false,
+				renderer : function(val, y, sample) {
+					if (sample.data.concentration != 0) {
+						return BUI.formatValuesUnits(sample.data.concentration, &quot;mg/ml&quot;, 7, this.decimals);
+					}
+				} },
+			{
+				header : &quot;Exp. Temp.&quot;,
+				name : &quot;bufferAcronym&quot;,
+				dataIndex : &quot;bufferAcronym&quot;,
+				flex : 0.5,
+				renderer : function(val, y, sample) {
+					return BUI.formatValuesUnits(sample.data.exposureTemperature, &quot;C&quot;, 10, this.decimals);
+				} },
+			{
+				text : &#039;Kratky.&#039;,
+				dataIndex : &#039;subtractionId&#039;,
+				hidden : true,
+				flex : 1,
+
+				name : &#039;subtractionId&#039;,
+				renderer : function(val, y, sample) {
+					return _this.getImage(sample, &quot;kratky&quot;);
+				} 
+			},
+			{
+				text : &#039;P(r).&#039;,
+				hidden : true,
+				flex : 1,
+				dataIndex : &#039;subtractionId&#039;,
+				type : &#039;string&#039;,
+				renderer : function(val, y, sample) {
+					return _this.getImage(sample, &quot;density&quot;);
+				}
+			},
+			{
+				text : &#039;Guinier.&#039;,
+				hidden : true,
+				flex : 1,
+				dataIndex : &#039;subtractionId&#039;,
+				type : &#039;string&#039;,
+				renderer : function(val, y, sample) {
+					return _this.getImage(sample, &quot;guinier&quot;);
+				} 
+			},
+			{
+				text : &#039;Guinier&#039;,
+				name : &#039;Guinier&#039;,
+				flex : 0.8,
+				dataIndex : &#039;subtractionId&#039;,
+				renderer : function(val, y, sample) {
+					if (sample.data.macromoleculeId != null) {
+						if (sample.data.subtractionId != null) {
+							var items = [];
+							if (sample.data.rg != null){
+								items.push({
+									key : &quot;Rg&quot;,
+									value : BUI.formatValuesUnits(sample.data.rg, &quot;nm&quot;, 12, this.decimals) });
+							}
+							else{
+								items.push({
+									key : &quot;Rg&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							
+							if (sample.data.rg != null){
+									items.push({
+										key : &quot;Points&quot;,
+										value : &quot;&lt;span&gt;&quot; + sample.data.firstPointUsed + &quot; - &quot; + sample.data.lastPointUsed + &quot; (&quot;
+												+ (sample.data.lastPointUsed - sample.data.firstPointUsed) + &quot;)&lt;/span&gt;&quot; });
+							}
+							else{
+								items.push({
+									key : &quot;Points&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							
+							if (sample.data.I0 != null){
+								items.push({
+									key : &quot;I0&quot;,
+									value : BUI.formatValuesErrorUnitsScientificFormat(sample.data.I0, sample.data.I0Stdev, &quot;&quot;) });
+							}
+							else{
+								items.push({
+									key : &quot;I0&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							return _this.getHTMLTable(items);
+
+						}
+					}
+				} },
+			{
+				text : &#039;Gnom&#039;,
+				name : &#039;Gnom&#039;,
+				flex : 0.7,
+				dataIndex : &#039;subtractionId&#039;,
+				renderer : function(val, y, sample) {
+					if (sample.data.macromoleculeId != null) {
+						if (sample.data.subtractionId != null) {
+							var items = [];
+							if (sample.data.rgGnom != null){
+								items.push({
+									key : &quot;Rg&quot;,
+									value : BUI.formatValuesUnits(sample.data.rgGnom, &quot;nm&quot;) });
+							}
+							else{
+								items.push({
+									key : &quot;Rg&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							
+							if (sample.data.rgGnom != null){
+								items.push({
+									key : &quot;Total&quot;,
+									value : BUI.formatValuesUnits(sample.data.total, &#039;&#039;) });
+							}
+							else{
+								items.push({
+									key : &quot;Total&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							if (sample.data.dmax != null){
+								items.push({
+											key : &quot;D&lt;sub&gt;max&lt;/sub&gt;&quot;,
+											value : BUI.formatValuesUnits(sample.data.dmax, &quot;&quot;)
+													+ &quot;&lt;span style=&#039;font-size:8px;color:gray;&#039;&gt; nm&lt;/span&gt;&quot; });
+							}
+							else{
+								items.push({
+									key : &quot;D&lt;sub&gt;max&lt;/sub&gt;&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+
+							return _this.getHTMLTable(items);
+
+						}
+					}
+				} },
+			{
+				text : &#039;Porod&#039;,
+				name : &#039;Porod&#039;,
+				flex : 1,
+				dataIndex : &#039;subtractionId&#039;,
+				renderer : function(val, y, sample) {
+					if (sample.data.macromoleculeId != null) {
+						if (sample.data.subtractionId != null) {
+							var items = [];
+							if (sample.data.volumePorod != null){
+								items.push({
+									key : &quot;Volume&quot;,
+									value : BUI.formatValuesUnits(sample.data.volumePorod, &#039;&#039;)
+											+ &quot;&lt;span style=&#039;font-size:8px;color:gray;&#039;&gt; nm&lt;sub&gt;3&lt;/sub&gt;&lt;/span&gt;&quot;
+	
+								});
+							}
+							else{
+								items.push({
+									key : &quot;Volume&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							
+							if (sample.data.volumePorod != null){
+								items.push({
+									key : &quot;MM Vol. est.&quot;,
+									value : Number(sample.data.volumePorod / 2).toFixed(1) + &quot; - &quot;
+											+ Number(sample.data.volumePorod / 1.5).toFixed(1)
+											+ &quot;&lt;span style=&#039;font-size:8px;color:gray;&#039;&gt;kD&lt;/span&gt;&quot; });
+								
+							}
+							else{
+								items.push({
+									key : &quot;MM Vol. est.&quot;,
+									value : &quot;&lt;span class=&#039;notavailablefield&#039;&gt;NA&lt;/span&gt;&quot;
+								});
+							}
+							
+							return _this.getHTMLTable(items);
+
+						}
+					}
+				}
+			},
+				{
+				text : &#039;Advanced&#039;,
+				hidden : false,
+				id : this.id + &#039;buttonAction&#039;,
+				dataIndex : &#039;subtrationId&#039;,
+				flex : 1,
+				renderer : function(val, y, sample) {
+					// &#039;fitCount&#039;, &#039;superposisitionCount&#039;, &#039;rigidbodyCount&#039;,
+					// &#039;abinitioCount&#039;
+					var html = &quot;&lt;table&gt;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getGreenButton(&quot;Data Reduction&quot;, {
+						width : 90,
+						height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+
+					if (sample.data.abinitioCount &gt; 0) {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getGreenButton(&quot;Abinitio&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					} else {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getBlueButton(&quot;Abinitio&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					}
+
+					if (sample.data.fitCount &gt; 0) {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getGreenButton(&quot;Fit&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					} else {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getBlueButton(&quot;Fit&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					}
+
+					if (sample.data.superposisitionCount &gt; 0) {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getGreenButton(&quot;Superposition&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					} else {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getBlueButton(&quot;Superposition&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					}
+					if (sample.data.rigidbodyCount &gt; 0) {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getGreenButton(&quot;Rigid Body&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					} else {
+						html = html + &quot;&lt;tr&gt;&lt;td style=&#039;padding-bottom: 1px;&#039;&gt;&quot; + BUI.getBlueButton(&quot;Rigid Body&quot;, {
+							width : 90,
+							height : 15 }) + &quot;&lt;/td&gt;&lt;/tr&gt;&quot;;
+					}
+
+					return html + &quot;&lt;/table&gt;&quot;;
+				}
+
+			}
+		];
+};
+
+QueueGrid.prototype.load = function(data) {
+	if (data != null) {
+		this.key = {};
+		this.store.loadData(data, true);
+	} else {
+		this.store.load();
+	}
+};
+
+QueueGrid.prototype.getPanel = function() {
+	var _this = this;
+	if(!Ext.ClassManager.isCreated(&#039;Queue&#039;) ){
+		Ext.define(&#039;Queue&#039;, {
+		extend : &#039;Ext.data.Model&#039;,
+		fields : [ &#039;name&#039;, &#039;date&#039;, &#039;volumePorod&#039;, &#039;runCreationDate&#039;, &#039;measurementCode&#039;, &#039;macromoleculeAcronym&#039;, &#039;bufferAcronym&#039;, &#039;I0&#039;,
+				&#039;I0Stdev&#039;, &#039;acronym&#039;, &#039;averageFilePath&#039;, &#039;bufferAverageFilePath&#039;, &#039;bufferId&#039;, &#039;bufferOnedimensionalFiles&#039;, &#039;code&#039;,
+				&#039;comments&#039;, &#039;composition&#039;, &#039;concentration&#039;, &#039;creationDate&#039;, &#039;creationTime&#039;, &#039;dataAcquisitionFilePath&#039;, &#039;dataCollectionId&#039;,
+				&#039;discardedFrameNameList&#039;, &#039;dmax&#039;, &#039;experimentId&#039;, &#039;experimentType&#039;, &#039;exposureTemperature&#039;, &#039;extintionCoefficient&#039;,
+				&#039;extraFlowTime&#039;, &#039;firstPointUsed&#039;, &#039;flow&#039;, &#039;frameListId&#039;, &#039;framesCount&#039;, &#039;framesMerge&#039;, &#039;gnomFilePath&#039;,
+				&#039;gnomFilePathOutput&#039;, &#039;guinierFilePath&#039;, &#039;isagregated&#039;, &#039;kratkyFilePath&#039;, &#039;lastPointUsed&#039;, {
+					name : &#039;macromoleculeId&#039;,
+					id : &#039;macromoleculeId&#039;
+
+				}, {
+					name : &#039;measurementId&#039;,
+					type : &#039;int&#039; }, &#039;mergeId&#039;, &#039;molecularMass&#039;, &#039;name&#039;, &#039;pH&#039;, &#039;priorityLevelId&#039;, &#039;proposalId&#039;, &#039;quality&#039;, &#039;rg&#039;, &#039;rgGnom&#039;,
+				&#039;rgGuinier&#039;, &#039;rgStdev&#039;, &#039;runId&#039;, &#039;safetyLevelId&#039;, &#039;sampleAverageFilePath&#039;, &#039;sampleOneDimensionalFiles&#039;,
+				&#039;samplePlatePositionId&#039;, &#039;scatteringFilePath&#039;, &#039;sequence&#039;, &#039;sessionId&#039;, &#039;sourceFilePath&#039;, &#039;specimenId&#039;, &#039;status&#039;,
+				&#039;stockSolutionId&#039;, &#039;substractedFilePath&#039;, &#039;subtractionId&#039;, &#039;total&#039;, &#039;transmission&#039;, &#039;viscosity&#039;, &#039;volume&#039;, &#039;volumeToLoad&#039;,
+				&#039;waitTime&#039;, &#039;reference&#039;, &#039;refined&#039;, &#039;fitCount&#039;, &#039;superposisitionCount&#039;, &#039;rigidbodyCount&#039;, &#039;abinitioCount&#039; ] });	
+	}
+	
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		model : &#039;Queue&#039;,
+		data : [],
+		filters : this.filters,
+		listeners : {
+			beforeload : function() {
+				_this.key = {};
+				return true;
+			},
+			load : function(store, records) {
+
+			} },
+		proxy : {
+			type : &#039;memory&#039;,
+			reader : {
+				type : &#039;json&#039; } } });
+
+	var selModel = Ext.create(&#039;Ext.selection.RowModel&#039;, {
+		allowDeselect		: true,
+		mode				: this.selectionMode,
+		listeners			: {
+						        selectionchange: function (sm, selections) {
+						           	_this.selected = _this.getSelectedData();
+						        	_this.onSelectionChange.notify(_this.selected );
+						        },
+						        select: function (sm, selected) {
+						        	_this.onSelect.notify(selected.data);
+						        },
+						        deselect: function (sm, deselected) {
+						        	_this.onDeselect.notify(deselected.data);
+						        }
+		}
+	});
+	
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : this.title,
+		border : true,
+		cls : &#039;defaultGridPanel&#039;,
+		maxHeight : this.maxHeight,
+//		minHeight : 300,
+		overflow : &#039;auto&#039;, 
+		margin : 5,
+		store : this.store,
+		columns : this.getColumns(),
+		allowDeselect : true,
+		selModel			: selModel,
+		collapsible : this.collapsible,
+		collapsed : this.collapsed,
+		viewConfig : {
+			enableTextSelection : true,
+			preserveScrollOnRefresh : true,
+			stripeRows : true,
+			rowLines : true,
+			listeners : {
+				cellclick : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+						if (e.target.defaultValue == &#039;Data Reduction&#039;) {
+							location.hash = &quot;/saxs/datacollection/dataCollectionId/&quot; + record.data.dataCollectionId + &quot;/primaryviewer&quot;;
+						}
+
+						if (e.target.defaultValue == &#039;Abinitio&#039;) {
+							_this.onAbinitioButtonClicked(record.raw);
+						}
+
+						if (e.target.defaultValue == &#039;Fit&#039;) {
+							_this.onFitButtonClicked(record.raw);
+						}
+
+						if (e.target.defaultValue == &#039;Superposition&#039;) {
+							_this.onSuperpositionButtonClicked(record.raw);
+						}
+
+						if (e.target.defaultValue == &#039;Rigid Body&#039;) {
+							_this.onRigidBodyButtonClicked(record.raw);
+						}
+				}
+			}
+		}
+	});
+	return this.panel;
+};
+
+QueueGrid.prototype.onDataReductionButtonClicked = function(record) {
+	var adapter = new DataAdapter();
+	var dataReductionForm = new DataReductionForm({});
+
+	Ext.create(&#039;Ext.window.Window&#039;, {
+		title : &#039;Data Reduction&#039;,
+		height : 540,
+		width : 1000,
+		modal : true,
+		items : [ dataReductionForm.getPanel() ]
+	}).show();
+
+	dataReductionForm.panel.setLoading();
+	adapter.onSuccess.attach(function(sender, subtractions) {
+		dataReductionForm.refresh(subtractions);
+		dataReductionForm.panel.setLoading(false);
+	});
+	adapter.getSubtractionsBySubtractionIdList([ record.subtractionId ]);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Extended ISPyB</title>
+
+<link rel="icon" type="image/x-icon" href="../images/icon/EXIicon2.ico">
+
+
+
+
+<!-- CSS -->
+
+     
+<link rel="stylesheet" type="text/css" href="../dependency/ext/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css">
+<link rel="stylesheet" type="text/css" href="../min/exi.min.css?v=1645196247039">
+
+
+<!-- JS -->
+<script type="text/javascript" src="../dependency/ext/build/bootstrap.js"></script>
+<script type="text/javascript" src="../dependency/ext/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+
+<!-- BOWER -->
+<script type="text/javascript" src="../min/bower_components.min.js?v=1645196247039"></script>
+
+
+
+<!-- EXI -->
+<script type="text/javascript" src="../min/exi.min.js?v=1645196247039"></script>
+
+<!-- CONFIG -->
+<script type="text/javascript" src="config.js?v=1645196247039"></script>
+
+
+</head>
+<script>
+	function isNumber(value) {
+		if (value=="") return false;
+
+		var d = parseInt(value);
+		if (!isNaN(d)) return true; else return false;		
+
+	} 
+	var exiSAXS;
+	Ext.onReady(function(){
+		Ext.Loader.setConfig({
+		    enabled: true
+		});
+
+		Ext.Loader.setPath('Ext.ux', '../dependency/ext/examples/ux/');
+		Ext.Loader.setPath('Ext.Extended', '../dependency/extended/');
+
+		Ext.require([
+		  'Ext.ux.statusbar.StatusBar',
+		  'Ext.Extended.RequiredTextField',
+		  'Ext.Extended.RequiredNumberField'
+		]);
+
+		if (location.href.indexOf("saxs") != -1){
+			EXI = new ExiSAXS();
+		}
+		else{
+            
+			EXI = new ExiMX();
+		}
+		
+		EXI.show();
+
+
+		EXI.onAfterRender.attach(function(){
+			Path.listen(); 	
+		});
+	});
+</script>	
+
+<body></body>
+
+<script type="text/javascript" src="../min/lightbox.js?v=1645196247039"></script>   
+<script type="text/javascript" src="../dependency/glmol.js?v=1645196247039"></script>   
+</html>

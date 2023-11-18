@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/view/phasingview/summaryphasinggrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/view/phasingview/summaryphasinggrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">103.38</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">316</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">31.41</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.09</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* It shows a summary about the phasing steps. Basically, one line per space group 
+*
+* @class SummaryPhasingGrid
+* @constructor
+*/
+function SummaryPhasingGrid(args) {
+	
+    this.pseudoFreeMin = 24;
+    this.ccOfPartialModel = 60;    
+    this.onSelect = new Event(this);
+}
+
+SummaryPhasingGrid.prototype.load = function(data) {
+   
+  /** Adding metrics as columns on the phasing Step */
+   for (var i = 0; i &lt; data.length; i++) {
+       var element = data[i];
+       if (element.metric){
+           var metrics = element.metric.split(&quot;,&quot;);
+           var statisticsValues = element.statisticsValue.split(&quot;,&quot;);
+           if (metrics.length &gt; 0){            
+               for (var j = 0; j &lt; metrics.length; j++) {                  
+                   element[metrics[j]] = statisticsValues[j];
+               }
+               
+           }
+       }
+   }
+   this.data = data;
+   this.store.loadData(data);
+};
+
+
+SummaryPhasingGrid.prototype.filter = function(data, metric, min, max) {        
+    var filterFunction = function(b){             
+        if (b){
+            if(b[metric]){
+                
+                try{
+                    if (Number(b[metric]) &gt; min){
+                        if (Number(b[metric]) &lt; max){
+                            return true;
+                        }
+                    }
+                
+                }   
+                catch(e){
+                    return false;
+                }
+            }
+        }
+        return false;
+    };
+    return _.filter(data, filterFunction);
+};
+
+SummaryPhasingGrid.prototype.getPanel = function() {
+	var _this = this;
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [  
+                    &#039;phasingStepId&#039;,
+                    &#039;previousPhasingStepId&#039;,
+                    &#039;processingPrograms&#039;,
+                    &#039;processingStatus&#039;,
+                    &#039;proposalId&#039;,
+                    &#039;sessionId&#039;,
+                    &#039;solventContent&#039;,
+                    &#039;spaceGroup&#039;,
+                    &#039;spaceGroupShortName&#039;,
+                    &#039;statisticsValue&#039;,
+                    &#039;phasingStepType&#039;,
+                    &#039;method&#039;,
+                    &#039;lowRes&#039;,
+                    &#039;highRes&#039;,
+                    &#039;phasingPrograms&#039;,
+                    &#039;enantiomorph&#039;,
+                    &#039;anomalous&#039;,
+                    &#039;Pseudo_free_CC&#039;,
+                    &#039;CC of partial model&#039;,
+                    &#039;anomalous&#039;,
+                    &#039;acronym&#039;,
+                    &#039;Average Fragment Length&#039;]
+	});
+    
+    var selModel = Ext.create(&#039;Ext.selection.RowModel&#039;, {
+		allowDeselect : true,
+		//mode : &#039;multi&#039;,
+		listeners : {
+			select : function(sm, selection) {
+               _this.onSelect.notify(selection.data);
+						}
+
+		} });
+        
+    this.pseudofreeCCSplitter =    Ext.create(&#039;Ext.slider.Multi&#039;, {
+            width: 300,           
+            hideLabel: false,
+            fieldLabel : &#039;Pseudo Free CC&#039;,
+            increment: 1,
+            minValue: 0,
+            maxValue: 120,
+            values: [0, 100]
+    });
+    
+    this.ccOfPartialModel =    Ext.create(&#039;Ext.slider.Multi&#039;, {
+            width: 300,           
+            hideLabel: false,
+            fieldLabel : &#039;CC of Partial Model&#039;,
+            increment: 1,
+            minValue: 0,
+            maxValue: 120,
+            values: [0, 100]
+    });
+    
+        
+    this.tbar = Ext.create(&#039;Ext.toolbar.Toolbar&#039;, {
+ 
+    width   : 500,
+    items: [
+       
+         
+         this.pseudofreeCCSplitter ,
+         this.ccOfPartialModel,
+     
+        &#039;-&#039;, // same as {xtype: &#039;tbseparator&#039;} to create Ext.toolbar.Separator
+        {
+            // xtype: &#039;button&#039;, // default for Toolbars
+            text: &#039;Apply filter&#039;,
+            listeners : {
+                click : function(){
+                    var data = _this.filter(_this.data, &#039;Pseudo_free_CC&#039;,  _this.pseudofreeCCSplitter.getValues()[0],  _this.pseudofreeCCSplitter.getValues()[1]);
+                    _this.store.loadData(_this.filter(data, &#039;CC of partial model&#039;,  _this.ccOfPartialModel.getValues()[0],  _this.ccOfPartialModel.getValues()[1]));
+                }
+                
+            }
+        },
+          {
+            // xtype: &#039;button&#039;, // default for Toolbars
+            text: &#039;Clear filter&#039;,
+            listeners : {
+                click : function(){
+                  
+                    _this.store.loadData(_this.data);
+                }
+                
+            }
+        }
+    ]
+});
+
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		title : &#039;Phasing Steps&#039;,
+		store : this.store,
+        selModel : selModel,
+        tbar :  this.tbar,
+        height : 600,
+        cls : &#039;border-grid&#039;,
+		layout : &#039;fit&#039;,
+        flex : 1,
+         viewConfig : {
+                    stripeRows : true,
+                    getRowClass : function(record, rowIndex, rowParams, store){
+
+                      /*  if (record.data.phasingStepType == &quot;PREPARE&quot;){
+                            return &quot;blue-grid-row&quot;;
+                        }
+                        if (record.data.phasingStepType == &quot;SUBSTRUCTUREDETERMINATION&quot;){
+                            return &quot;blue2-grid-row&quot;;
+                        }
+                        if (record.data.phasingStepType == &quot;PHASING&quot;){
+                            return &quot;blue3-grid-row&quot;;
+                        }
+                        if (record.data.phasingStepType == &quot;MODELBUILDING&quot;){
+                            return &quot;white-grid-row&quot;;
+                        }
+                        return &quot;warning-grid-row&quot;;*/
+                    }
+                },
+		columns : [ 
+                         {
+                            text : &#039;Space Group&#039;,
+                            flex : 1,
+                            dataIndex : &#039;spaceGroupShortName&#039;
+                        },
+                        {
+                            text : &#039;Steps&#039;,
+                            columns : [     {
+                                                text : &#039;Prepare&#039;,
+                                                flex : 1,
+                                                dataIndex : &#039;previousPhasingStepId&#039;,
+                                                renderer : function(grid, e, record){
+                                                    
+                                                    if (record.data.phasingStepType == &quot;PREPARE&quot;){
+                                                        return record.data.phasingPrograms.toUpperCase();
+                                                    }
+                                                }
+                                            },
+                                             {
+                                                text : &#039;Subs. Deter.&#039;,
+                                                flex : 1,
+                                                dataIndex : &#039;previousPhasingStepId&#039;,
+                                                renderer : function(grid, e, record){
+                                                   
+                                                    if (record.data.phasingStepType == &quot;SUBSTRUCTUREDETERMINATION&quot;){
+                                                        return record.data.phasingPrograms.toUpperCase();
+                                                    }
+                                                }
+                                            },
+                                             {
+                                                text : &#039;Phasing&#039;,
+                                                flex : 1,
+                                                dataIndex : &#039;previousPhasingStepId&#039;,
+                                                renderer : function(grid, e, record){
+                                                   
+                                                    if (record.data.phasingStepType == &quot;PHASING&quot;){
+                                                         return record.data.phasingPrograms.toUpperCase();
+                                                    }
+                                                }
+                                            },
+                                             {
+                                                text : &#039;Model&#039;,
+                                                flex : 1,
+                                                dataIndex : &#039;previousPhasingStepId&#039;,
+                                                renderer : function(grid, e, record){
+                                                    if (record.data.phasingStepType == &quot;MODELBUILDING&quot;){
+                                                         return record.data.phasingPrograms.toUpperCase();
+                                                    }
+                                                }
+                                            },
+                            ]
+                        },
+                         {
+                            text : &#039;phasingStepId&#039;,
+                            flex : 1,
+                            hidden : true,
+                            dataIndex : &#039;phasingStepId&#039;
+                      
+                        },
+                         {
+                            text : &#039;previousPhasingStepId&#039;,
+                            flex : 1,
+                            hidden : true,
+                            dataIndex : &#039;previousPhasingStepId&#039;
+                        },
+                         {
+                            text : &#039;phasingStepId&#039;,
+                            flex : 1,
+                            hidden : true,
+                            dataIndex : &#039;phasingStepId&#039;
+                        },
+                        
+                          {
+                            text : &#039;Protein&#039;,
+                            flex : 1,
+                            hidden : true,
+                            dataIndex : &#039;acronym&#039;
+                        },
+                         {
+                            text : &#039;Method&#039;,
+                            flex : 1,
+                            dataIndex : &#039;method&#039;
+                        },
+                         {
+                            text : &#039;Low Resolution&#039;,
+                            flex : 1,
+                            dataIndex : &#039;lowRes&#039;,
+                            renderer : function(grid, e, record){
+                                                    if (record.data.phasingStepType == &quot;MODELBUILDING&quot;){
+                                                         return record.data.lowRes + &quot; - &quot; + record.data.highRes ;
+                                                    }
+                                                }
+                        },
+                         {
+                            text : &#039;High Resolution&#039;,
+                            flex : 1,
+                            hidden : true,
+                            dataIndex : &#039;highRes&#039;
+                        },
+                         {
+                            text : &#039;Enantiomorph&#039;,
+                            flex : 1,
+                            dataIndex : &#039;enantiomorph&#039;
+                        },
+                         {
+                            text : &#039;Anomalous&#039;,
+                            flex : 1,
+                            dataIndex : &#039;anomalous&#039;
+                        },
+                         {
+                            text : &#039;Solvent&#039;,
+                            flex : 1,
+                            dataIndex : &#039;solventContent&#039;
+                        },
+                         {
+                            text : &#039; Program&#039;,
+                            flex : 1,
+                            hidden : true,
+                            dataIndex : &#039;phasingPrograms&#039;
+                        },
+                         {
+                            text : &#039;Pseudo Free &lt;br /&gt;(CC)&#039;,
+                            flex : 1,
+                            dataIndex : &#039;Pseudo_free_CC&#039;
+                        },
+                         {
+                            text : &#039;Partial Model &lt;br /&gt;(CC)&#039;,
+                            flex : 1,
+                            dataIndex : &#039;CC of partial model&#039;
+                        },
+                          {
+                            text : &#039;Avg. Fragment &lt;br /&gt;Length&#039;,
+                            flex : 1,
+                            dataIndex : &#039;Average Fragment Length&#039;
+                        }
+                        
+                       
+                        
+                ]
+	});
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

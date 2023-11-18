@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/network/networkdatasetformatter.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/network/networkdatasetformatter.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">116.26</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">468</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">80.53</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">7.27</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function NetworkDataSetFormatter(vertexFormatProperties, defaultEdgeProperties, args){
+	DataSet.prototype.constructor.call(this);
+	
+	this.args = new Object();
+	
+	this.vertices = new Object();
+	this.edges = new Object();
+	this.dataset = null;
+	this.maxClass = 0;
+	this.minClass = 0;
+	
+	/** Coordenates with default Setting */
+	this.args.width = 1100;
+	this.args.height = 500;
+	
+	/** Optional parameters */
+	this.args.backgroundColor = &quot;#FFFFFF&quot;;
+	this.args.backgroundImage = null;
+	this.args.backgroundImageHeight = null;
+	this.args.backgroundImageWidth = null;
+	this.args.backgroundImageX = null;
+	this.args.backgroundImageY = null;
+	
+	
+	this.args.balanceNodes = false;
+	this.args.nodesMaxSize = 3;
+	this.args.nodesMinSize = 0.5;
+		
+	
+	/** Zoom **/
+	this.args.zoomScale = 1;
+	this.args.zoomScaleStepFactor = 0.4;
+	
+	if (args != null){
+		if (args.backgroundImage != null){
+			this.args.backgroundImage = args.backgroundImage;		
+		}
+		
+		if (args.width != null){
+			this.args.width = args.width;		
+		}
+		
+		if (args.height != null){
+			this.args.height = args.height;	
+			this.args.svgHeight = args.height;		
+		}
+		
+		if (args.svgHeight != null){
+			this.args.svgHeight = args.svgHeight;		
+		}
+		
+		if (args.backgroundColor != null){
+			this.args.backgroundColor = args.backgroundColor;		
+		}
+		
+		if(args.balanceNodes != null){
+			this.args.balanceNodes = args.balanceNodes;
+		}
+
+		if(args.nodesMaxSize != null){
+			this.args.nodesMaxSize = args.nodesMaxSize;
+		}
+		if(args.nodesMinSize != null){
+			this.args.nodesMinSize = args.nodesMinSize;
+		}
+	}
+	
+	this.args.defaultEdgeProperties =  {&quot;fill&quot;:&quot;#000000&quot;, &quot;radius&quot;:&quot;1&quot;, &quot;stroke&quot;:&quot;#000000&quot;, &quot;size&quot;:1, &quot;title&quot;:{&quot;fontSize&quot;:10, &quot;fontColor&quot;:&quot;#000000&quot;}};
+	this.args.vertexFormatProperties = { &quot;fill&quot;:&quot;#000000&quot;, &quot;stroke&quot;:&quot;#000000&quot;, &quot;stroke-opacity&quot;:&quot;#000000&quot;};
+	
+	if (vertexFormatProperties!= null){
+		this.args.vertexFormatProperties = vertexFormatProperties;
+	}
+	if (defaultEdgeProperties!= null){
+		this.args.defaultEdgeProperties = defaultEdgeProperties;
+	}
+	
+	/** Events **/
+	this.changed = new Event(this);
+	this.edgeChanged = new Event(this);
+	this.resized = new Event(this);
+	this.backgroundImageChanged= new Event(this);
+	this.backgroundColorChanged= new Event(this);
+};
+
+NetworkDataSetFormatter.prototype.loadFromJSON = function(dataset, json){
+	this.args = new Object();
+	this.vertices = new Object();
+	this.args = json;
+	this._setDataset(dataset);
+	var _this = this;
+	
+	for ( var vertex in json.vertices) {
+		this.addVertex(vertex, json.vertices[vertex]);
+	}
+	
+	for ( var edgeId in json.edges) {
+		this.addEdge(edgeId, json.edges[edgeId]);
+	}
+};
+
+
+NetworkDataSetFormatter.prototype.toJSON = function(){
+	
+	
+//	this.args.vertices = new Object();
+//	this.args.edges = new Object();
+//	
+//	for ( var vertex in this.vertices) {
+//		this.args.vertices[vertex] = this.getVertexById(vertex).toJSON();
+//	}
+//	for ( var edge in this.edges) {
+//		this.args.edges[edge] = this.getEdgeById(edge).toJSON();
+//	}
+//	
+//	return (this.args);
+	
+
+	var serialize = new Object();
+	serialize = JSON.parse(JSON.stringify(this.args));
+	serialize.vertices = new Object();
+	serialize.edges = new Object();
+	
+	for ( var vertex in this.vertices) {
+		serialize.vertices[vertex] = this.getVertexById(vertex).toJSON();
+	}
+	for ( var edge in this.edges) {
+		serialize.edges[edge] = this.getEdgeById(edge).toJSON();
+	}
+	
+	return (serialize);
+};
+
+
+
+NetworkDataSetFormatter.prototype._getNodeSize = function(nodeId){
+	if (this.isVerticesBalanced()){
+		var total =  this.maxClass - this.minClass;
+		if (total == 0){ total = 1;}
+		var nodeConnection = this.dataset.getVertexById(nodeId).getEdges().length;
+		return ((nodeConnection*this.args.nodesMaxSize)/total)  + this.args.nodesMinSize;
+	}
+	return this.getVertexById(nodeId).getDefault().getSize();
+};
+
+NetworkDataSetFormatter.prototype._recalculateSize = function(){
+	if (this.isVerticesBalanced()){
+		this.maxClass = this.dataset.getMaxClass();
+		this.minClass = this.dataset.getMinClass();
+		for ( var vertexIdAll in this.vertices) {
+				var size = this._getNodeSize(vertexIdAll);
+				this.vertices[vertexIdAll].getDefault().setSize(size);
+				this.vertices[vertexIdAll].getSelected().setSize(size);
+				this.vertices[vertexIdAll].getOver().setSize(size);
+		}
+	}
+};
+
+
+NetworkDataSetFormatter.prototype.addVertex = function(vertexId, json){
+	
+	
+	if (json == null){
+		this.vertices[vertexId] = new CircleVertexGraphFormatter(vertexId, this.args.vertexFormatProperties.defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	else{
+		
+		/** Cargo los attributos desde el json **/
+		if (json.type == null){
+			this.vertices[vertexId] = new CircleVertexGraphFormatter(vertexId, this.args.vertexFormatProperties.defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+		}
+		
+		if ((json.type == &quot;SquareVertexGraphFormatter&quot;)||(json.type == &quot;SquareVertexNetworkFormatter&quot;)){
+			this.vertices[vertexId] = new SquareVertexGraphFormatter(vertexId);
+			this.vertices[vertexId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;CircleVertexGraphFormatter&quot;)||(json.type == &quot;CircleVertexNetworkFormatter&quot;)){
+			this.vertices[vertexId] = new CircleVertexGraphFormatter(vertexId);
+			this.vertices[vertexId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;EllipseVertexGraphFormatter&quot;)||(json.type == &quot;EllipseVertexNetworkFormatter&quot;)){
+			this.vertices[vertexId] = new EllipseVertexGraphFormatter(vertexId);
+			this.vertices[vertexId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;RectangleVertexGraphFormatter&quot;)||(json.type == &quot;RectangleVertexNetworkFormatter&quot;)){
+			this.vertices[vertexId] = new RectangleVertexGraphFormatter(vertexId);
+			this.vertices[vertexId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;RoundedVertexGraphFormatter&quot;)||(json.type == &quot;RoundedVertexNetworkFormatter&quot;)){
+			this.vertices[vertexId] = new RoundedVertexGraphFormatter(vertexId);
+			this.vertices[vertexId].loadFromJSON(json);
+		}
+		
+	}
+	
+	
+	var _this = this;
+	this.vertices[vertexId].stateChanged.attach(function (sender, item){
+		_this.changed.notify(item);
+	});
+	
+	var size = this._getNodeSize(vertexId);
+	this.vertices[vertexId].defaultFormat.args.size = size;
+	this.vertices[vertexId].selected.args.size =  size;
+	this.vertices[vertexId].over.args.size =  size;
+	
+};
+
+NetworkDataSetFormatter.prototype.addEdge = function(edgeId, json){
+	
+	/** Es un edge nuevo que le doy los atributos por defecto **/
+	if (json == null){
+		if (this.dataset.getEdgeById(edgeId).getNodeSource().getId() == this.dataset.getEdgeById(edgeId).getNodeTarget().getId()){
+			this.edges[edgeId] = new BezierEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+		}else{
+			this.edges[edgeId] = new DirectedLineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+		}
+	}
+	else{
+		/** Cargo los attributos desde el json **/
+		if (json.type == null){
+			this.edges[edgeId] = new LineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+		}
+		
+		if ((json.type == &quot;LineEdgeGraphFormatter&quot;)||(json.type == &quot;LineEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new LineEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+		if ((json.type == &quot;DirectedLineEdgeGraphFormatter&quot;)||(json.type == &quot;DirectedLineEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new DirectedLineEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;BezierEdgeGraphFormatter&quot;)||(json.type == &quot;BezierEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new BezierEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+		
+		
+		if ((json.type == &quot;CutDirectedLineEdgeGraphFormatter&quot;)||(json.type == &quot;CutDirectedLineEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new CutDirectedLineEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;DotDirectedLineEdgeGraphFormatter&quot;)||(json.type == &quot;DotDirectedLineEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new DotDirectedLineEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+		if ((json.type == &quot;OdotDirectedLineEdgeGraphFormatter&quot;)||(json.type == &quot;OdotDirectedLineEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new OdotDirectedLineEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+		
+		if ((json.type == &quot;OdirectedLineEdgeGraphFormatter&quot;)||(json.type == &quot;OdirectedLineEdgeNetworkFormatter&quot;)){
+			this.edges[edgeId] = new OdirectedLineEdgeGraphFormatter(edgeId);
+			this.edges[edgeId].loadFromJSON(json);
+		}
+	}
+	
+	var _this = this;
+	this.edges[edgeId].stateChanged.attach(function (sender, item){
+		_this.edgeChanged.notify(item);
+	});
+	
+	this._recalculateSize();
+};
+
+NetworkDataSetFormatter.prototype._setDataset = function(dataset){
+	this.dataset = dataset;
+	this.maxClass = dataset.getMaxClass();
+	this.minClass = dataset.getMinClass();
+	this._attachDatasetEvents();
+};
+
+NetworkDataSetFormatter.prototype.changeEdgeType = function(edgeId, type){
+	if ((type == &quot;LineEdgeGraphFormatter&quot;)||(type == &quot;LineEdgeNetworkFormatter&quot;)){
+		this.edges[edgeId] = new LineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+		
+	}
+	if ((type == &quot;DirectedLineEdgeGraphFormatter&quot;)||(type == &quot;DirectedLineEdgeNetworkFormatter&quot;)){
+		this.edges[edgeId] = new DirectedLineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+	}
+	
+	if ((type == &quot;CutDirectedLineEdgeGraphFormatter&quot;)||(type == &quot;CutDirectedLineEdgeNetworkFormatter&quot;)){
+		this.edges[edgeId] = new CutDirectedLineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+	}
+	
+	if ((type == &quot;DotDirectedLineEdgeGraphFormatter&quot;)||(type == &quot;DotDirectedLineEdgeNetworkFormatter&quot;)){
+		this.edges[edgeId] = new DotDirectedLineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+	}
+	
+	if ((type == &quot;OdotDirectedLineEdgeGraphFormatter&quot;)||(type == &quot;OdotDirectedLineEdgeNetworkFormatter&quot;)){
+		this.edges[edgeId] = new OdotDirectedLineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+	}
+	
+	if ((type == &quot;OdirectedLineEdgeGraphFormatter&quot;)||(type == &quot;OdirectedLineEdgeNetworkFormatter&quot;)){
+		this.edges[edgeId] = new OdirectedLineEdgeGraphFormatter(edgeId, this.args.defaultEdgeProperties.defaultFormat, this.args.defaultEdgeProperties.selected, this.args.defaultEdgeProperties.over, this.args.defaultEdgeProperties.dragging);
+	}
+	
+	
+	
+	var _this = this;
+	this.edges[edgeId].stateChanged.attach(function (sender, item){
+		_this.edgeChanged.notify(item);
+	});
+	_this.edgeChanged.notify(this.edges[edgeId]);
+};
+/*
+classe = &quot;SquareNetworkNodeFormatter&quot;;
+}
+if (value == &quot;circle&quot;){
+	classe = &quot;CircleNetworkNodeFormatter&quot;;
+	**/
+NetworkDataSetFormatter.prototype.changeNodeType = function(vertexId, type){
+	var defaultFormat = JSON.parse(JSON.stringify(this.vertices[vertexId].getDefault()));
+	var selectedFormat = JSON.parse(JSON.stringify(this.vertices[vertexId].getSelected()));
+	var defaultFormat = JSON.parse(JSON.stringify(this.vertices[vertexId].getDefault()));
+	var defaultFormat = JSON.parse(JSON.stringify(this.vertices[vertexId].getDefault()));
+	
+	if ((type == &quot;SquareVertexGraphFormatter&quot;)||(type == &quot;SquareVertexNetworkFormatter&quot;)){
+		this.vertices[vertexId] = new SquareVertexGraphFormatter(vertexId,defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	
+	if ((type == &quot;CircleVertexGraphFormatter&quot;)||(type == &quot;CircleVertexNetworkFormatter&quot;)){
+		this.vertices[vertexId] = new CircleVertexGraphFormatter(vertexId, defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	
+	if ((type == &quot;EllipseVertexGraphFormatter&quot;)||(type == &quot;EllipseVertexNetworkFormatter&quot;)){
+		this.vertices[vertexId] = new EllipseVertexGraphFormatter(vertexId, defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	
+	if ((type == &quot;RectangleVertexGraphFormatter&quot;)||(type == &quot;RectangleVertexNetworkFormatter&quot;)){
+		this.vertices[vertexId] = new RectangleVertexGraphFormatter(vertexId, defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	
+	if ((type == &quot;RoundedVertexGraphFormatter&quot;)||(type == &quot;RoundedVertexNetworkFormatter&quot;)){
+		this.vertices[vertexId] = new RoundedVertexGraphFormatter(vertexId, defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	
+	if ((type == &quot;OctagonVertexGraphFormatter&quot;)||(type == &quot;OctagonVertexNetworkhFormatter&quot;)){
+		this.vertices[vertexId] = new OctagonVertexGraphFormatter(vertexId, defaultFormat, this.args.vertexFormatProperties.selected, this.args.vertexFormatProperties.over, this.args.vertexFormatProperties.dragging);
+	}
+	
+
+	var _this = this;
+	this.vertices[vertexId].stateChanged.attach(function (sender, item){
+		_this.changed.notify(item);
+	});
+	_this.changed.notify(this.vertices[vertexId]);
+};
+
+
+
+NetworkDataSetFormatter.prototype.dataBind = function(networkDataSet){
+	var _this = this;
+	this._setDataset(networkDataSet);
+		
+	for ( var vertex in this.dataset.getVertices()) {
+		this.addVertex(vertex);
+	}
+	
+	for ( var edge in this.dataset.getEdges()) {
+		this.addEdge(edge);
+	}
+};
+
+NetworkDataSetFormatter.prototype._removeEdge = function(edgeId){
+	delete this.edges[edgeId];
+};
+
+NetworkDataSetFormatter.prototype._removeVertex = function(vertexId){
+	delete this.vertices[vertexId];
+};
+
+NetworkDataSetFormatter.prototype._attachDatasetEvents = function(id){
+	var _this = this;
+	this.dataset.vertexDeleted.attach(function (sender, item){
+		_this._removeVertex(item.getId());
+	});
+	
+	this.dataset.edgeDeleted.attach(function (sender, item){
+		_this._removeEdge(item.getId());
+	});
+	
+	this.dataset.newVertex.attach(function (sender, item){
+		_this.addVertex(item.getId());
+	});
+	
+	this.dataset.newEdge.attach(function (sender, item){
+		_this.addEdge(item.getId());
+	});
+};
+
+
+NetworkDataSetFormatter.prototype.getVertexById = function(id){
+	return this.vertices[id];
+};
+
+NetworkDataSetFormatter.prototype.getEdgeById = function(id){
+	return this.edges[id];
+};
+
+NetworkDataSetFormatter.prototype.makeLabelsBigger = function(){
+for ( var vertexId in this.vertices) {
+		var fontSize = this.vertices[vertexId].getDefault().getFontSize() + 2;
+		this.vertices[vertexId].getDefault().setFontSize(fontSize);
+	}
+};
+
+NetworkDataSetFormatter.prototype.makeLabelsSmaller = function(){
+	for ( var vertexId in this.vertices) {
+			var fontSize = this.vertices[vertexId].getDefault().getFontSize() - 2;
+			this.vertices[vertexId].getDefault().setFontSize(fontSize);
+		}
+};
+
+
+NetworkDataSetFormatter.prototype.resize = function(width, height){
+	this.args.width = width;
+	this.args.height = height;
+	this.resized.notify();
+};
+
+/** ZOOM GETTERS **/
+NetworkDataSetFormatter.prototype.getZoomScaleStepFactor = function(){return this.args.zoomScaleStepFactor;};
+NetworkDataSetFormatter.prototype.setZoomScaleStepFactor = function(scaleFactor){this.args.zoomScaleStepFactor = scaleFactor;};
+NetworkDataSetFormatter.prototype.getZoomScale = function(){return this.args.zoomScale;};
+NetworkDataSetFormatter.prototype.setZoomScale = function(scale){this.args.zoomScale = scale;};
+
+NetworkDataSetFormatter.prototype.getNodesMaxSize = function(){return this.args.nodesMaxSize;};
+NetworkDataSetFormatter.prototype.getNodesMinSize = function(){return this.args.nodesMinSize;};
+
+/** SIZE SETTERS AND GETTERS **/
+NetworkDataSetFormatter.prototype.isVerticesBalanced = function(){return this.args.balanceNodes;};
+NetworkDataSetFormatter.prototype.getWidth = function(){return this.args.width;};
+NetworkDataSetFormatter.prototype.getHeight = function(){return this.args.height;};
+
+/** OPTIONAL PARAMETERS GETTERS AND SETTERS **/
+NetworkDataSetFormatter.prototype.getBackgroundImage = function(){return this.args.backgroundImage;};
+NetworkDataSetFormatter.prototype.setBackgroundImage = function(value){this.args.backgroundImage = value; this.backgroundImageChanged.notify(this);};
+
+
+NetworkDataSetFormatter.prototype.getBackgroundImageWidth = function(){return this.args.backgroundImageWidth;};
+NetworkDataSetFormatter.prototype.setBackgroundImageWidth = function(value){this.args.backgroundImageWidth = value; this.backgroundImageChanged.notify(this);};
+
+NetworkDataSetFormatter.prototype.getBackgroundImageHeight = function(){return this.args.backgroundImageHeight;};
+NetworkDataSetFormatter.prototype.setBackgroundImageHeight = function(value){this.args.backgroundImageHeight = value; this.backgroundImageChanged.notify(this);};
+
+NetworkDataSetFormatter.prototype.getBackgroundImageX = function(){return this.args.backgroundImageX;};
+NetworkDataSetFormatter.prototype.setBackgroundImageX = function(value){this.args.backgroundImageX = value; this.backgroundImageChanged.notify(this);};
+
+NetworkDataSetFormatter.prototype.getBackgroundImageY = function(){return this.args.backgroundImageX;};
+NetworkDataSetFormatter.prototype.setBackgroundImageY = function(value){this.args.backgroundImageY = value; this.backgroundImageChanged.notify(this);};
+
+
+
+NetworkDataSetFormatter.prototype.getBackgroundColor = function(){return this.args.backgroundColor;};
+NetworkDataSetFormatter.prototype.setBackgroundColor = function(value){this.args.backgroundColor = value; this.backgroundColorChanged.notify(this);};
+
+NetworkDataSetFormatter.prototype.getWidth = function(){return this.args.width;};
+NetworkDataSetFormatter.prototype.setWidth = function(value){this.args.width = value;};
+
+NetworkDataSetFormatter.prototype.getHeight = function(){return this.args.height;};
+NetworkDataSetFormatter.prototype.setHeight = function(value){this.args.height = value;};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

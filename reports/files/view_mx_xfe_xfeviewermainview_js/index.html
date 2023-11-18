@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/mx/xfe/xfeviewermainview.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/mx/xfe/xfeviewermainview.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">115.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">432</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">43.95</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.84</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This view shows a main plot with the spectrum and a grid with the elements
+*
+* @class XfeViewerMainView
+* @constructor
+*/
+function XfeViewerMainView() {
+    this.id = BUI.id();
+    MainView.call(this);
+
+    //this.filters = [&#039;channel&#039;, &#039;counts&#039;, &#039;Energy&#039;, &#039;fit&#039;, &#039;continuum&#039;, &#039;pileup&#039;];
+    this.filters = [];
+
+    this.data = {
+        labels : [], // labels = [{name: &#039;axisX&#039;, x: true, y, false},{name: &#039;axisXY&#039;, x: false, y, true}] 
+        data   : [] 
+    };
+}
+
+XfeViewerMainView.prototype.getPanel = MainView.prototype.getPanel;
+
+/**
+* Makes an store and a grid where the labels of the csv will be shown 
+*
+* @method getGrid
+* @return {Grid} Retuns a Ext.panel.Grid
+*/
+XfeViewerMainView.prototype.getGrid = function() {
+    var _this = this;
+    /** Store for labels */
+    this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+        fields: [&#039;name&#039;, &#039;value&#039;, &#039;x&#039;, &#039;y&#039;],
+        sorters: [{ property: &#039;value&#039;, direction: &#039;DESC&#039; }]
+    });
+    return this.grid = Ext.create(&#039;Ext.grid.Panel&#039;, {
+        title: &#039;Labels&#039;,
+        store: this.store,
+        cls: &#039;border-grid&#039;,        
+        width: 300,
+        height: 700,
+        columns: [
+            {
+                text: &#039;name&#039;,
+                dataIndex: &#039;name&#039;,
+                flex: 1
+            },
+            {
+                text: &#039;value&#039;,
+                dataIndex: &#039;value&#039;,
+                flex: 1
+            },
+            {
+                text : &#039;x&#039;,
+                dataIndex: &#039;&#039;,
+                id : this.id + &#039;x&#039;,
+                flex: 0.5,
+                renderer : function(grid, sample, record){
+                    
+                    var id = _this.id + &quot;_&quot; +record.data.name + &quot;_X&quot;; 
+                    if (record.data.x){
+                        return &#039;&lt;input disabled id=&quot;&#039; + id+&#039;&quot; type=&quot;checkbox&quot; name=&quot;x&quot; value=&quot;bike&quot; checked&gt;&#039;;
+                    }
+                    else{
+                        return &#039;&lt;input id=&quot;&#039; + id+&#039;&quot; type=&quot;checkbox&quot; name=&quot;x&quot; value=&quot;bike&quot;&gt;&#039;;
+                    }
+                }
+            },{
+                text : &#039;y&#039;,
+                dataIndex: &#039;&#039;,
+                id : this.id + &#039;y&#039;,
+                flex: 0.5,
+                renderer : function(grid, sample, record){
+                     var id = _this.id + &quot;_&quot; +record.data.name + &quot;_Y&quot;; 
+                      if (record.data.y){
+                        return &#039;&lt;input id=&quot;&#039; + id+&#039;&quot; type=&quot;checkbox&quot; name=&quot;y&quot; value=&quot;bike&quot; checked=&quot;&#039; + record.data.y + &#039;&quot;&gt;&#039;;
+                      }
+                        else{
+                         return &#039;&lt;input id=&quot;&#039; + id+&#039;&quot; type=&quot;checkbox&quot; name=&quot;y&quot; value=&quot;bike&quot;&gt;&#039;;
+                    }
+                }
+            }
+        ],
+        listeners : {
+            cellclick : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts ){
+                /** This is X */
+                if (cellIndex == 2){
+                    _this.setXColumn(record.data.name, document.getElementById(_this.id + &quot;_&quot; + record.data.name + &quot;_X&quot;).checked);
+                }
+                
+                /** This is Y */
+                if (cellIndex == 3){
+                    _this.setYColumn(record.data.name, document.getElementById(_this.id + &quot;_&quot; + record.data.name + &quot;_Y&quot;).checked);
+                }
+                _this.parseData();
+            }
+            
+            
+        }
+    });
+};
+
+/**
+* Sets as X axis the column labelName is selected is true. It sets to false all the other labels for the value X
+*
+* @method setXColumn
+*/
+XfeViewerMainView.prototype.setXColumn = function(labelName, selected) {
+    var label = _.filter(this.data.labels, function(o){ return o.name == labelName});
+    if (label){
+        /** As X only can be one we set all x to false */
+        this.data.labels = _.map(this.data.labels,  function disable(o){o.x = false; return o;});
+        if (label[0]){
+            label[0].x = selected;
+            label[0].y = !selected;
+        }
+    }
+    this.store.loadData(this.data.labels);
+ 
+};
+
+/**
+* Sets the value to selected of the attribute Y of a label
+*
+* @method setXColumn
+*/
+XfeViewerMainView.prototype.setYColumn = function(labelName, selected) {
+    var label = _.filter(this.data.labels, function(o){ return o.name == labelName});
+    if (label){
+        if (label[0]){
+            label[0].y = selected;
+        }
+    }
+    this.store.loadData(this.data.labels);
+ 
+};
+
+/**
+* Returns the containers. There are four container 2xHbox(2xvbox)
+*
+* @method getContainer
+* @return {Grid} Retuns a Ext.panel.Grid
+*/
+XfeViewerMainView.prototype.getContainer = function() {
+    var _this = this;
+
+    return Ext.create(&#039;Ext.container.Container&#039;, {
+        layout: {
+            type: &#039;hbox&#039;
+        },
+        margin: 10,
+        items: [
+            {
+                xtype: &#039;container&#039;,
+                margin: &#039;5 0 0 5&#039;,
+                width: 300,
+                items: [
+                    this.getGrid()
+                 
+                ]
+            },
+            {
+                xtype: &#039;container&#039;,
+                flex: 0.8,
+                margin: &#039;5 0 0 5&#039;,
+                items: [
+                    {
+                        html: &#039;&lt;div style=&quot;width:100%&quot;  id=&quot;plot&#039; + _this.id + &#039;&quot;&gt;&lt;/div&gt;&#039;,
+                        cls: &#039;border-grid&#039;,
+                        id: this.id + &#039;containerLayout&#039;,
+                        height: 700,
+
+                    },
+                    {
+                        html: &#039;Results produced by &lt;a href=&quot;http://pymca.sourceforge.net/&quot;&gt;PyMca&lt;/a&gt;&#039;,
+                        cls: &#039;border-grid&#039;,
+                        margin: &#039;2 0 0 0&#039;,
+                        flex: 1,
+                        height: 20
+                    }
+                ]
+
+            }
+        ]
+    });
+};
+
+/**
+* Convert the labels as array of string into json and load in the store
+* labels = [&quot;l1, &quot;l1&quot;]
+* sum = [1, 2]
+*
+* 
+* @method getSumForLabels
+* @return {json} Retuns [{name:&#039;l1&#039;, value:1}, {name:&#039;l2&#039;, value:2}]
+*/
+XfeViewerMainView.prototype.getSumForLabels = function(labels, sum) {
+    var _this = this;
+    /** Loading grid of labels */
+    try {
+        function toJson(el) {
+            return {
+                name: el[0].name,
+                x: el[0].x,
+                y: el[0].y,
+                value: el[1]
+            };
+        }
+        /** This converts to arrays labels and sum in a single json array with name and value */
+        var data = _.map(_.zip(labels, sum), toJson);
+        data = _.reject(data, function(o) {
+            return (_.indexOf(_this.filters, o.name) != -1);
+        });
+        return data;
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
+
+
+
+/**
+* Sums the values for each columns 
+*
+* 
+* @method sumByColums
+* @return {Array} Retuns the value of sum for each column in an array
+*/
+XfeViewerMainView.prototype.sumByColums = function(labels, data) {
+    var sum = new Array( labels.length);
+    for (var i = 0; i &lt; data.length; i++) {
+        for (var j = 0; j &lt; data[i].length; j++) {
+            if (sum[j] == null) {
+                sum[j] = 0;
+            }
+            sum[j] = sum[j] + data[i][j];
+        }
+    }
+    return sum;
+};
+
+XfeViewerMainView.prototype.getDataColumn = function(data, indexes) {
+    function reduceColumns(row){
+        return  _.pullAt(row, indexes);
+    }
+    /** Using slice to make a copy by value */
+   return _.map(data, reduceColumns);
+
+};
+XfeViewerMainView.prototype.parseData = function() {
+    /** get X column */
+   
+    /** We need first to clone in order to not touch the original data */
+    var duplicatedData = _.cloneDeep(this.data.data);
+    
+    /** Getting the label X and data X */
+    var labelX = _.filter(this.data.labels, function(o){ return o.x;})[0];
+    var dataX =  this.getDataColumn(duplicatedData, [_.indexOf(this.data.labels, labelX)]);
+   
+   /** Getting the labels Y and data Y */
+   var duplicatedData = _.cloneDeep(this.data.data);
+    var labelsY = _.filter(this.data.labels.slice(), function(o){ return o.y;});
+    /** Getting indexes for Y columns */
+    var indexes = [];
+    
+    for (var i = 0; i &lt; labelsY.length; i++){
+        indexes.push(_.indexOf(this.data.labels, labelsY[i]));
+    }
+    
+    var data =  this.getDataColumn(duplicatedData, indexes);
+  
+   
+    for (var i = 0; i &lt; dataX.length; i++) {
+        data[i] = _.concat(dataX[i], data[i]);
+    }
+   
+    this.renderPlot( _.concat(labelX, labelsY), data);
+};
+
+/**
+* It transposes the data in order to calculate the max value of Y for each statistic then it create the annotation by getting the index X
+*
+* 
+* @method getAnnotations
+*/
+XfeViewerMainView.prototype.getAnnotations = function(data, labels) {
+    var annotations = [];
+    if (data){
+        /**  First, we transpose the matrix **/
+        var transposed = data[0].map(function(col, i) { 
+            return data.map(function(row) { 
+                return row[i] 
+            })
+        });
+       
+        for (var i = 0; i &lt; labels.length; i++) {
+                var max = _.max(transposed[i]);
+                var index = _.findIndex(transposed[i], function(o) { return o == max; });
+                annotations.push({
+                            x           : data[index][0],
+                            shortText   : labels[i].name,//this.data.labels[i].name,
+                            text        : labels[i].name,
+                            series      : labels[i].name,
+                            width       : 100,
+                            height      : 25
+                    }
+                );
+        }
+    }
+    return annotations;
+};
+/**
+* Render the dygraph widget on a container that should exists with id = this.id
+*
+* 
+* @method renderPlot
+*/
+XfeViewerMainView.prototype.renderPlot = function(labels, data) {
+    var _this = this;
+  
+    /** Plotting */
+    var g = new Dygraph(
+        document.getElementById(&quot;plot&quot; + this.id),
+        data,
+        {
+            legend: &#039;always&#039;,
+            title: &#039;XRF&#039;,
+            labels :   _.map(labels, &#039;name&#039;),
+            height: 600,
+            width: 800,
+            displayAnnotations : true,
+            //sigFigs : false,
+            //stackedGraph: false,
+            labelsSeparateLines : true,
+            labelsShowZeroValues : false,
+            logscale : false,
+            ylabel: &#039;Count&#039;
+        }
+    );
+  
+     g.ready(function() { 
+        g.setAnnotations(_this.getAnnotations(data, labels));
+    });
+    
+};
+
+/**
+* Parser the first line of the csv file
+*
+* 
+* @method parseHeaders
+*/
+XfeViewerMainView.prototype.parseHeaders = function(line) {
+    /** Only first is used as X */
+    var counter = 0;
+    function remove(element) {
+        counter = counter + 1;
+        return {
+                    name : element.replace(new RegExp(&quot;\&quot;&quot;, &#039;g&#039;), &quot;&quot;),
+                    x    : counter == 1,
+                    y    :  counter != 1
+        }
+     };
+     return _.map(line.split(&quot;,&quot;), remove);
+};
+/**
+* Gets the csv data, parses it and plot it
+*
+* 
+* @method plot
+*/
+XfeViewerMainView.prototype.plot = function() {
+    var _this = this;
+    $.ajax({
+        url: EXI.getDataAdapter().mx.xfescan.getCSV(this.xfeFluorescenceSpectrumId),
+        context: this
+
+    }).done(function(csv) {
+        if (csv) {
+            var lines = csv.split(&quot;\n&quot;);
+            var labelsHeader = [];
+            if (lines) {
+                if (lines[0]) {
+                   this.data.labels = this.parseHeaders(lines[0]);
+                   
+                }
+                else {
+                    /** No Lines */
+                    EXI.setError(&quot;No labels on csv&quot;);
+                    return;
+                }
+
+                function convertToNumber(element) {
+                    var elements = element.split(&#039;,&#039;);
+                    function toNumber(el) {
+                        return parseFloat(el);
+                    }
+                    elements = _.map(elements, toNumber);
+                    return elements;
+                }
+                /** Parsing data it means remove labels, split by , and convert to number */
+                this.data.data = _.map(_.slice(lines, 1, lines.length - 1), convertToNumber);
+                
+                /** Fills the labels grid */
+                try {
+                    
+                    this.data.labels = this.getSumForLabels(this.data.labels, this.sumByColums( _this.data.labels, _this.data.data));
+                    this.store.loadData(this.data.labels);
+                }
+                catch (e) {
+                    EXI.setError(e.message);
+                }
+                try {
+                    
+                    this.renderPlot( this.data.labels,  this.data.data);
+                }
+                catch (e) {
+                    EXI.setError(e.message);
+                }
+            }
+        }
+        else {
+            /** No Lines */
+            EXI.setError(&quot;CSV is empty&quot;);
+            return;
+        }
+    });
+};
+
+
+
+XfeViewerMainView.prototype.load = function(xfeFluorescenceSpectrumId) {
+    var _this = this;
+    this.panel.setTitle(&quot;XRF Viewer&quot;);
+    this.xfeFluorescenceSpectrumId = xfeFluorescenceSpectrumId;
+    this.plot();
+
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

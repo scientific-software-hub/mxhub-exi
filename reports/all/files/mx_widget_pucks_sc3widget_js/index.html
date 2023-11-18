@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - mx/widget/pucks/sc3widget.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>mx/widget/pucks/sc3widget.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">115.34</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">75</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">36.31</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">0.80</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This class extends the SampleChangerWidget class for a SC3
+*
+* @class FlexHCDWidget
+* @constructor
+*/
+function SC3Widget (args) {
+	
+	SampleChangerWidget.call(this,args);
+	
+	this.name = &#039;SC3&#039;;
+	this.sampleChangerCapacity = 5;
+	this.clockwise = -1;
+
+	this.data = {
+		radius : this.radius,
+		cells : 5,
+		text : []
+	};
+	
+	this.createStructure();
+	this.createPucks(&quot;Spinepuck&quot;, this.data.cells, 0, this.data.radius/2, 0.8);
+};
+
+SC3Widget.prototype.getPuckIndexFromAngle = SampleChangerWidget.prototype.getPuckIndexFromAngle;
+SC3Widget.prototype.createPucks = SampleChangerWidget.prototype.createPucks;
+SC3Widget.prototype.getPanel = SampleChangerWidget.prototype.getPanel;
+SC3Widget.prototype.load = SampleChangerWidget.prototype.load;
+SC3Widget.prototype.getStructure = SampleChangerWidget.prototype.getStructure;
+SC3Widget.prototype.findPuckById = SampleChangerWidget.prototype.findPuckById;
+SC3Widget.prototype.getAllPucks = SampleChangerWidget.prototype.getAllPucks;
+SC3Widget.prototype.render = SampleChangerWidget.prototype.render;
+SC3Widget.prototype.setClickListeners = SampleChangerWidget.prototype.setClickListeners;
+SC3Widget.prototype.disablePucksOfDifferentCapacity = SampleChangerWidget.prototype.disablePucksOfDifferentCapacity;
+SC3Widget.prototype.allowAllPucks = SampleChangerWidget.prototype.allowAllPucks;
+SC3Widget.prototype.getPuckData = SampleChangerWidget.prototype.getPuckData;
+SC3Widget.prototype.getAllFilledPucks = SampleChangerWidget.prototype.getAllFilledPucks;
+SC3Widget.prototype.loadSamples = SampleChangerWidget.prototype.loadSamples;
+SC3Widget.prototype.emptyAllPucks = SampleChangerWidget.prototype.emptyAllPucks;
+
+/**
+* Creates the particular structure of the SC3
+*
+* @method createStructure
+*/
+SC3Widget.prototype.createStructure = function () {
+	var textR = this.data.radius*0.9;
+	for (var i = 0 ; i &lt; this.data.cells ; i++){
+		var ang = i*2*Math.PI/this.data.cells;
+		var textNumber = {
+			text : i+1,
+			x : -textR*Math.sin(ang) + this.data.radius,
+			y : -textR*Math.cos(ang) + this.data.radius
+		};
+		this.data.text.push(textNumber);
+	}
+};
+
+/**
+* Converts the idLocation to the corresponding location in the SC3 by convention
+*
+* @method convertIdToSampleChangerLocation
+* @return The corresponding location in the SC3 by convention
+*/
+SC3Widget.prototype.convertIdToSampleChangerLocation = function (idLocation) {
+	return Number(idLocation.split(&quot;-&quot;)[1]);
+};
+
+/**
+* Converts the sample changer location in a SC3 to the id of the puck
+*
+* @method convertSampleChangerLocationToId
+* @return The corresponding id of the puck in the given location
+*/
+SC3Widget.prototype.convertSampleChangerLocationToId = function (sampleChangerLocation) {
+	if (sampleChangerLocation &lt;= 5 &amp;&amp; sampleChangerLocation &gt; 0) {
+		return this.id + &quot;-&quot; + sampleChangerLocation + &quot;-1&quot;;
+	} else {
+		return null;
+	}
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/parcelpanel.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/parcelpanel.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">116.69</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">222</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">27.15</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.61</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This is a form  for parcels. It includes all items includes in a parcel. Include pucks
+*
+* @class ParcelPanel
+* @constructor
+*/
+function ParcelPanel(args) {
+	this.id = BUI.id();
+	this.height = 500;
+	this.width = 500;
+
+	this.isSaveButtonHidden = false;
+	this.isHidden = false;
+
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+	}
+	
+	this.onSavedClick = new Event(this);
+}
+
+/**
+* It inserts a panel into the this.panel with the template parcelformsummary
+*
+* @method addHeaderPanel
+*/
+ParcelPanel.prototype.addHeaderPanel = function() {
+	var html = &quot;No information&quot;;
+	dust.render(&quot;parcelformsummary&quot;, this.dewar, function(err, out){
+		html = out;
+    });
+	this.panel.insert(
+				{
+					xtype 	: &#039;container&#039;,
+					width	: 200,
+					border : 1,
+					padding : 20,
+					items 	: [	{html : html}
+				
+					]
+				}
+	);
+};
+
+ParcelPanel.prototype.render = function() {
+	var dewar = this.dewar;
+	this.panel.removeAll();
+
+	this.addHeaderPanel();
+	
+	if (dewar != null){
+		if (dewar.containerVOs != null){
+			/** Sorting container by id **/
+			dewar.containerVOs.sort(function(a, b){return a.containerId - b.containerId;});
+			for (var i = 0; i&lt; dewar.containerVOs.length; i++){
+				var container = dewar.containerVOs[i];
+				/** Adding the puck layout **/
+				var puckPanel = new PuckPanel({height : 200});
+				this.panel.insert(puckPanel.getPanel());
+				puckPanel.load(container);
+				
+			}
+		}
+	}
+};
+
+ParcelPanel.prototype.load = function(dewar) {
+	this.dewar = dewar;
+	try {
+		/** Rendering pucks **/
+		this.render();
+	}
+	catch(e){
+		console.log(e);
+	}
+};
+
+/**
+* It inserts a new puck into the dewar and reloads the widget
+*
+* @method addPuckToDewar
+*/
+ParcelPanel.prototype.addPuckToDewar = function() {
+	var _this = this;
+	var onSuccess = function(sender, puck){
+		_this.dewar.containerVOs.push(puck);
+		_this.load(_this.dewar);
+	};
+	EXI.getDataAdapter({onSuccess : onSuccess}).proposal.shipping.addPuck(this.dewar.dewarId, this.dewar.dewarId);
+};
+
+/**
+* It displays a window with a case form
+*
+* @method showCaseForm
+*/
+ParcelPanel.prototype.showCaseForm = function() {
+	var _this = this;
+	/** Opens a window with the cas form **/
+	var caseForm = new CaseForm();
+	var window = Ext.create(&#039;Ext.window.Window&#039;, {
+	    title: &#039;Parcel&#039;,
+	    height: 450,
+	    width: 600,
+	    modal : true,
+	    layout: &#039;fit&#039;,
+	    items: [
+	            	caseForm.getPanel(_this.dewar)
+	    ],
+	    listeners : {
+			afterrender : function(component, eOpts) {
+				if (_this.puck != null){
+						_this.render(_this.puck);
+				}
+			}
+	    },
+	    buttons : [ {
+						text : &#039;Save&#039;,
+						handler : function() {
+							_this.onSavedClick.notify(caseForm.getDewar());
+							window.close();
+						}
+					}, {
+						text : &#039;Cancel&#039;,
+						handler : function() {
+							window.close();
+						}
+					} ]
+	});
+	window.show();
+};
+
+ParcelPanel.prototype._getTopButtons = function() {
+	var _this = this;
+	var actions = [];
+	
+	
+	actions.push(this.code);
+	actions.push(this.status);
+	actions.push(this.storageCondition);
+	
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		icon : &#039;../images/icon/edit.png&#039;,
+		text : &#039;Edit&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+					_this.showCaseForm();
+		}
+	}));
+	
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		icon : &#039;../images/print.png&#039;,
+		text : &#039;Print Labels&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+			var dewarId = _this.dewar.dewarId;
+			var url = EXI.getDataAdapter().proposal.shipping.getDewarLabelURL(dewarId, dewarId);
+			location.href = url;
+			return;
+		}
+	}));
+	
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		icon : &#039;../images/icon/add.png&#039;,
+		text : &#039;Add puck&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+			_this.addPuckToDewar();
+		}
+	}));
+	
+	return actions;
+};
+
+
+ParcelPanel.prototype.getPanel = function() {
+	var _this = this;
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		layout 		: &#039;hbox&#039;,
+		cls 		: &quot;border-grid&quot;,
+		margin 		: 10,
+		height 		: this.height,
+		autoScroll	: true,
+		items 		: [],
+		listeners : {
+			afterrender : function(component, eOpts) {
+						_this.render();
+			}
+	    }
+//	,
+//		toolbar : [ {
+//						text : &#039;Save&#039;,
+//						handler : function() {
+//								var adapter = new DataAdapter();
+//								_this.panel.setLoading();
+//								var dewar = caseForm.getDewar();
+//								var onSuccess = (function(sender, shipment) {
+//									_this.load(shipment);
+//									window.close();
+//									_this.panel.setLoading(false);
+//								});
+//								dewar[&quot;sessionId&quot;] = dewar.firstExperimentId;
+//								dewar[&quot;shippingId&quot;] = _this.shipment.shippingId;
+//								EXI.getDataAdapter({onSuccess : onSuccess}).proposal.dewar.saveDewar(_this.shipment.shippingId, dewar);
+//						}
+//					}, 
+//					{
+//							text : &#039;Cancel&#039;,
+//							handler : function() {
+//								window.close();
+//							}
+//					}]
+	});
+	
+	this.panel.addDocked({
+		id 		: _this.id + &#039;tbar&#039;,
+		height 	: 45,
+		xtype 	: &#039;toolbar&#039;,
+		items 	: _this._getTopButtons(),
+		cls 	: &#039;exi-top-bar&#039;
+	});
+	return this.panel;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

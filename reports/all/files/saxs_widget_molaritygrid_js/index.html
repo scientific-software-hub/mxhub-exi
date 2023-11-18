@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/molaritygrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/molaritygrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">115.92</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">195</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">24.91</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.85</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * A shipment may contains one or more cases where stock solutions and sample
+ * plates are stored
+ * 
+ * @height
+ * @btnEditVisible
+ * @btnRemoveVisible
+ * 
+ * #onEditButtonClicked
+ */
+function MolarityGrid(args) {
+	this.height = 100;
+	this.width = 100;
+
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+	}
+
+	var _this = this;
+	
+	this.molarityForm = new MolarityForm({height : 180, width : 455});
+
+	this.molarityForm.onSave.attach(function(sender){
+		_this.molarityWindow.destroy();
+		_this.updateProposal();
+		
+	});
+	
+	this.molarityForm.onClose.attach(function(sender){
+		_this.molarityWindow.destroy();
+		
+	});
+	
+	/** Events * */
+	this.onEditButtonClicked = new Event(this);
+}
+
+MolarityGrid.prototype._getColumns = function() {
+	return [ {
+		text : &#039;Subunit&#039;,
+		columns : [ {
+			text : &quot;Acronym&quot;,
+			width : 100,
+			hidden : false,
+			dataIndex : &#039;acronym&#039;,
+			sortable : true
+		}, {
+			text : &quot;Name&quot;,
+			width : 125,
+			hidden : false,
+			dataIndex : &#039;name&#039;,
+			sortable : true
+		}, {
+			text : &quot;MM Est.&quot;,
+			width : 100,
+			dataIndex : &#039;molecularMass&#039;,
+			sortable : true,
+			renderer : function(grid, cls, record){
+				return BUI.formatValuesUnits(record.data.molecularMass , &quot;Da&quot;, 10, 2); 
+				
+			}
+		} ]
+	}, {
+//		text : &quot;Number &lt;br/&gt;&lt;span style=&#039;font-size:10px&#039;&gt;in assymmetric units&lt;/span&gt;&quot;,
+		text : &quot;Ratio&quot;,
+		width : 100,
+		dataIndex : &#039;ratio&#039;,
+		tooltip : &#039;Number of times the subunit is present in the macromolecule&#039;,
+		sortable : true
+	}, {
+		id : this.id + &#039;MOLARITY_REMOVE&#039;,
+		flex : 0.1,
+		sortable : false,
+		renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+			return BUI.getRedButton(&#039;REMOVE&#039;);
+		}
+	} ];
+};
+
+MolarityGrid.prototype._openMolarityWindow = function() {
+	this.molarityWindow = Ext.create(&#039;Ext.window.Window&#039;, {
+		title : &#039;Molarity&#039;,
+		height : 220,
+		width : 500,
+		modal : true,
+		items : [this.molarityForm.getPanel() ]
+	}).show();
+};
+
+MolarityGrid.prototype._getButtons = function() {
+	var _this = this;
+	return [ {
+		text : &#039;Add subunit&#039;,
+		icon : &#039;../images/add.png&#039;,
+		handler : function() {
+			_this._openMolarityWindow();
+		}
+    }];
+};
+
+
+MolarityGrid.prototype.updateProposal = function() {
+	var _this = this;
+	this.panel.setLoading();
+	BIOSAXS.proposal.onInitialized.attach(function() {
+		if (BIOSAXS.proposal != null) {
+			var macromolecules = BIOSAXS.proposal.macromolecules;
+			for (var i = 0; i &lt; macromolecules.length; i++) {
+				
+				if (macromolecules[i].macromoleculeId == _this.macromolecule.macromoleculeId) {
+					_this.refresh(macromolecules[i]);
+					_this.panel.setLoading(false);
+				}
+			}
+		}
+	});
+	BIOSAXS.proposal.init();
+};
+
+
+MolarityGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.molarityStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;acronym&#039;, &#039;ratio&#039;, &#039;comments&#039;, &#039;stoichiometryId&#039;, &#039;name&#039;, &#039;molecularMass&#039; ],
+		sorters : {
+			property : &#039;ratio&#039;,
+			direction : &#039;DESC&#039;
+		}
+	});
+
+	this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		store : this.molarityStore,
+		height : this.height,
+		padding : 5,
+		columns : this._getColumns(),
+		listeners : {
+			cellclick : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+
+				/** Remove entry * */
+				if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;MOLARITY_REMOVE&#039;) {
+					var dataAdapter = new BiosaxsDataAdapter();
+					dataAdapter.onSuccess.attach(function(sender) {
+						_this.updateProposal();
+						
+					});
+					dataAdapter.removeStoichiometry(record.data.stoichiometryId);
+					_this.panel.setLoading(&quot;Removing Structure&quot;);
+				}
+			}
+		},
+		tbar : this._getButtons()
+	});
+	return this.panel;
+};
+
+MolarityGrid.prototype._prepareData = function(macromolecule) {
+	/** Return an array of [{ratio,acronym, stoichiometryId, name}] **/
+		var data = [];
+		if (macromolecule.stoichiometry != null) {
+			for (var i = 0; i &lt; macromolecule.stoichiometry.length; i++) {
+				var hostMacromolecule = BIOSAXS.proposal.getMacromoleculeById(macromolecule.stoichiometry[i].macromoleculeId);
+				data.push({
+					ratio : macromolecule.stoichiometry[i].ratio,
+					acronym : hostMacromolecule.acronym,
+					comments : hostMacromolecule.comments,
+					molecularMass : hostMacromolecule.molecularMass,
+					stoichiometryId : macromolecule.stoichiometry[i].stoichiometryId,
+					name : hostMacromolecule.name
+				});
+			}
+		}
+		return data;
+};
+
+MolarityGrid.prototype.refresh = function(macromolecule) {
+	if (macromolecule != null){
+		this.molarityStore.loadData(this._prepareData(macromolecule));
+		this.molarityForm.refresh(macromolecule);
+		this.macromolecule = macromolecule;
+	}
+};
+
+MolarityGrid.prototype.input = function() {
+	return {
+		proposal : DATADOC.getProposal_10(),
+		dewars : DATADOC.getDewars_10()
+
+	};
+};
+
+MolarityGrid.prototype.test = function(targetId) {
+	var MolarityGrid = new MolarityGrid({
+		height : 150
+	});
+	BIOSAXS.proposal = new Proposal(MolarityGrid.input().proposal);
+	var panel = MolarityGrid.getPanel(MolarityGrid.input().dewars);
+	panel.render(targetId);
+
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

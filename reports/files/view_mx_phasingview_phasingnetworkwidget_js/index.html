@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/mx/phasingview/phasingnetworkwidget.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/mx/phasingview/phasingnetworkwidget.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">104.12</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">304</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.87</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.13</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+* This class renders a network graph with the PhasingStep
+*
+* @class PhasingNetworkWidget
+* @constructor
+*/
+function PhasingNetworkWidget(args){
+	this.id = BUI.id();
+	this.data = [];
+
+	/** &quot;OPEN_VIEWER&quot; **/
+	this.tbar = &quot;MENU&quot;;
+	
+	
+    
+	if (args != null){
+		if (args.tbar != null){
+			this.tbar = args.tbar;
+		}
+	}
+}
+
+PhasingNetworkWidget.prototype.clear = function(){
+	document.getElementById(this.id).innerHTML = &quot;&quot;;
+};
+
+PhasingNetworkWidget.prototype.getTbar = function(){
+	var _this = this;
+	if (this.tbar == &quot;MENU&quot;){
+		return [
+						Ext.create(&#039;Ext.button.Split&#039;, {
+						    text: &#039;View&#039;,
+						    handler: function() {
+						       
+						    },
+						    menu: new Ext.menu.Menu({
+						        items: [
+									{
+										text: &#039;Default&#039;, 
+										handler: function(){ 
+											_this.layout = {
+											    };
+											_this.render();
+										
+									}},
+						            {
+						            	text: &#039;Horizontal&#039;,      	
+						            	handler: function(){ 
+						            		_this.layout = {
+						            		        hierarchical: {
+						            		            direction: &quot;UD&quot;,
+						            		            levelSeparation : 100
+						            		        }
+						            		    };
+						            		_this.render();
+						            	
+						            }},
+						            {
+ 
+						            	text: &#039;Vertical&#039;, 
+						            	handler: function(){ 
+						            		_this.layout = {
+						            		        hierarchical: {
+						            		            direction: &quot;LR&quot;,
+						            		            levelSeparation : 100
+						            		        }
+						            		    };
+						            		_this.render();
+						            	
+						            }},
+						        ]
+						    })
+						})
+		       ];
+		
+	}
+	else{
+		return [
+		           { 
+		        	   xtype: &#039;button&#039;, 
+		        	   text: &#039;Open Viewer&#039;, 
+		        	   handler : function(sender){
+		        		   location.hash = &quot;/autoprocintegration/datacollection/&quot; + _this.data[0].v_datacollection_summary_phasing_dataCollectionId + &quot;/phasingviewer/main&quot;;
+		        	   } 
+		           }
+	    ];
+	}
+};
+
+PhasingNetworkWidget.prototype.getPanel = function(){
+	var _this = this;
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+	   layout : &#039;fit&#039;,
+	    border: 1,
+	    margin : 5,
+	    tbar: this.getTbar(),
+	    cls : &quot;borderGrid&quot;,
+	    items: [
+	    {
+	    	html : &quot;&lt;div style=&#039; height: 600px;min-height: 100% !important;display:block;overflow:auto;&#039; id=&#039;&quot; + this.id +&quot;&#039;&gt;Select an autoprocIntegration&lt;/div&gt;&quot;
+	    }],
+	    listeners : {
+			afterrender : function(component, eOpts) {
+				_this.render();
+		}
+	    }
+	});
+	return this.panel;
+};
+
+
+PhasingNetworkWidget.prototype.getLabelByNode = function(node){
+    debugger
+	if (node.phasingStepType == &quot;PREPARE&quot;){
+		return &quot;Pepare&quot; +
+				&quot;\n&quot; +
+				node.phasingPrograms +
+				&quot;\n&quot; +
+				node.lowRes + &quot; - &quot; + node.highRes +
+				&quot;\n&quot; +
+				node.spaceGroupShortName +
+				&quot;\n&quot; +
+				node.method;
+				
+		
+	}
+	
+	if (node.phasingStepType == &quot;PHASING&quot;){
+		return &quot;Phasing&quot; +
+		        &quot;\n&quot; +
+				node.phasingPrograms +
+				&quot;\n&quot; +
+				node.lowRes + &quot; - &quot; + node.highRes +
+				&quot;\n&quot; +
+				node.spaceGroupShortName +
+				&quot;\n&quot; +
+				node.method;
+		
+	}
+	
+	if (node.phasingStepType == &quot;SUBSTRUCTUREDETERMINATION&quot;){
+		return &quot;Substructure&quot; +
+				&quot;\n&quot; +
+				node.phasingPrograms +
+				&quot;\n&quot; +
+				node.lowRes + &quot; - &quot; + node.highRes +
+				&quot;\n&quot; +
+				node.spaceGroupShortName +
+				&quot;\n&quot; +
+				node.method;
+	}
+    
+    if (node.phasingStepType == &quot;MODELBUILDING&quot;){
+		return &quot;Model&quot; +
+				&quot;\n&quot; +
+				node.phasingPrograms +
+				&quot;\n&quot; +
+				node.lowRes + &quot; - &quot; + node.highRes +
+				&quot;\n&quot; +
+				node.spaceGroupShortName +
+				&quot;\n&quot; +
+				node.method;
+	}
+	return node.phasingStepType;
+};
+/**
+* It renders the network by using viz.js
+* http://visjs.org/
+*
+* @method render
+*/
+PhasingNetworkWidget.prototype.render = function(){
+	var _this =this;
+	 
+	//_this.panel.setLoading(&quot;Rendering&quot;);
+//	$.when(_this._render()).then(function( data, textStatus, jqXHR ) {
+//		  _this.panel.setLoading(false);
+//	});
+	/* contrived example alert */
+	//setTimeout(function(){  _this.panel.setLoading(false); }, 6000);
+	//setTimeout(function(){ _this._render(); }, 1000);
+	_this._render();
+	
+};
+
+
+PhasingNetworkWidget.prototype._render = function(){
+	var nodes = [];
+	var edges = [];
+	
+	/** Start Node **/
+	/*nodes.push({
+		id 		: 1,
+		label 	: &quot;START&quot;,
+		font	: {size:8}
+	});*/
+	
+	for (var i = 0; i &lt; this.data.length; i++) {
+		if (this.data[i].phasingStepId != null){
+			var color = &#039;lime&#039;;
+			switch(this.data[i].phasingStepType) {
+				    case &quot;PREPARE&quot;:
+				        color = &quot;#FF5733&quot;;
+				        break;
+				    case &quot;SUBSTRUCTUREDETERMINATION&quot;:
+				    	color = &quot;#FFF8A8&quot;;
+				        break;
+                    case &quot;MODELBUILDING&quot;:
+				    	color = &quot;#82FA58&quot;;
+				        break;
+				    default:
+				    	color = &#039;#F7FE2E&#039;;
+			}
+			
+			nodes.push({
+				id 		: this.data[i].phasingStepId,
+				label 	: this.getLabelByNode(this.data[i]),// + &quot;-- &quot; + this.data[i].spaceGroupShortName,
+				color	: color,
+				font	: {size:12}
+			});
+			
+			
+			/** Edges **/
+			var previous = this.data[i].previousPhasingStepId;
+			var label = &quot;&quot;;
+			
+			/** This is root **/
+			if (previous == null){
+					if (this.data[i].phasingStepType == &quot;PHASING&quot;){
+						previous = -1;
+					}
+					else{
+						/** Adding spacegroup Node**/
+						nodes.push({
+							id 		: this.data[i].phasingStepId + this.data[i].spaceGroupShortName,
+							label 	: this.data[i].spaceGroupShortName,
+							color	: &quot;orange&quot;,
+							font	: {size:32}
+						});
+						previous = this.data[i].phasingStepId + this.data[i].spaceGroupShortName;
+						
+						edges.push({
+							 from	: null, 
+							 to		: this.data[i].phasingStepId + this.data[i].spaceGroupShortName,
+							 label	: label,
+							 arrows	:&#039;to&#039;,
+							 font	: {size:8}
+						});
+					}
+			}
+			
+			
+			
+			
+			edges.push({
+					 from	: previous, 
+					 to		: this.data[i].phasingStepId,
+					 label	: label,
+					 arrows	:&#039;to&#039;,
+					 font	: {size:8}
+			});
+		}
+	}
+	  var container = document.getElementById(&#039;mynetwork&#039;);
+	  var data = {
+	    nodes: nodes,
+	    edges: edges
+	  };
+  
+        var options = {
+            height: &#039;100%&#039;,
+             width: &#039;100%&#039;,
+            &quot;edges&quot;: {
+                &quot;smooth&quot;: {
+                &quot;type&quot;: &quot;discrete&quot;,
+                &quot;forceDirection&quot;: &quot;vertical&quot;,
+                &quot;roundness&quot;: 0.25
+                }
+            },
+            &quot;physics&quot;: {
+                &quot;barnesHut&quot;: {
+                &quot;gravitationalConstant&quot;: -12550,
+                &quot;springLength&quot;: 145
+                },
+                &quot;minVelocity&quot;: 0.75,
+                &quot;timestep&quot;: 0.62
+            }
+        }
+     
+	  this.network = new vis.Network(document.getElementById(this.id), data, options)
+};
+
+/**
+* It just loads the data but it will not be rendered
+* Rendering is done when afterrender method is triggered
+*
+* @method load
+* @param {Object} autoprocIntegrationList This is a list of autoprocintegration retrieved from the phasing view
+*/
+PhasingNetworkWidget.prototype.load = function(autoprocIntegrationList){	
+	/** First we concat all arrays **/
+	this.data = [].concat.apply([], autoprocIntegrationList);
+	
+	if (document.getElementById(this.id) != null){
+		this.clear();
+		this.render();
+	}
+	
+	
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

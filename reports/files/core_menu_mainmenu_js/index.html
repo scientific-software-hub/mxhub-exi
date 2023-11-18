@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - core/menu/mainmenu.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>core/menu/mainmenu.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">109.46</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">266</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.70</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.25</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function MainMenu(args) {
+	this.id = BUI.id();
+	this.loginButtonId = &#039;loginButton&#039; + this.id;
+	this.cssClass = &#039;mainMenu&#039;;
+	this.isHidden = true;
+	if (args != null){
+		if (args.cssClass != null){
+			this.cssClass = args.cssClass;
+		}
+		if (args.isHidden != null){
+			this.isHidden = args.isHidden;
+		}
+	}
+}
+
+MainMenu.prototype.getMenuItems = function() { return [];};
+
+
+/**
+ * If there is a credential then home tab will redirect to the welcome page (either manager or user)
+ */
+MainMenu.prototype.getHomeItem = function() { 
+	return {
+		text : this._convertToHTMLWhiteSpan(&quot;Home&quot;),
+		cls : &#039;ExiSAXSMenuToolBar&#039;,
+		icon : &#039;../images/icon/rsz_ic_home_black_24dp.png&#039;,
+		handler : function(){
+				if (EXI.credentialManager.getCredentials() != null){
+					if (EXI.credentialManager.getCredentials().length &gt; 0){
+						var username = EXI.credentialManager.getCredentials()[0].username;
+						var credential = EXI.credentialManager.getCredentialByUserName(EXI.credentialManager.getCredentials()[0].username);
+						if (credential.isManager()){
+							location.hash = &quot;/welcome/manager/&quot; + username + &quot;/main&quot;;
+						}
+						else{
+							location.hash = &quot;/welcome/user/&quot; + username + &quot;/main&quot;;
+						}
+					}
+					else{
+						BUI.showError(&quot;You should sign up&quot;);
+					}
+				}
+				else{
+					BUI.showError(&quot;You should sign up&quot;);
+				}
+		}
+	};
+};
+
+MainMenu.prototype.getShipmentItem = function() { 
+	var _this = this;
+	function onItemCheck(item, checked) {
+		if (item.text == &quot;Shipments&quot;) {
+			location.hash = &quot;/proposal/shipping/nav&quot;;
+		}
+		if (item.text == &quot;Manage shipping addresses&quot;) {
+			location.hash = &quot;/proposal/addresses/nav&quot;;
+		}
+		if (item.text == &quot;Shipment List&quot;) {
+			location.hash = &quot;/proposal/shipping/nav&quot;;
+		}
+	}
+
+	function getBiosaxsMenu() {
+		var _this = this;
+		function onItemCheck(item, checked) {
+			if (item.text == &quot;Stock Solutions&quot;) {
+				location.hash = &quot;/saxs/stocksolution/nav&quot;;
+			}
+			
+		}
+
+		return Ext.create(&#039;Ext.menu.Menu&#039;, {
+			items : [ 
+						{
+							text : &#039;Stock Solutions&#039;,
+							icon : &#039;../images/icon/testtube.png&#039;,
+							handler : onItemCheck 
+						} 
+			] });
+	}
+	
+	
+	
+	return {
+		text : this._convertToHTMLWhiteSpan(&quot;Shipment&quot;),
+		cls : &#039;ExiSAXSMenuToolBar&#039;,
+//		hidden : this.isHidden,
+        disabled : true,
+		menu : Ext.create(&#039;Ext.menu.Menu&#039;, {
+			items : [ 
+						{
+							text : &#039;BioSAXS&#039;,
+							icon : &#039;../images/icon/macromolecule.png&#039;,
+							menu: getBiosaxsMenu()
+						}, 
+						{
+							text : &#039;Manage shipping addresses&#039;,
+							icon : &#039;../images/icon/contacts.png&#039;,
+							handler : onItemCheck 
+						}, 
+						{
+							text : &#039;Shipments&#039;,
+							icon : &#039;../images/icon/shipping.png&#039;,
+							handler : onItemCheck 
+						} 
+					] })
+	};
+
+};
+
+
+MainMenu.prototype.getHelpMenu = function() {
+	var _this = this;
+	function onItemCheck(item, checked) {
+		if (item.text == &quot;ISPyB Web services API Map&quot;) {
+			window.open(&#039;/exi/documentation/ispyb-api-ws/print.html&#039;);
+		}
+		if (item.text == &quot;Job list&quot;) {
+			location.hash = &quot;/tool/list&quot;;
+		}
+	}
+
+	return Ext.create(&#039;Ext.menu.Menu&#039;, {
+		items : [
+
+		{
+			text : &#039;Developer&#039;,
+			checked : false,
+			group : &#039;theme&#039;,
+			menu : {       
+                    items: [
+                        {
+                            text: &#039;ISPyB Web services API Map&#039;,
+                            handler: onItemCheck
+                        }, {
+                            text: &#039;How to retrieve data from ISPyB?&#039;,
+                            handler: onItemCheck
+                        }, {
+                            text: &#039;EXI Router&#039;,
+                            handler: onItemCheck
+                        }, {
+                            text: &#039;EXI List Views Objects&#039;,
+                            handler: onItemCheck
+                        }, {
+                            text: &#039;EXI Main View Objects&#039;,
+                            handler: onItemCheck
+                        }
+                    ]
+                }
+		},
+		&quot;-&quot;,
+		{
+				text : &#039;About&#039;,
+				checked : false,
+				group : &#039;theme&#039;,
+				handler : onItemCheck }
+		] });
+};
+
+MainMenu.prototype.getAddCredentialMenu = function() {
+	if (EXI.credentialManager.getCredentials() != null){
+		if (EXI.credentialManager.getCredentials().length &gt; 0){
+			return {
+				icon : &#039;../images/icon/rsz_1ic_input_black_24dp.png&#039;,
+				height : 30,
+				text : &#039;Add&#039;,
+				handler : function() {
+						window.location.href = &#039;#/login&#039;;
+				} 
+			};
+		}
+	}
+};
+
+MainMenu.prototype.populateCredentialsMenu = function() {
+	this.credentialsMenu.removeAll();
+	var credentialDisplay = &quot;&quot;;
+	if (EXI.credentialManager.getCredentials() != null) {
+		for (var i = 0; i &lt; EXI.credentialManager.getCredentials().length; i++) {
+			credentialDisplay = EXI.credentialManager.getCredentials()[i].username;
+			if (EXI.credentialManager.getCredentials()[i].activeProposals.length &gt; 0) {
+				for (var j = 0; j &lt; EXI.credentialManager.getCredentials()[i].activeProposals.length; j++) {
+					credentialDisplay = EXI.credentialManager.getCredentials()[i].activeProposals[j] + &quot;@&quot; + EXI.credentialManager.getCredentials()[i].username;
+					this.credentialsMenu.add({
+						text : credentialDisplay,
+						icon : &quot;../images/icon/rsz_esrflogo80.gif&quot;,
+						disabled : true });
+				}
+			} else {
+				this.credentialsMenu.add({
+					text : credentialDisplay,
+					icon : &quot;../images/icon/rsz_esrflogo80.gif&quot;,
+					disabled : true });
+				
+			}
+			
+			
+		}
+	} 
+	if (EXI.credentialManager.getCredentials().length &gt; 0){
+		Ext.getCmp(this.loginButtonId).setText(&quot;&lt;span style=&#039;color:white&#039;&gt;Log out &lt;span style=&#039;font-weight:bold;&#039;&gt;&quot; + credentialDisplay + &quot; &lt;/span&gt; &lt;/span&gt;&quot;);
+		Ext.getCmp(this.loginButtonId).setIcon(&quot;../images/rsz_logout.png&quot;);
+	}
+	else{
+		Ext.getCmp(this.loginButtonId).setText(&quot;&lt;span style=&#039;color:white&#039;&gt;Sign In&lt;/span&gt;&quot;);
+		Ext.getCmp(this.loginButtonId).setIcon(&quot;../images/rsz_login.png&quot;);
+	}
+	
+	
+};
+
+MainMenu.prototype._convertToHTMLWhiteSpan = function(text) {
+	return &#039;&lt;span style=&quot;color:white&quot;&gt;&#039; + text +&#039;&lt;/span&gt;&#039;;
+};
+
+MainMenu.prototype.isLoggedIn = function() {
+	return (EXI.credentialManager.getCredentials().length &gt; 0);
+};
+
+
+MainMenu.prototype.getLoginButton = function() {
+	var icon =  &quot;../images/rsz_login.png&quot;;
+	var text =  this._convertToHTMLWhiteSpan(&quot;Sign In&quot;);
+	
+	if (EXI.credentialManager.getCredentials().length &gt; 0){
+		icon =  &quot;../images/rsz_logout.png&quot;;
+		text =  this._convertToHTMLWhiteSpan(&quot;log out&quot;);
+	}
+	
+	return {
+		xtype 	: &#039;splitbutton&#039;,
+		id	: this.loginButtonId,
+		text 	: text,
+		cls 	: &#039;button_log_out&#039;,
+		icon 	: icon,
+		menu 	: this.credentialsMenu,
+		handler : function() {
+			if (EXI.credentialManager.getCredentials().length == 0){
+				location.hash = &quot;/login&quot;;
+			}
+			else{
+				location.hash = &quot;/logout&quot;;
+			}
+		} 
+	};
+};
+
+MainMenu.prototype.getPanel = function() {
+	var _this = this;
+	
+	this.credentialsMenu = new Ext.menu.Menu({
+		id : _this.id + &quot;menu&quot;,
+		items : [_this.getAddCredentialMenu()] 
+	});
+	
+	var items  = this.getMenuItems();
+	items.push(&#039;-&gt;&#039;);
+	items.push(this.getLoginButton());
+	
+	this.tb = Ext.create(&#039;Ext.toolbar.Toolbar&#039;, {
+		cls : this.cssClass,
+		items : items
+	});
+	return this.tb;
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

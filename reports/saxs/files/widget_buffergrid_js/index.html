@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/buffergrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/buffergrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">108.38</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">228</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">27.00</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.21</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * It shows buffer grid with a top bar with &quot;Add&quot; button
+ * 
+ * @height
+ * @searchBar
+ * @collapsed
+ * @width
+ */
+function BufferGrid(args) {
+	this.height = 500;
+	this.searchBar = false;
+	this.tbar = false;
+	this.collapsed = false;
+	this.id = BUI.id();
+
+	this.collapsible = false;
+	
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.searchBar != null) {
+			this.searchBar = args.searchBar;
+		}
+
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+
+		if (args.collapsed != null) {
+			this.collapsed = args.collapsed;
+		}
+
+		if (args.width != null) {
+			this.width = args.width;
+		}
+	}
+	
+	this.onUpdated = new Event(this);
+}
+
+BufferGrid.prototype._edit = function(bufferId) {
+	var _this = this;
+	function getButtons(){
+				return [ {
+					text : &#039;Save&#039;,
+					handler : function() {
+						var onSuccess = function(sender) {
+							var onSuccess2 = function(sender, proposals){
+								_this.window.close();
+								_this.onUpdated.notify();
+								_this.panel.setLoading(false);
+							};
+							_this.panel.setLoading(&quot;Updading proposal information&quot;);
+							EXI.getDataAdapter({onSuccess : onSuccess2}).proposal.proposal.update();
+							
+						};
+						/** Checking mandatory fields **/
+						if (_this.bufferForm.getBuffer().name == &quot;&quot;){
+							BUI.showWarning(&quot;Name field is mandatory&quot;);
+							return;
+						}
+						if (_this.bufferForm.getBuffer().acronym == &quot;&quot;){
+							BUI.showWarning(&quot;Acronym field is mandatory&quot;);
+							return;
+						}
+						if ((_this.bufferForm.getBuffer().proposalId == &quot;&quot;) || (_this.bufferForm.getBuffer().proposalId == null)){
+							BUI.showWarning(&quot;Proposal field is mandatory&quot;);
+							return;
+						}
+						EXI.getDataAdapter({onSuccess : onSuccess}).saxs.buffer.saveBuffer(_this.bufferForm.getBuffer());
+					}
+				}, {
+					text : &#039;Cancel&#039;,
+					handler : function() {
+						_this.window.close();
+					}
+				}];
+	}
+
+	this.bufferForm = new BufferForm({height : 400, width : 700});
+	
+	this.window = Ext.create(&#039;Ext.window.Window&#039;, {
+	    title: &#039;Edit buffer&#039;,
+	    layout: &#039;fit&#039;,
+	    items: this.bufferForm.getPanel(),
+	    buttons			: getButtons(),
+	}).show();
+	
+	this.bufferForm.load(this.getBufferById(bufferId));
+};
+
+BufferGrid.prototype.getBufferById = function(bufferId) {
+	for (var i = 0; i &lt; this.buffers.length; i++) {
+		if (this.buffers[i].bufferId == bufferId){
+			return this.buffers[i];
+		}
+	}
+	return {};
+};
+
+BufferGrid.prototype.load = function(buffers) {
+	var _this = this;
+	/** Retrieving proposals **/
+	this.buffers = buffers;
+	
+	this.proposalKey = {};
+	this.proposalColor = {};
+	var colors = [&quot;#006633&quot;, &quot;#999966&quot;, &quot;#CC0066&quot;];
+	for (var i = 0; i &lt; buffers.length; i++) {
+		var proposal = EXI.proposalManager.getProposalById(buffers[i].proposalId);
+		buffers[i][&quot;proposal&quot;] = proposal.code + proposal.number;
+	}
+	this.store.loadData(buffers, false);
+};
+
+BufferGrid.prototype._getTbar = function() {
+	var _this = this;
+	var actions = [];
+
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		text : &#039;Add&#039;,
+		icon: &#039;images/icon/add.png&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+			_this._edit();
+		}
+	}));
+	return actions;
+};
+
+BufferGrid.prototype.getPanel = function() {
+	var _this = this;
+
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [ &#039;proposal&#039;, &#039;bufferId&#039;, &#039;acronym&#039;, &#039;name&#039;, &#039;composition&#039;, &#039;comments&#039;, &#039;ph&#039; ]
+	});
+
+	this.store.sort(&#039;acronym&#039;);
+
+	var type = &#039;Ext.grid.Panel&#039;;
+	if (this.searchBar == true) {
+		type = &#039;Ext.ux.LiveSearchGridPanel&#039;;
+	}
+
+	this.panel = Ext.create(type, {
+		title : &#039;Buffers&#039;,
+		collapsible : this.collapsible,
+		collapsed : this.collapsed,
+		store : this.store,
+		height : this.height,
+		width : this.width,
+		columns : [ 
+		{
+			text : &#039;Proposal&#039;,
+			dataIndex : &#039;proposal&#039;,
+			flex : 1
+		}, 
+		{
+			text : &#039;Acronym&#039;,
+			dataIndex : &#039;acronym&#039;,
+			flex : 2
+		}, {
+			text : &#039;Name&#039;,
+			dataIndex : &#039;name&#039;,
+			flex : 2,
+			hidden : false
+		}, {
+			text : &#039;pH&#039;,
+			dataIndex : &#039;ph&#039;,
+			flex : 2
+		},{
+			text : &#039;Composition&#039;,
+			dataIndex : &#039;composition&#039;,
+			flex : 2,
+			hidden : false
+		}, 
+		{
+			text : &#039;Comments&#039;,
+			dataIndex : &#039;comments&#039;,
+			flex : 4,
+			hidden : false
+		}, 
+		 {
+            xtype:&#039;actioncolumn&#039;,
+            width:40,
+            text : &#039;Edit&#039;,
+            items: [{
+                icon: &#039;images/icon/edit.png&#039;,  // Use a URL in the icon config
+                tooltip: &#039;Edit&#039;,
+                handler: function(grid, rowIndex, colIndex) {
+                    var rec = grid.getStore().getAt(rowIndex);
+                    _this._edit(rec.get(&#039;bufferId&#039;));
+                }
+            }]
+        }
+		],
+		flex : 1,
+		viewConfig : {
+			stripeRows : true,
+			listeners : {
+				&#039;celldblclick&#039; : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+					_this._edit(record.data.bufferId);
+				}
+			}
+		}
+	});
+
+	/** Adding the tbar **/
+	if (this.tbar) {
+		this.panel.addDocked({
+			xtype : &#039;toolbar&#039;,
+			cls : &#039;toolBarGrid&#039;,
+			height : 48,
+			items : this._getTbar()
+		});
+	}
+	return this.panel;
+};
+
+BufferGrid.prototype.input = function() {
+	return new MacromoleculeGrid().input();
+};
+
+BufferGrid.prototype.test = function(targetId) {
+	var bufferGrid = new BufferGrid({
+		width : 800,
+		height : 350,
+		collapsed : false,
+		tbar : true
+	});
+
+	BIOSAXS.proposal = new Proposal(bufferGrid.input().proposal);
+	var panel = bufferGrid.getPanel(BIOSAXS.proposal.macromolecules);
+	panel.render(targetId);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

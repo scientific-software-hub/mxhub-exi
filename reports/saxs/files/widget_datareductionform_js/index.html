@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/datareductionform.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/datareductionform.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">105.47</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">271</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">31.70</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.68</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * Example form
+ * 
+ * @witdh
+ * @height
+ */
+function DataReductionForm(args) {
+	this.id = BUI.id();
+	this.width = null;
+	this.height = null;
+
+	if (args != null) {
+		if (args.width != null) {
+			this.width = args.width;
+		}
+		if (args.height != null) {
+			this.height = args.height;
+		}
+	}
+
+	var _this = this;
+
+	/** Widgets **/
+	this.plotWidget = new PlotWidget({
+		width : 650,
+		height : 490
+	});
+
+	/** Selected frames to be displayed **/
+	this.selectedItems = {
+		frames : [],
+		averages : [],
+		subtractions : []
+	};
+
+}
+
+DataReductionForm.prototype._parseSelectedItemsToIds = function(selectedArray) {
+	var ids = [];
+	if (selectedArray != null) {
+		for (var i = 0; i &lt; selectedArray.length; i++) {
+			ids.push(selectedArray[i].id);
+		}
+	}
+	return ids;
+};
+
+DataReductionForm.prototype.onSelectionChanged = function(columnName, selected) {
+	if (selected != null) {
+		if (columnName == &quot;Frames&quot;) {
+			this.selectedItems.frames = selected;
+			this.selectedItems.subtractions = [];
+		}
+		if (columnName == &quot;Averages&quot;) {
+			this.selectedItems.averages = selected;
+		}
+		if (columnName == &quot;Subtractions&quot;) {
+			this.selectedItems.frames = [];
+			this.selectedItems.subtractions = selected;
+		}
+	}
+	this.plotWidget.refresh(this._parseSelectedItemsToIds(this.selectedItems.frames), this._parseSelectedItemsToIds(this.selectedItems.subtractions));
+};
+
+DataReductionForm.prototype._getFramesExtPanel = function(store, columnName, height) {
+	var _this = this;
+
+	var selModel = Ext.create(&#039;Ext.selection.RowModel&#039;, {
+		allowDeselect : true,
+		mode : &#039;MULTI&#039;,
+		listeners : {
+			selectionchange : function(sm, selections) {
+				var selected = [];
+				for (var i = 0; i &lt; selections.length; i++) {
+					selected.push(selections[i].data);
+				}
+				_this.onSelectionChanged(columnName, selected);
+			}
+		}
+	});
+
+	return Ext.create(&#039;Ext.grid.Panel&#039;, {
+		store : store,
+		margin : 10,
+		height : height,
+		width : 200,
+		selModel : selModel,
+		columns : [ {
+			text : columnName,
+			dataIndex : &#039;fileName&#039;,
+			flex : 1
+		} ],
+		viewConfig : {
+		}
+	});
+};
+
+DataReductionForm.prototype._getFramesPanel = function() {
+	var fields = [ &#039;fileName&#039;, &#039;type&#039;, &#039;id&#039; ];
+
+	this.framesStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : fields,
+		sorters : &#039;fileName&#039;
+	});
+
+	this.averagesStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : fields
+	});
+
+	this.subtractionStore = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : fields
+	});
+
+	var gridFrames = this._getFramesExtPanel(this.framesStore, &quot;Frames&quot;, 375);
+	var gridAvgs = this._getFramesExtPanel(this.averagesStore, &quot;Averages&quot;, 125);
+	var subtractionAvgs = this._getFramesExtPanel(this.subtractionStore, &quot;Subtractions&quot;, 75);
+
+	return {
+		xtype : &#039;container&#039;,
+		layout : &#039;vbox&#039;,
+		items : [ gridFrames,  subtractionAvgs ]
+	};
+};
+
+DataReductionForm.prototype._getImageContainer = function(name, help) {
+	var html = &quot;&lt;div id=&#039;&quot; + this.id + &quot;_&quot; + name + &quot;&#039;&gt;&quot; + name + &quot;&lt;/div&gt;&quot;
+	return {
+		xtype : &#039;container&#039;,
+		layout : &#039;vbox&#039;,
+		items : [ {
+			html : html,
+			margin : &quot;5 0 0 0&quot;,
+			height : 95,
+			width : 100
+		}, {
+			xtype : &#039;label&#039;,
+			forId : &#039;myFieldId&#039;,
+			text : help,
+			margin : &#039;5 0 0 0&#039;,
+			cls : &quot;inline-help&quot;
+		} ]
+	}
+};
+
+DataReductionForm.prototype._getItems = function() {
+	var _this = this;
+	return [ {
+		xtype : &#039;container&#039;,
+		layout : &#039;hbox&#039;,
+		items : [
+				this._getFramesPanel(),
+				this.plotWidget.getPanel(),
+				{
+					xtype : &#039;panel&#039;,
+					width : 110,
+					frame : true,
+					margin : &quot;10 5 5 5&quot;,
+					border : 0,
+					layout : &#039;vbox&#039;,
+					items : [ this._getImageContainer(&quot;scattering&quot;, &quot;Scattering&quot;), this._getImageContainer(&quot;guinier&quot;, &quot;Guinier Region&quot;),
+							this._getImageContainer(&quot;kratky&quot;, &quot;Kratky Plot&quot;), this._getImageContainer(&quot;gnom&quot;, &quot;P(r) distribution&quot;) ]
+				} ]
+	} ]
+};
+
+DataReductionForm.prototype._getButtons = function() {
+	return [];
+};
+
+DataReductionForm.prototype.getPanel = function() {
+	var _this = this;
+	this.panel = Ext.create(&#039;Ext.form.Panel&#039;, {
+		width : this.width,
+		height : this.height,
+		border : 0,
+		items : this._getItems(),
+		buttons : this._getButtons(),
+		listeners : {
+			afterrender : function() {
+				_this._populate();
+			}
+		}
+	});
+	return this.panel;
+};
+
+/** Populates could be call when the DOM is not filled yet **/
+DataReductionForm.prototype._populate = function() {
+};
+
+/** It populates the form * */
+DataReductionForm.prototype.refresh = function(subtractions) {
+	if (subtractions != null) {
+		for (var i = 0; i &lt; subtractions.length; i++) {
+			/** Loading frame grids **/
+			var subtraction = subtractions[i];
+			var averages = [ {
+				fileName : BUI.getFileName(subtraction.bufferAverageFilePath),
+				type : &#039;bufferAvg&#039;,
+				id : subtraction.subtractionId
+			}, {
+				fileName : BUI.getFileName(subtraction.sampleAverageFilePath),
+				type : &#039;sampleAvg&#039;,
+				id : subtraction.subtractionId
+			}
+
+			];
+			this.averagesStore.loadData(averages, true);
+			this.subtractionStore.loadData([ {
+				fileName : BUI.getFileName(subtraction.substractedFilePath),
+				type : &#039;SUBTRACTION&#039;,
+				id : subtraction.subtractionId
+			} ], true);
+
+			var frames = [];
+			/** Buffers **/
+			if (subtraction.bufferOneDimensionalFiles != null) {
+				if (subtraction.bufferOneDimensionalFiles.frametolist3VOs != null) {
+					for (var j = 0; j &lt; subtraction.bufferOneDimensionalFiles.frametolist3VOs.length; j++) {
+						var frametolist3VO = subtraction.bufferOneDimensionalFiles.frametolist3VOs[j];
+						if (frametolist3VO.frame3VO != null) {
+							frames.push({
+								fileName : BUI.getFileName(frametolist3VO.frame3VO.filePath),
+								type : &#039;BUFFER&#039;,
+								id : frametolist3VO.frame3VO.frameId
+							});
+						}
+					}
+				}
+			}
+			/** Samples **/
+			if (subtraction.sampleOneDimensionalFiles != null) {
+				if (subtraction.sampleOneDimensionalFiles.frametolist3VOs != null) {
+					for (var j = 0; j &lt; subtraction.sampleOneDimensionalFiles.frametolist3VOs.length; j++) {
+						var frametolist3VO = subtraction.sampleOneDimensionalFiles.frametolist3VOs[j];
+						if (frametolist3VO.frame3VO != null) {
+							frames.push({
+								fileName : BUI.getFileName(frametolist3VO.frame3VO.filePath),
+								type : &#039;SAMPLE&#039;,
+								id : frametolist3VO.frame3VO.frameId
+							});
+						}
+					}
+				}
+			}
+
+			this.framesStore.loadData(frames, true);
+
+			/** Loading images **/
+			this._displayImage(&quot;scattering&quot;, subtraction.subtractionId);
+			this._displayImage(&quot;kratky&quot;, subtraction.subtractionId);
+			this._displayImage(&quot;guinier&quot;, subtraction.subtractionId);
+			this._displayImage(&quot;gnom&quot;, subtraction.subtractionId);
+		}
+	}
+};
+
+DataReductionForm.prototype._displayImage = function(name, subtractionId) {
+//	var url = BUI.getURL() + &#039;&amp;type=&#039; + name + &#039;&amp;subtractionId=&#039; + subtractionId;
+	var url = new DataAdapter().getImage(subtractionId, name);
+	console.log(url);
+	var event = &quot;OnClick= window.open(&#039;&quot; + url + &quot;&#039;)&quot;;
+//	name
+	document.getElementById(this.id + &quot;_&quot; + name).innerHTML = &#039;&lt;img src=&#039; + url + &#039;   height=&quot;90&quot; width=&quot;90&quot; &#039; + event + &#039;&gt;&#039;;
+//	return &#039;&lt;img src=&#039; + url + &#039;   height=&quot;100&quot; width=&quot;100&quot; &gt;&#039;;
+};
+
+DataReductionForm.prototype.input = function() {
+	return {};
+};
+
+/** It populates the form **/
+DataReductionForm.prototype.test = function(targetId) {
+	var macromoleculeForm = new DataReductionForm();
+	var panel = macromoleculeForm.getPanel();
+	panel.render(targetId);
+};
+
+//
+//function PlotWidget(args) {
+//	this.width = 600;
+//	this.height = 600;
+//	this.id = BUI.id();
+//
+//	this.linear = false;
+//
+//	this.margin =  &quot;10 0 0 0&quot;;
+//	/** for each stat the max and minimum value when it is scaled in order to show correctly in the legend **/
+//	this.ranges = {};
+//	if (args != null) {
+//		if (args.width != null) {
+//			this.width = args.width;
+//		}
+//		if (args.height != null) {
+//			this.height = args.height;
+//		}
+//		if (args.margin != null) {
+//			this.margin = args.margin;
+//		}
+//	}
+//
+//}
+//
+//PlotWidget.prototype.getMenu = function() {
+//	var _this = this;
+//	/** Actions buttons **/
+//	var actions = [];
+//	actions.push(&quot;-&gt;&quot;);
+//	actions.push({
+//		text : &quot;Export as Image&quot;,
+//		scope : this,
+//		icon : &#039;../images/save.gif&#039;,
+//		handler : function(item, pressed) {
+//			var largeImage = document.createElement(&quot;img&quot;);
+//			largeImage.style.display = &#039;block&#039;;
+//			largeImage.style.width = 200 + &quot;px&quot;;
+//			largeImage.style.height = 200 + &quot;px&quot;;
+//			largeImage.setAttribute(&#039;src&#039;, Dygraph.Export.asCanvas(this.dygraphObject.dygraph).toDataURL());
+//			window.open(Dygraph.Export.asCanvas(this.dygraphObject.dygraph).toDataURL(), &#039;Image&#039;, &#039;&#039;);
+//		}
+//	});
+//
+//	return actions;
+//};
+//
+///** Looks for the maximum value and then divide everything but that value **/
+//PlotWidget.prototype.scaledData = function(data) {
+//	for (var i = 0; i &lt; data.length; i++) {
+//		var values = this.getMaxAndMinValue(data[i]);
+//		data[i] = this.divideValuesByMax(data[i], values.max);
+//		this.ranges[data[i].label] = values;
+//	}
+//	return data;
+//};
+//
+///** Given a stat float[] and a max number it will divide each value by max **/
+//PlotWidget.prototype.divideValuesByMax = function(stat, max) {
+//	for (var j = 0; j &lt; stat.data.length; j++) {
+//		if (max != 0) {
+//			stat.data[j] = Number(stat.data[j]) / max;
+//			stat.std[j] = Number(stat.std[j]) / max;
+//		}
+//	}
+//	return stat;
+//};
+//
+///** returns max value of a stat **/
+//PlotWidget.prototype.getMaxAndMinValue = function(stat) {
+//	var max = 0;
+//	var min = stat.data[0];
+//	for (var j = 0; j &lt; stat.data.length; j++) {
+//		if (Number(stat.data[j]) &gt; max) {
+//			max = Number(stat.data[j]);
+//		}
+//		if (Number(stat.std[j]) &gt; max) {
+//			max = Number(stat.std[j]);
+//		}
+//		if (Number(stat.data[j]) &lt; min) {
+//			min = Number(stat.data[j]);
+//		}
+//	}
+//	return {
+//		max : Number(max),
+//		min : Number(min)
+//	};
+//};
+//
+//PlotWidget.prototype._renderDygraph = function(parsed, colors, labels) {
+//	this.dygraphObject = new StdDevDyGraph(this.id, {
+//		width : this.width - 20,
+//		height : this.height - 40,
+//		xlabel : &quot;&quot;,
+//	});
+//
+//	this.dygraphObject.draw(parsed, colors, labels);
+//
+//};
+//
+//PlotWidget.prototype.getPanel = function() {
+//	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+//		width : this.width,
+//		height : this.height,
+//		margin : this.margin,
+//		tbar : this.getMenu(),
+//		items : [ {
+//			html : &quot;&quot;,
+//			id : this.id,
+//			width : this.width,
+//			height : this.height,
+//			padding : 10,
+//			margin : &quot;0 0 0 -30&quot;,
+//			border : 0
+//		} ]
+//	});
+//
+//	return this.panel;
+//};
+//
+//PlotWidget.prototype.getPoint = function(y, error) {
+//	var minus = y - error;
+//	var max = y + error;
+//
+//	if (this.linear) {
+//		return [ Math.abs(minus), y, Math.abs(max) ];
+//	}
+//	if ((minus != 0) &amp;&amp; (max != 0)) {
+//		return [ Math.log(Math.abs(minus)), Math.log(y), Math.log(Math.abs(max)) ];
+//	} else {
+//		return [ Math.log(y), Math.log(y), Math.log(y) ];
+//	}
+//
+//};
+//
+//PlotWidget.prototype.getDataPlot = function(frames, subtractions, models, fits, rbms) {
+//	var files = [];
+//	var labels = [ &quot;Intensity&quot; ];
+//	if (frames != null) {
+//		for (var i = 0; i &lt; frames.length; i++) {
+//			files.push(frames[i].data);
+//			labels.push(frames[i].fileName);
+//		}
+//	}
+//	 function splitData(data, column, errorColumn, name){
+//		 var result = []
+//		 for (var j = 0; j &lt; data.length; j++) {
+//			 console.log(data[j][column]);
+//			result.push([j,data[j][column],data[j][errorColumn]]);//[0, data[i][column],0]]);
+//		}
+//		 files.push(result);
+//		 labels.push(name);
+//	 }
+//	 
+//	if (subtractions != null) {
+//		for (var i = 0; i &lt; subtractions.length; i++) {
+//			/** For subtraction **/
+//			files.push(subtractions[i].subtraction.data);
+//			labels.push(subtractions[i].subtraction.fileName);
+//			/** For sample average **/
+////			files.push(subtractions[i].sampleAvg.data);
+////			labels.push(subtractions[i].sampleAvg.fileName);
+//			/** For buffer average **/
+////			files.push(subtractions[i].bufferAvg.data);
+////			labels.push(subtractions[i].bufferAvg.fileName);
+//		}
+//	}
+//	
+//	if (models != null) {
+//		for (var i = 0; i &lt; models.length; i++) {
+//			for ( var key in models[i]) {
+//				 splitData(models[i][key].fir.data, 1, 2, &quot;Intensity&quot;);
+//				 splitData(models[i][key].fir.data, 3, 3, &quot;Fit&quot;);
+//			}
+//		}
+//	}
+//	
+//	if (fits != null) {
+//		for (var i = 0; i &lt; fits.length; i++) {
+//			for ( var key in fits[i]) {
+//				
+//				/** adding fit file to be plotted **/
+//						 if (fits[i][key].fit.data[0].length == 3){
+//							 splitData(fits[i][key].fit.data, 1, 1, &quot;Intensity&quot;);
+//							 splitData(fits[i][key].fit.data, 2, 2, &quot;Fit&quot;);
+//						 }
+//						 
+//						 if (fits[i][key].fit.data[0].length == 5){
+//							 /** X Intensity Fit Error Residues **/
+//							
+//							 splitData(fits[i][key].fit.data, 1, 3, &quot;Intensity&quot;);
+//							 splitData(fits[i][key].fit.data, 2, 2, &quot;Fit&quot;);
+//						 }
+//			}
+//		}
+//	}
+//	
+//	var dataPoints = [];
+//	if (files.length &gt; 0) {
+//		for (var i = 0; i &lt; files[0].length; i++) {
+//			dataPoints.push([ files[0][i][0], this.getPoint(files[0][i][1], files[0][i][2]) ]);
+//		}
+//		if (files.length &gt; 1) {
+//			for (var i = 1; i &lt; files.length; i++) {
+//				for (var j = 0; j &lt; dataPoints.length; j++) {
+//					if (files[i][j] != null){
+//						dataPoints[j].push(this.getPoint(files[i][j][1], files[i][j][2]));
+//					}
+//					else{
+//						dataPoints[j].push([0,0,0]);
+//					}
+//				}
+//			}
+//		}
+//	}
+//
+//	return {
+//		dataPoints : dataPoints,
+//		labels : labels
+//	};
+//};
+//
+//PlotWidget.prototype.refresh = function(frames, subtractions, models, fits, rbms, colors) {
+//	var _this = this;
+////	this.panel.setLoading(&quot;Reading Files&quot;);
+////	
+////	var dataAdapter = new BiosaxsDataAdapter();
+////	dataAdapter.onSuccess.attach(function(sender, data) {
+////			_this.panel.setLoading(&quot;Rendering&quot;);
+////			var parsed = _this.getDataPlot(data.frames, data.subtractions, data.models, data.fits, rbms);
+////			_this._renderDygraph(parsed.dataPoints, colors, parsed.labels);
+////		_this.panel.setLoading(false);
+////	});
+////	dataAdapter.onError.attach(function(sender, data) {
+////		_this.panel.setLoading(false);
+////	});
+////	dataAdapter.getDataPlot(frames, subtractions, models, fits, rbms);
+//};
+//
+//PlotWidget.prototype.input = function() {
+//	return DATADOC.getHPLCData();
+//};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

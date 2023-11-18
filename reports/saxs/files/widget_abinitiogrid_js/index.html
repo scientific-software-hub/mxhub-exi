@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/abinitiogrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/abinitiogrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">108.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">228</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">34.03</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.02</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function AbinitioGrid(args) {
+	this.height = null;
+	this.width = null;
+	this.id = BUI.id();
+
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+
+			if (args.width != null) {
+				this.width = args.width;
+			}
+		}
+	}
+	
+	this.onSelected = new Event(this);
+}
+
+
+AbinitioGrid.prototype.refresh = function(subtractions){
+	this.store.loadData(this._prepareData(subtractions));
+};
+
+AbinitioGrid.prototype._prepareData = function(subtractions){
+	/** Parsing data * */
+	var models = [];
+	for (var l = 0; l &lt; subtractions.length; l++) {
+		var subtraction = subtractions[l];
+		for (var k = 0; k &lt; subtraction.substractionToAbInitioModel3VOs.length; k++) {
+			var data = subtraction.substractionToAbInitioModel3VOs[k].abinitiomodel3VO;
+			if (data.averagedModel != null) {
+				models.push(data.averagedModel);
+				models[models.length - 1].type = &quot;Reference&quot;;
+			}
+	
+			if (data.shapeDeterminationModel != null) {
+				models.push(data.shapeDeterminationModel);
+				models[models.length - 1].type = &quot;Refined&quot;;
+			}
+	
+			if (data.modelList3VO != null) {
+				if (data.modelList3VO.modeltolist3VOs != null) {
+					for (var i = 0; i &lt; data.modelList3VO.modeltolist3VOs.length; i++) {
+						models.push(data.modelList3VO.modeltolist3VOs[i].model3VO);
+						models[models.length - 1].type = &quot;Model&quot;;
+					}
+				}
+			}
+		}
+	}
+	return models;
+};
+
+AbinitioGrid.prototype.getPanel = function(){
+	var _this = this;
+	
+	
+	var modelFields = [ &quot;modelId&quot;, &quot;type&quot;, &quot;chiSqrt&quot;, &quot;dmax&quot;, &quot;firFile&quot;, &quot;logFile&quot;, &quot;fitFile&quot;, &quot;pdbFile&quot;, &quot;rfactor&quot;, &quot;rg&quot;, &quot;volume&quot; ];
+	Ext.define(&#039;AbinitioModel&#039;, {
+		extend : &#039;Ext.data.Model&#039;,
+		fields : modelFields
+		
+	});
+
+	/**
+	 * Store in Memory
+	 */
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		model : &#039;AbinitioModel&#039;,
+		autoload : true,
+		groupField : &#039;type&#039;
+	});
+	
+	
+	  var groupingFeature = Ext.create(&#039;Ext.grid.feature.Grouping&#039;,{
+	        groupHeaderTpl: &#039;{name} ({rows.length} model{[values.rows.length &gt; 1 ? &quot;s&quot; : &quot;&quot;]})&#039;,
+	        startCollapsed: false,
+	        collapsible : true
+	  });
+	
+	  var selModel = Ext.create(&#039;Ext.selection.RowModel&#039;, {
+			allowDeselect : true,
+//			mode : &#039;multi&#039;,
+			listeners : {
+				selectionchange : function(sm, selections) {
+					if (selections.length &gt; 0){
+						_this.onSelected.notify([selections[0].data]); 
+					}
+
+				}
+
+			} });
+	  
+	this.grid = Ext.create(&#039;Ext.grid.Panel&#039;, {
+		collapsible : false,
+		resizable : true,
+		selModel : selModel,
+		features: [groupingFeature],
+		autoscroll : true,
+		multiSelect : true,
+		store : this.store,
+		cls : &#039;border-grid&#039;,
+		height : this.height,
+		width : this.width,
+		margin : 10,
+		columns : [ {
+			text : &quot;Type&quot;,
+			dataindex : &quot;type&quot;,
+			hidden : true,
+			renderer : function(a, b, record) {
+				return record.data.type;
+			},
+			flex : 1
+		},
+		{
+			text : &quot;ModelId&quot;,
+			dataindex : &quot;modelId&quot;,
+			hidden : true,
+			renderer : function(a, b, record) {
+					return record.data.modelId;
+				
+			},
+			flex : 1
+		},
+		
+		{
+			text : &quot;chiSqrt&quot;,
+			dataindex : &quot;chiSqrt&quot;,
+			renderer : function(a, b, record) {
+				if (record.data.dmax != null) {
+					return BUI.formatValuesUnits(record.data.chiSqrt, &quot;&quot;, 12, this.decimals);
+				}
+				
+			},
+			flex : 1
+		},
+		{
+			text : &quot;Dmax&quot;,
+			dataindex : &quot;dmax&quot;,
+			renderer : function(a, b, record) {
+				if (record.data.dmax != null) {
+					return BUI.formatValuesUnits(record.data.dmax, &quot;nm&quot;, 12, this.decimals);
+				}
+				
+			},
+			flex : 1
+		}, {
+			text : &quot;rFactor&quot;,
+			dataindex : &quot;rfactor&quot;,
+			hidden : true,
+			renderer : function(a, b, record) {
+				if (record.data.rfactor != null) {
+					return record.data.rfactor;
+				}
+			},
+			flex : 1
+		}, {
+			text : &quot;Rg&quot;,
+			dataindex : &quot;rg&quot;,
+			renderer : function(a, b, record) {
+				if (record.data.rg != null) {
+					return BUI.formatValuesUnits(record.data.rg, &quot;nm&quot;, 12, this.decimals);
+				}
+				
+			},
+			flex : 1
+		},
+		{
+			text : &quot;Volume&quot;,
+			dataindex : &quot;volume&quot;,
+			renderer : function(a, b, record) {
+				if (record.data.volume != null){
+					return BUI.formatValuesUnits(record.data.volume, &#039;&#039;) + &quot;&lt;span style=&#039;font-size:8px;color:gray;&#039;&gt; nm&lt;sub&gt;3&lt;/sub&gt;&lt;/span&gt;&quot;;
+				}
+			},
+			flex : 1
+		},
+		{
+			text : &quot;PDB&quot;,
+			dataindex : &quot;pdbFile&quot;,
+			renderer : function(a, b, record) {
+				if (record.data.pdbFile != null){
+					return record.data.pdbFile.split(&quot;/&quot;)[record.data.pdbFile.split(&quot;/&quot;).length - 1];
+				}
+			},
+			flex : 1
+		}, {
+			text : &quot;Fir&quot;,
+			dataindex : &quot;firFile&quot;,
+			renderer : function(a, b, record) {
+				if (record.data.firFile != null){
+					return record.data.firFile.split(&quot;/&quot;)[record.data.firFile.split(&quot;/&quot;).length - 1];
+				}
+			},
+			flex : 1
+		}, {
+			text : &quot;LOG&quot;,
+			dataindex : &quot;logFile&quot;,
+			hidden : true,
+			renderer : function(a, b, record) {
+				if (record.data.logFile != null){
+					return record.data.logFile.split(&quot;/&quot;)[record.data.logFile.split(&quot;/&quot;).length - 1];
+				}
+			},
+			flex : 1
+		}
+		],
+		viewConfig : {
+			enableTextSelection : true,
+			preserveScrollOnRefresh : true,
+			stripeRows : true,
+			listeners : {
+//				&#039;celldblclick&#039; : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+//				},
+//				&#039;cellclick&#039; : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+//					var models = [];
+//					debugger
+//					for (var i = 0; i &lt; grid.getSelectionModel().selected.items.length; i++) {
+//						models.push(grid.getSelectionModel().selected.items[i].data);
+//					}
+//					
+//				}
+			}
+		}
+	});
+	return this.grid;
+	
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

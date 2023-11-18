@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - saxs/widget/experimentgrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>saxs/widget/experimentgrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">104.03</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">602</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">50.14</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">6.51</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ *  Shows a list of experiment AKA data acquisitions
+ *	@height
+ *	@sorters 
+ *	@minHeight
+ *	@gridType: Ext.ux.LiveSearchGridPanel or Ext.grid.Panel
+ *	@tbar true or false
+ *	@grouping true or false
+ *	@width
+ *	@title
+ *	#onEditButtonClicked
+ */
+function ExperimentGrid(args) {
+	this.width = &quot;100%&quot;;
+	this.height = 700;
+	this.minHeight = 500;
+
+	this.id =  BUI.id();
+	this.gridType = &#039;Ext.grid.Panel&#039;; //&#039;Ext.ux.LiveSearchGridPanel&#039;;
+	this.tbar = false;
+	this.hideHeaders = false;
+	this.grouping = true;
+	this.title = null;
+
+	this.filtered = null;
+	
+	/** maximum row count **/
+	this.limit = 100;
+	
+	this.sessionIdFilter = null;
+	
+	/** if not null filtered by date **/
+	this.date = null;
+	
+	this.sorters = [ {
+		property : &#039;date&#039;,
+		direction : &#039;DESC&#039;
+	}, {
+		property : &#039;time&#039;,
+		direction : &#039;DESC&#039;
+	} ];
+
+	this.dates = {};
+	if (args != null) {
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.limit != null) {
+			this.limit = args.limit;
+		}
+		if (args.sorters != null) {
+			this.sorters = args.sorters;
+		}
+		if (args.sessionId != null){
+			this.sessionIdFilter = args.sessionId;
+		}
+		if (args.filtered != null) {
+			this.filtered = args.filtered;
+		}
+		if (args.minHeight != null) {
+			this.minHeight = args.minHeight;
+		}
+		if (args.gridType != null) {
+			this.gridType = args.gridType;
+		}
+		if (args.tbar != null) {
+			this.tbar = args.tbar;
+		}
+		if (args.grouping != null) {
+			this.grouping = args.grouping;
+		}
+		if (args.width != null) {
+			this.width = args.width;
+		}
+		if (args.title != null) {
+			this.title = args.title;
+		}
+
+	}
+	/** Events **/
+	this.onEditButtonClicked = new Event(this);
+}
+
+ExperimentGrid.prototype._getFilterTypes = function() {
+	return [];
+};
+
+ExperimentGrid.prototype._prepareData = function(rows) {
+	var data = [];
+	var count = 0;
+	
+	rows.sort(function(a,b){return b.experimentId - a.experimentId;});
+	for ( var i = 0; i &lt; rows.length; i++) {
+	var row = rows[i];
+				this.dates[moment(row.creationDate).format(&quot;YYYYMMDD&quot;)] = moment(row.creationDate).format(&quot;MMM Do YY&quot;);
+				if (
+						  ( this.filtered == null || row.experimentType == this.filtered ) &amp;&amp; (count &lt; this.limit || this.limit == null )	&amp;&amp; (this.sessionIdFilter == null || this.date != null || (this.date == null &amp;&amp; this.sessionIdFilter == row.sessionId)) 
+					){
+
+					data.push({
+						experimentId : row.experimentId,
+						status : row.status,
+						dataAcquisitionFilePath : row.dataAcquisitionFilePath,
+						type : row.experimentType,
+						name : row.name,
+						macromolecules_names : row.macromolecules,
+						percentageAnalysed : {
+							value : (row.dataCollectionDoneCount / row.dataCollectionCount) * 100,
+							text : row.dataCollectionDoneCount + &quot; of &quot; + row.dataCollectionCount
+						},
+						percentageCollected : {
+							value : (row.measurementDoneCount / row.measurementCount) * 100,
+							text : row.measurementDoneCount + &quot; of &quot; + row.measurementCount
+						},
+						percentageMerged : {
+							value : (row.measurementAveragedCount / row.measurementCount) * 100,
+							text : row.measurementAveragedCount + &quot; of &quot; + row.measurementCount
+						},
+						date : moment(row.creationDate).format(&quot;YYYYMMDD&quot;),
+						time : moment(row.creationDate).format(&quot;YYYYMMDDHHmmss&quot;),
+						creationDate : row.creationDate
+					});
+					count ++;
+		}
+	}
+	return data;
+};
+
+ExperimentGrid.prototype.getPanel = function(experiments) {
+	this.features = experiments;
+	return this._renderGrid(experiments);
+};
+
+ExperimentGrid.prototype.refresh = function(experiments) {
+	
+	this.experiments = experiments;
+	var filtered = [];
+	for ( var i = 0; i &lt; experiments.length; i++) {
+		if (experiments[i].experimentType != &quot;TEMPLATE&quot;) {
+			filtered.push(experiments[i]);
+		}
+	}
+
+	this.parsedData = this._prepareData(filtered);
+	
+	var day = {};
+	var dates = [];
+	for ( var i = 0; i &lt; this.experiments.length; i++) {
+		var date  =  moment(this.experiments[i].creationDate).format(&quot;MMM Do YYYY&quot;);
+		if (day[date] == null){
+			dates.push({
+				date : date,
+				value :  moment(this.experiments[i].creationDate)
+			});
+			day[date] = true;
+		}
+	}
+	
+	this.storeDate.loadData(dates, false);
+	this.store.loadData(this.parsedData, false);
+	
+	/** If it has already been filtered by date we keep the filter **/
+	if (this.date != null){
+		this._filterByDate(this.date);
+	}
+	
+};
+
+ExperimentGrid.prototype._getTopButtons = function() {
+	var _this = this;
+	/** Actions buttons **/
+	var actions = [];
+
+	actions.push(Ext.create(&#039;Ext.Action&#039;, {
+		icon : &#039;../images/calendar_icon.png&#039;,
+		text : &#039;Show Calendar&#039;,
+		disabled : false,
+		handler : function(widget, event) {
+			var window = Ext.create(&#039;Ext.window.Window&#039;, {
+				title : &#039;Calendar&#039;,
+				width : 600,
+				height : 600,
+				modal : true,
+				closable : true,
+				layout : {
+					type : &#039;vbox&#039;,
+					align : &#039;stretch&#039;
+				},
+				items : [ {
+					xtype : &#039;label&#039;,
+					html : &#039;Click on a data acquisition to select:&#039;,
+					margin : &#039;5 5 5 5&#039;
+				}, {
+					html : &#039;&lt;div id=&quot;calendar&quot; style=&quot;height:450px;overflow-y: scroll;&quot;&gt;&lt;/div&gt;&#039;,
+					margin : &#039;5 5 5 5&#039;
+				}
+
+				]
+			}).show();
+
+			var calendarWidget = new CalendarWidget({
+				height : 450
+			});
+			var aux = _this.limit;
+			/** we remove the limit temporarily **/
+			_this.limit = null;
+			_this.sessionIdFilter = null;
+			calendarWidget.loadData(_this._prepareData(_this.experiments));
+			_this.limit = aux;
+			calendarWidget.draw(&#039;calendar&#039;);
+			calendarWidget.onClick.attach(function(sender, date) {
+				date = moment(date, &quot;YYYY-MM-DD&quot;);
+				_this._filterByDate(date);
+				window.close();
+				
+			});
+
+		}
+	}));
+	this.storeDate =  Ext.create(&#039;Ext.data.ArrayStore&#039;, {
+		        fields: [&#039;date&#039;, &#039;value&#039;],
+		        data : []
+		    });
+	
+	this.dateMenu = Ext.create(&#039;Ext.form.field.ComboBox&#039;, {
+	        hideLabel: true,
+	        store: this.storeDate,
+	        displayField: &#039;date&#039;,
+	        typeAhead: true,
+	        queryMode: &#039;local&#039;,
+	        margin : &#039;0 0 0 30&#039;,
+	        triggerAction: &#039;all&#039;,
+	        emptyText:&#039;Select a date...&#039;,
+	        selectOnFocus:true,
+	        width:135,
+	        listeners:{
+	            scope: this,
+	            &#039;select&#039;: function (a,b,c){
+	            	_this.limit = null;
+	            	_this._filterByDate(moment(b[0].raw.value, &quot;YYYY-MM-DD&quot;));
+	            }
+	       }
+	 });
+	 
+	actions.push(this.dateMenu);
+	
+	actions.push(&quot;-&gt;&quot;);
+	if (_this.filtered != null){
+		actions.push({
+			html	: &quot;&lt;span&gt;Experiment Type: &quot; + _this.filtered +&quot;&lt;/span&gt;&quot;
+		});
+	}
+	else{
+		actions.push({
+			html	: &quot;&lt;span&gt;Experiment Type: ALL&lt;/span&gt;&quot;
+		});
+	}
+	return actions;
+};
+
+/**
+ * Date format: &quot;YYYY-MM-DD&quot;
+ */
+ExperimentGrid.prototype._filterByDate = function(date) {
+	var experimentsFiltered = [];
+	/** Getting all the experiments of date**/
+	for ( var i = 0; i &lt; this.experiments.length; i++) {
+		var experiment = this.experiments[i];
+		if (experiment.creationDate != null) {
+			var experimentDate = moment(experiment.creationDate);
+			if (experimentDate.year() == date.year()) {
+				if (experimentDate.month() == date.month()) {
+					if (experimentDate.date() == date.date()) {
+						experimentsFiltered.push(experiment);
+					}
+				}
+			}
+		}
+	}
+	var parsedData = this._prepareData(experimentsFiltered);
+	this.store.loadData(parsedData);
+	this.date = date;
+};
+
+/** Only for templates **/
+ExperimentGrid.prototype._removeExperimentById = function(experimentId) {
+	var _this = this;
+	var adapter = new BiosaxsDataAdapter();
+	adapter.onSuccess.attach(function(evt, args) {
+		_this.grid.setLoading(false);
+		document.getElementById(BIOSAXS.targetId).innerHTML = &quot;&quot;;
+		BIOSAXS.start(BIOSAXS.targetId);
+	});
+	this.grid.setLoading(&quot;Removing experiment &quot;);
+	adapter.removeExperimentById(experimentId);
+};
+
+ExperimentGrid.prototype._renderGrid = function() {
+	var _this = this;
+
+	/** Store **/
+	this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+		fields : [&quot;name&quot;], 
+//		groupField : &#039;date&#039;,
+		autoload : true,
+		data : [],
+		remoteSort: false,
+		sorters : this.sorters
+	});
+
+	
+	
+	
+	var groupingFeature = Ext.create(&#039;Ext.grid.feature.Grouping&#039;, {
+		groupHeaderTpl : Ext.create(&#039;Ext.XTemplate&#039;,
+				&quot;&lt;div style=&#039;background:#0ca3d2; color:white; float:left; margin:6px 8px 0 0; padding:5px 8px;&#039;&gt;{name:this.formatName}&lt;/div&gt;&quot;, {
+					formatName : function(name) {
+						return _this.dates[name];
+					}
+				}),
+		hideGroupedHeader : true,
+		startCollapsed : false
+	});
+
+	this.features = [];
+	if (this.grouping) {
+		this.features.push(groupingFeature);
+	}
+
+	/** Grid **/
+	this.grid = Ext.create(this.gridType, {
+		hideHeaders : this.hideHeaders,
+		resizable : true,
+		title : this.title,
+		width : this.width,
+		minHeight : this.minHeight,
+		height : this.height,
+		features : this.features,
+		store : this.store,
+		columns : this._getColumns(),
+		selModel : {
+			mode : &#039;SINGLE&#039;
+		},
+		viewConfig : {
+			stripeRows : true,
+			getRowClass : function(record, rowIdx, params, store) {
+				if (record.raw.type == &quot;TEMPLATE&quot;) {
+					return &quot;template-color-row&quot;;
+				}
+				if ((record.raw.type == &quot;CALIBRATION&quot;) &amp;&amp; (record.raw.status == &quot;FINISHED&quot;)) {
+					return &quot;blue-row&quot;;
+				}
+			},
+			listeners : {
+				itemdblclick : function(dataview, record, item, e) {
+					_this._editExperiment(record.raw.experimentId);
+				},
+				cellclick : function(grid, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;GO&#039;) {
+						_this._editExperiment(record.raw.experimentId);
+					}
+
+					if (grid.getGridColumns()[cellIndex].getId() == _this.id + &#039;REMOVE&#039;) {
+						_this._removeExperimentById(record.raw.experimentId);
+					}
+
+				}
+			}
+		}
+	});
+
+	var actions = _this._getTopButtons();
+
+	if (this.tbar) {
+		this.grid.addDocked({
+			xtype : &#039;toolbar&#039;,
+			height : 48,
+			items : actions
+		});
+		this.grid.getSelectionModel().on({
+			selectionchange : function(sm, selections) {
+				if (selections.length) {
+					for ( var i = 0; i &lt; actions.length; i++) {
+						if (actions[i].enable) {
+							actions[i].enable();
+						}
+					}
+				} else {
+					for ( var i = 0; i &lt; actions.length; i++) {
+						if (actions[i].alwaysEnabled == false) {
+							if (actions[i].disable) {
+								actions[i].disable();
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+
+	return this.grid;
+};
+
+ExperimentGrid.prototype._getColumns = function() {
+	var _this = this;
+	function actionItemRenderer(value, meta, record, rowIx, ColIx, store) {
+		if (record.raw.buffer3VOs != null) {
+			if (record.raw.buffer3VOs.length &gt; 0) {
+				return &#039;x-hide-display&#039;;
+			}
+		}
+
+		if (record.data.platesCount &gt; 0) {
+			return &#039;x-hide-display&#039;;
+		}
+	}
+
+	return [
+		{
+			text : &#039;experimentId&#039;,
+			dataIndex : &#039;experimentId&#039;,
+			name : &#039;experimentId&#039;,
+			type : &#039;string&#039;,
+			hidden : true
+		},
+		{
+			xtype : &#039;rownumberer&#039;,
+			width : 40
+		},
+		{
+			text : &#039;Name&#039;,
+			dataIndex : &#039;name&#039;,
+			name : &#039;name&#039;,
+			type : &#039;string&#039;,
+			flex : 1
+		},
+
+		{
+			text : &#039;Type&#039;,
+			dataIndex : &#039;type&#039;,
+			name : &#039;type&#039;,
+			type : &#039;string&#039;,
+			flex : 1,
+			renderer : function(val) {
+				if (val == &quot;CALIBRATION&quot;) {
+					return &quot;&lt;span style=&#039;color:blue;&#039;&gt;&quot; + val + &quot;&lt;/span&gt;&quot;;
+				}
+
+				return val;
+			}
+		},
+		{
+			text : &#039;Macromolecules&#039;,
+			name : &#039;macromolecules_names&#039;,
+			dataIndex : &#039;macromolecules_names&#039;,
+			flex : 1,
+			renderer : function(val) {
+				if (val != null) {
+					return &quot; &lt;span style=&#039;font-weight:bold&#039;&gt;&quot; + val + &quot;&lt;/span&gt;&quot;;
+				}
+				return &quot; &lt;span style=&#039;font-style:italic;color:gray;&#039;&gt;Information not available&lt;/span&gt;&quot;;
+			}
+		},
+		{
+			text : &#039;Buffers&#039;,
+			dataIndex : &#039;buffer_names&#039;,
+			name : &#039;buffer_names&#039;,
+			flex : 1,
+			hidden : true,
+			renderer : function(val) {
+				return &quot;Buffer/s: &lt;span style=&#039;font-weight:bold&#039;&gt;&quot; + val + &quot;&lt;/span&gt;&quot;;
+			}
+		},
+		{
+			text : &#039;Status&#039;,
+			dataIndex : &#039;status&#039;,
+			name : &#039;status&#039;,
+			type : &#039;string&#039;,
+			flex : 1,
+			renderer : function(val, x, sample) {
+				if (sample.raw.type == &quot;TEMPLATE&quot;) {
+					return &quot;READY&quot;;
+				}
+				if (sample.raw.status == &quot;ABORTED&quot;) {
+					return &quot;&lt;span style=&#039;color:red;&#039;&gt;&quot; + val + &quot;&lt;/span&gt;&quot;;
+				}
+				return &quot;&lt;span style=&#039;color:green;&#039;&gt;&quot; + val + &quot;&lt;/span&gt;&quot;;
+			}
+		},
+		{
+			text : &#039;Download&#039;,
+			dataIndex : &#039;creationDate&#039;,
+			name : &#039;creationDate&#039;,
+			renderer : function(val, x, sample) {
+				if (sample != null) {
+					if (sample.raw.type == &quot;HPLC&quot;) {
+						return;
+					}
+					return BUI.getZipHTMLByExperimentId(sample.raw.experimentId, sample.raw.name);
+				}
+			},
+			width : 100
+
+		},
+		{
+			header : &#039;Measurements&#039;,
+			dataIndex : &#039;percentageCollected&#039;,
+			name : &#039;percentageCollected&#039;,
+			type : &#039;string&#039;,
+			renderer : function(val, y, sample) {
+				if ((sample.raw.type == &quot;TEMPLATE&quot;) || (sample.raw.type == &quot;HPLC&quot;)) {
+					return;
+				}
+				return &quot;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&quot; + BUI.getProgessBar(sample.raw.percentageCollected.value, sample.raw.percentageCollected.text) + &quot;&lt;/td&gt;&lt;/table&gt;&quot;;
+			},
+			width : 100
+		},
+		{
+			header : &#039;Averaged&#039;,
+			dataIndex : &#039;percentageMerged&#039;,
+			name : &#039;percentageMerged&#039;,
+			type : &#039;string&#039;,
+			renderer : function(val, y, sample) {
+				if ((sample.raw.type == &quot;TEMPLATE&quot;) || (sample.raw.type == &quot;HPLC&quot;)) {
+					return;
+				}
+				return &quot;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&quot; + BUI.getProgessBar(sample.raw.percentageMerged.value, sample.raw.percentageMerged.text) + &quot;&lt;/td&gt;&lt;/table&gt;&quot;;
+			},
+			width : 100
+		},
+		{
+			header : &#039;Subtractions&#039;,
+			dataIndex : &#039;percentageAnalysed&#039;,
+			name : &#039;percentageAnalysed&#039;,
+			type : &#039;string&#039;,
+			renderer : function(val, y, sample) {
+				if ((sample.raw.type == &quot;TEMPLATE&quot;) || (sample.raw.type == &quot;HPLC&quot;)) {
+					return;
+				}
+				return &quot;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&quot; + BUI.getProgessBar(sample.raw.percentageAnalysed.value, sample.raw.percentageAnalysed.text) + &quot;&lt;/td&gt;&lt;/table&gt;&quot;;
+			},
+			width : 100
+		},
+
+		{
+			text : &#039;time&#039;,
+			dataIndex : &#039;time&#039;,
+			name : &#039;time&#039;,
+			hidden : true,
+			renderer : function(val) {
+				return val;
+			},
+			width : 100
+
+		}, {
+			text : &#039;Date&#039;,
+			dataIndex : &#039;date&#039;,
+			name : &#039;date&#039;,
+			renderer : function(val) {
+				return val;
+			},
+			width : 100
+
+		},
+
+		{
+			text : &#039;Time&#039;,
+			dataIndex : &#039;creationDate&#039;,
+			name : &#039;creationDate&#039;,
+			renderer : function(val) {
+				return moment(val).format(&quot; HH:mm:ss&quot;);
+			},
+			width : 100
+
+		}, {
+			id : _this.id + &#039;GO&#039;,
+			width : 80,
+			sortable : false,
+			renderer : function(value, metaData, record, rowIndex, colIndex, store) {
+				return BUI.getGreenButton(&#039;GO&#039;);
+			}
+		} ];
+};
+
+/** Changes location.href in order to edit the experiment **/
+ExperimentGrid.prototype._editExperiment = function(experimentId) {
+	if (Ext.urlDecode(window.location.href).sessionId != null) {
+		location.href = &#039;viewProjectList.do?reqCode=display&amp;experimentId=&#039; + experimentId + &#039;&amp;sessionId=&#039;+ Ext.urlDecode(window.location.href).sessionId;
+	} else {
+		location.href = &#039;viewProjectList.do?reqCode=display&amp;experimentId=&#039; + experimentId;
+	}
+};
+
+ExperimentGrid.prototype.input = function() {
+	var experiments = DATADOC.getExperimentList_10();
+	return {
+		experiments : experiments,
+		proposal : new MeasurementGrid().input().proposal
+
+	};
+};
+
+ExperimentGrid.prototype.test = function(targetId) {
+	var experimentGrid = new ExperimentGrid({
+		height : 350,
+		minHeight : 350,
+		width : 1000
+
+	});
+	BIOSAXS.proposal = new Proposal(experimentGrid.input().proposal);
+	var panel = experimentGrid.getPanel(experimentGrid.input().experiments);
+	experimentGrid.refresh(experimentGrid.input().experiments);
+	panel.render(targetId);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

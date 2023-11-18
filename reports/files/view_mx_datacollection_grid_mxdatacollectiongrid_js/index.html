@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - view/mx/datacollection/grid/mxdatacollectiongrid.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>view/mx/datacollection/grid/mxdatacollectiongrid.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">113.71</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">344</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">33.87</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.91</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function MXDataCollectionGrid(args) {
+    this.id = BUI.id();
+
+    /** If view should be collapsed or not */
+    this.collapsed = false;
+}
+
+
+
+/**
+* Attaches the events to lazy load to the images. Images concerned are with the class img-responsive and smalllazy
+*
+* @method attachCallBackAfterRender
+*/
+MXDataCollectionGrid.prototype.attachCallBackAfterRender = function() {
+    var _this = this;
+    var lazy = {
+            bind: &#039;event&#039;,
+            /** !!IMPORTANT this is the id of the parent node which contains the scroll **/
+            appendScroll: document.getElementById(document.getElementById(_this.id).parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.id),
+            beforeLoad: function(element) {
+                console.log(&#039;image &quot;&#039; + (element.data(&#039;src&#039;)) + &#039;&quot; is about to be loaded&#039;);
+            },           
+            onFinishedAll: function() {
+                EXI.mainStatusBar.showReady();
+            }
+        };
+        
+    var myVar = setTimeout(function() {  $(&#039;.img-responsive&#039;).lazy(lazy);}, 1000);
+    var myVar = setTimeout(function() {  $(&#039;.smalllazy&#039;).lazy(lazy);}, 1000);  
+};
+
+MXDataCollectionGrid.prototype.getPanel = function(dataCollectionGroup) {
+    var _this = this;
+    this.store = Ext.create(&#039;Ext.data.Store&#039;, {
+        fields: [&quot;dataCollectionGroup&quot;]
+    });
+    this.panel = Ext.create(&#039;Ext.grid.Panel&#039;, {
+        border: 1,
+        padding: 5,
+        id: this.id,
+        store: this.store,
+        disableSelection: true,
+        tbar: this.getToolBar(),
+        columns: this.getColumns(),
+        viewConfig: {
+            enableTextSelection: true,
+            stripeRows: false
+        },
+        listeners: {
+            viewready: function() {
+                function loadMagnifiers() {
+                    for (var i = 0; i &lt; _this.dataCollectionGroup.length; i++) {
+                        var elementId = _this.dataCollectionGroup[i].DataCollection_dataCollectionId + &quot;_thumb&quot;;
+                        $(&#039;#&#039; + elementId).Lazy();
+
+                    }
+                }
+            }
+        }
+
+    });
+
+    this.panel.on(&#039;boxready&#039;, function() {
+        _this.attachCallBackAfterRender();
+    });
+
+    return this.panel;
+};
+
+
+/**
+* Creates the container for the img with lazy loading and data-lightbox for enlarging
+*
+* @method _getHTMLImage
+* @param {Object} data Record where DataCollection_dataCollectionId, acronym and protein name is
+* @param {String} url An url where actually the image can be found
+* @return {String} Returns html code for the anchor with the images
+*/
+MXDataCollectionGrid.prototype._getHTMLImage = function(data, url) {
+    return &#039;&lt;a href=&quot;&#039; + url + &#039;&quot; data-lightbox=&quot;&#039; + data.DataCollection_dataCollectionId + &#039;&quot; data-title=&quot;&#039; + data.Protein_acronym + &quot;: &quot; + data.Protein_name + &#039;&quot;&gt;&lt;img class=&quot;smalllazy&quot;  data-src=&#039; + url + &#039;&gt;&lt;/a&gt;&#039;;
+};
+
+
+/**
+* Parses statistics and return the best one
+*
+* @method _getAutoprocessingStatistics
+* @param {Object} data Record with all the information that it is stored in the store
+* @return {Object} return all statistics sorted by best values
+*/
+MXDataCollectionGrid.prototype._getAutoprocessingStatistics = function(data) {
+    /** This converts and array of comma separated value in a array */
+    function getArrayValues(value) {
+        /** It splits every value */
+        return _.map(_.trim(value).split(&quot;,&quot;), function(singleValue) { return _.trim(singleValue); });
+    }
+
+    var autoProc_spaceGroups = getArrayValues(data.AutoProc_spaceGroups);
+    var autoProcIds = getArrayValues(data.autoProcIds);
+    var completenessList = getArrayValues(data.completenessList);
+    var resolutionsLimitHigh = getArrayValues(data.resolutionsLimitHigh);
+    var resolutionsLimitLow = getArrayValues(data.resolutionsLimitLow);
+    var scalingStatisticsTypes = getArrayValues(data.scalingStatisticsTypes);
+    var rMerges = getArrayValues(data.rMerges);
+    var cell_a = getArrayValues(data.Autoprocessing_cell_a);
+    var cell_b = getArrayValues(data.Autoprocessing_cell_b);
+    var cell_c = getArrayValues(data.Autoprocessing_cell_c);
+
+    var cell_alpha = getArrayValues(data.Autoprocessing_cell_alpha);
+    var cell_beta = getArrayValues(data.Autoprocessing_cell_beta);
+    var cell_gamma = getArrayValues(data.Autoprocessing_cell_gamma);
+
+
+    var data = {};
+    /** Returning if no autoprocs */
+    if (autoProcIds) {
+        if (autoProcIds[0] == &quot;&quot;) {
+            return [];
+        }
+    }
+    for (var i = 0; i &lt; autoProcIds.length; i++) {
+        if (data[autoProcIds[i]] == null) {
+            data[autoProcIds[i]] = {
+                autoProcId: autoProcIds[i],
+                spaceGroup: autoProc_spaceGroups[i]
+            };
+        }
+
+        data[autoProcIds[i]][scalingStatisticsTypes[i]] = ({
+            autoProcId: autoProcIds[i],
+            scalingStatisticsType: scalingStatisticsTypes[i],
+            completeness: Number(completenessList[i]).toFixed(0),
+            resolutionsLimitHigh: Number(resolutionsLimitHigh[i]).toFixed(1),
+            resolutionsLimitLow: Number(resolutionsLimitLow[i]).toFixed(1),
+            rMerge: Number(rMerges[i]).toFixed(1),
+            spaceGroup: autoProc_spaceGroups[i],
+            cell_a: cell_a[i],
+            cell_b: cell_b[i],
+            cell_c: cell_c[i],
+            cell_alpha: cell_alpha[i],
+            cell_beta: cell_beta[i],
+            cell_gamma: cell_gamma[i]
+
+        });
+
+    }
+
+    /** Convert from map to array */
+    var ids = _.map(data, &#039;autoProcId&#039;);
+    var result = [];
+    for (var i = 0; i &lt; ids.length; i++) {
+        result.push(data[ids[i]]);
+    }
+
+    function sortByBest(a, b) {
+        var spaceGroupA = a.spaceGroup.replace(/\s/g, &quot;&quot;);
+        var spaceGroupB = b.spaceGroup.replace(/\s/g, &quot;&quot;);
+        return (_.indexOf(ExtISPyB.spaceGroups, spaceGroupA) &gt; _.indexOf(ExtISPyB.spaceGroups, spaceGroupB));
+    }
+
+    var sorted = result.sort(sortByBest).reverse();
+    /** Add new attribute for ranking order */
+    for (var i = 0; i &lt; sorted.length; i++) {
+        sorted[i][&quot;rank&quot;] = i + 1;
+    }
+
+    return sorted;
+};
+
+MXDataCollectionGrid.prototype.getToolBar = function() {
+    var _this = this;
+    return Ext.create(&#039;Ext.toolbar.Toolbar&#039;, {
+        width: 500,
+        items: [
+            {
+                xtype: &#039;checkboxfield&#039;,
+                boxLabel: &#039;Summary&#039;,
+                id: this.id + &quot;_collapse&quot;,
+                listeners: {
+                    change: function(field, e) {
+                        _this.collapsed = e;
+                        if (Ext.getCmp(_this.id + &quot;_search&quot;).getValue() != &quot;&quot;) {
+                            _this.filterBy(Ext.getCmp(_this.id + &quot;_search&quot;).getValue());
+                        }
+                        else {
+                            _this.reloadData(_this.dataCollectionGroup);
+                        }
+                    }
+                }
+            },
+            &#039;-&gt;&#039;, 
+            {
+                xtype: &#039;textfield&#039;,
+                id: this.id + &quot;_search&quot;,
+                width: 400,
+                emptyText: &#039;enter search prefix, sample or protein&#039;,
+                listeners: {
+                    specialkey: function(field, e) {
+                        if (e.getKey() == e.ENTER) {
+                            _this.filterBy(field.getValue());
+                        }
+                    }
+                }
+            },
+            { xtype: &#039;tbtext&#039;, text: &#039;&#039;, id: this.id + &quot;_found&quot; }
+        ]
+    });
+};
+MXDataCollectionGrid.prototype.getColumns = function() {
+    var _this = this;
+    var columns = [
+        {
+
+            dataIndex: &#039;dataCollectionGroup&#039;,
+            name: &#039;dataCollectionGroup&#039;,
+            flex: 1.5,
+            hidden: false,
+            renderer: function(grid, e, record) {
+
+                var data = record.data;                              
+                var html = &quot;&quot;;
+                               
+
+                /** For thumbnail */
+                data.urlThumbnail = EXI.getDataAdapter().mx.dataCollection.getThumbNailById(data.lastImageId);
+                data.url = EXI.getDataAdapter().mx.dataCollection.getImageById(data.lastImageId);
+                data.ref = &#039;#/mx/beamlineparameter/datacollection/&#039; + data.DataCollection_dataCollectionId + &#039;/main&#039;;
+                data.runNumber = data.DataCollection_dataCollectionNumber;
+                data.prefix = data.DataCollection_imagePrefix;
+                data.comments = data.DataCollectionGroup_comments;
+                data.sample = data.BLSample_name;
+                data.folder = data.DataCollection_imageDirectory;
+
+                /** For Phasing */
+                
+                if (data.phasingStepType) {
+                    var phasingSteps = data.phasingStepType.split(&quot;,&quot;);
+                    data.phasingStepLength = phasingSteps.length;
+                   
+                }
+
+
+                /** For crystal */
+                data.xtal1 = EXI.getDataAdapter().mx.dataCollection.getCrystalSnapshotByDataCollectionId(record.data.DataCollection_dataCollectionId, 1);
+                data.xtal2 = EXI.getDataAdapter().mx.dataCollection.getCrystalSnapshotByDataCollectionId(record.data.DataCollection_dataCollectionId, 2);
+                data.xtal3 = EXI.getDataAdapter().mx.dataCollection.getCrystalSnapshotByDataCollectionId(record.data.DataCollection_dataCollectionId, 3);
+                data.xtal4 = EXI.getDataAdapter().mx.dataCollection.getCrystalSnapshotByDataCollectionId(record.data.DataCollection_dataCollectionId, 4);
+
+                /** Image quality indicator **/
+                data.indicator = EXI.getDataAdapter().mx.dataCollection.getQualityIndicatorPlot(record.data.DataCollection_dataCollectionId);
+
+                /** For online data analysis */
+                var online = (new OnlineResultSectionDataCollection().parseData(record.data));
+                data.autoprocessing = _.filter(online, function(b) { return b.name == &quot;Autoprocessing&quot;; });
+
+                data.screening = _.filter(online, function(b) { return b.name == &quot;Screening&quot;; });
+                data.onlineresults = _this._getAutoprocessingStatistics(record.data);
+
+                /** For the workflows */
+                if (record.data.WorkflowStep_workflowStepType) {
+                    data.workflows = new WorkflowSectionDataCollection().parseWorkflow(record.data);
+                }
+                if (data.workflows == null) {
+                    data.workflows = [];
+                }
+
+                if (!_this.collapsed) {
+                    
+                    dust.render(&quot;mxdatacollectiongrid.template&quot;, data, function(err, out) {
+                                                                       
+                        html = html + out;
+                    });
+
+                 
+                    dust.render(&quot;online.mxdatacollectiongrid.template&quot;, data, function(err, out) {
+                        html = html + out;
+                    });
+                }
+                else {
+                    dust.render(&quot;collapsed.mxdatacollectiongrid.template&quot;, data, function(err, out) {
+                        html = html + out;
+                    });
+                }
+
+
+                return html;
+
+            }
+        },
+        {
+            header: &#039;IDs&#039;,
+            dataIndex: &#039;dataCollectionGroup&#039;,
+            name: &#039;dataCollectionGroup&#039;,
+            flex: 1.5,
+            hidden: true,
+            renderer: function(grid, e, record) {
+                var html = &quot;&quot;;
+                dust.render(&quot;ids.mxdatacollectiongrid.template&quot;, record.data, function(err, out) {
+                    html = out;
+                });
+                return html;
+
+            }
+        },
+         
+    ];
+    return columns;
+};
+
+MXDataCollectionGrid.prototype.reloadData = function(dataCollections) {
+    this.store.loadData(dataCollections);
+    this.attachCallBackAfterRender();
+};
+/**
+* Filters data by prefix, protein acronym or sample
+*
+* @method filterBy
+* @return {String} searchTerm prefix, protein acronym or sample to be searched
+*/
+MXDataCollectionGrid.prototype.filterBy = function(searchTerm) {
+    console.log(this.dataCollectionGroup);
+    var filtered = _.filter(this.dataCollectionGroup, function(dataCollection) {
+        var params = [&quot;DataCollection_imagePrefix&quot;, &quot;Protein_acronym&quot;, &quot;BLSample_name&quot;];
+        for (var i = 0; i &lt; params.length; i++) {
+            var param = params[i];
+            if (dataCollection[param]) {
+                if (dataCollection[param].indexOf(searchTerm) != -1) {
+                    return dataCollection;
+                }
+            }
+        }
+
+
+    });
+    Ext.getCmp(this.id + &quot;_found&quot;).setText(filtered.length + &quot; items found&quot;);
+    this.reloadData(filtered);
+};
+
+MXDataCollectionGrid.prototype.load = function(dataCollectionGroup) {
+    this.dataCollectionGroup = dataCollectionGroup;
+    this.dataCollectionGroup.reverse();
+    this.store.loadData(this.dataCollectionGroup);
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - widget/pdbviewer.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>widget/pdbviewer.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">111.79</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">457</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">55.74</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">5.23</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">function PDBViewer(args) {
+	this.id = BUI.id();
+	this.glMol = null;
+
+	this.width = 600;
+	this.height = 600;
+	this.title = &quot;&quot;;
+
+	this.margin = &quot;10 0 0 5&quot;;
+	if (args != null) {
+		if (args.width != null) {
+			this.width = args.width;
+		}
+		if (args.height != null) {
+			this.height = args.height;
+		}
+		if (args.title != null) {
+			this.title = args.title;
+		}
+		if (args.margin != null) {
+			this.margin = args.margin;
+		}
+	}
+}
+
+PDBViewer.prototype.getTitle = function() {
+	return &quot;&lt;div style=&#039;width:&quot; + this.width + &quot;px; height:20px; font-weight:bold;background-color: #E6E6E6;color:black&#039;&gt;&quot; + this.title + &quot;&lt;/div&gt;&quot;;
+};
+
+PDBViewer.prototype.getTextAreaId = function() {
+	return this.id + &quot;_src&quot;;
+};
+
+PDBViewer.prototype.getCanvas = function() {
+	/** For text Area **/
+	var textAreaStyle = &quot;width:&quot; + this.width + &quot;px; height: &quot; + this.height + &quot;px;display: none;&quot;;
+	var textArea = &quot;&lt;textarea id=&#039;&quot; + this.getTextAreaId() + &quot;&#039;; style=&#039;&quot; + textAreaStyle + &quot;&#039; &gt;&lt;/textarea&gt;&quot;;
+	var style = &quot;width: &quot; + this.width + &quot;px; height: &quot; + this.height + &quot;px; background-color: black;&quot;;
+	return textArea + &quot;&lt;div id=&#039;&quot; + this.id + &quot;&#039;; style=&#039;&quot; + style + &quot;&#039; &gt;&lt;/div&gt;&quot;;
+
+};
+
+PDBViewer.prototype.getDownload = function(type, abInitioModelId) {
+	/** For title **/
+	var url = BUI.getPdbURL() + &#039;&amp;type=&#039; + type + &#039;&amp;abInitioModelId=&#039; + abInitioModelId;
+	html = &#039;&lt;a href=&#039; + url + &#039; style=&quot;color:blue;font-weight:bold;&quot;  height=&quot;80&quot; width=&quot;80&quot; &gt;Download&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;&#039;;
+	return &quot;&lt;div style=&#039;width:&quot; + this.width + &quot;px; height:20px; font-weight:bold;background-color: #336699;color:white&#039;&gt;&quot; + html + &quot;&lt;/div&gt;&quot;;
+};
+
+PDBViewer.prototype.getBar = function() {
+	/** For title **/
+	return &quot;&lt;div style=&#039;width:&quot; + this.width + &quot;px; height:20px; font-weight:bold;background-color: #336699;color:white&#039;&gt;&lt;/div&gt;&quot;;
+};
+
+PDBViewer.prototype.refresh = function(models) {
+	var _this = this;
+	if (BUI.isWebGLEnabled()) {
+		this.models = models;
+//		var adapter = new BiosaxsDataAdapter();
+		_this.panel.setLoading(&quot;Rendering&quot;);
+//		adapter.onSuccess.attach(function(sender, data) {
+//			if (data.models != null){
+//				if (data.models[0] != null){
+//					document.getElementById(_this.getTextAreaId()).innerHTML = data.models[0].XYZ;
+//					if (_this.glMol == null) {
+//						_this.glMol = new GLmol(_this.id);
+//					} else {
+//						_this.glMol.loadMolecule();
+//					}
+//				}
+//			}
+//			_this.panel.setLoading(false);
+//		});
+//		adapter.onError.attach(function(sender, data) {
+//			_this.panel.setLoading(&quot;Not available&quot;);
+//		});
+//		adapter.getDataPDB(models, []);
+//		
+		var onSuccess = function(sender, data){
+			if (data.models != null){
+				if (data.models[0] != null){
+					document.getElementById(_this.getTextAreaId()).innerHTML = data.models[0].XYZ;
+					if (_this.glMol == null) {
+						_this.glMol = new GLmol(_this.id);
+					} else {
+						_this.glMol.loadMolecule();
+					}
+				}
+			}
+			_this.panel.setLoading(false);
+		};
+		
+//		adapter.onError.attach(function(sender, data) {
+//			_this.panel.setLoading(&quot;Not available&quot;);
+//		});
+//		adapter.getDataPDB(models, []);
+		EXI.getDataAdapter({onSuccess : onSuccess}).saxs.model.getPDB(models, []);
+		
+		
+		
+	} else {
+		this.webGLNotAvailable();
+	}
+};
+
+PDBViewer.prototype.getOpacity = function(text) {
+	if (text == &#039;Invisible&#039;) {
+		return &#039;0&#039;;
+	}
+	if (text == &#039;Minimum&#039;) {
+		return &#039;0.2&#039;;
+	}
+	if (text == &#039;Medium&#039;) {
+		return &#039;0.5&#039;;
+	}
+	if (text == &#039;High&#039;) {
+		return &#039;0.7&#039;;
+	}
+	return &#039;1&#039;;
+};
+
+PDBViewer.prototype.getMenu = function(model) {
+	var _this = this;
+	function onItemCheck(comp, checked, eOpts) {
+		if (checked) {
+			var i = null;
+			if (comp.group == &#039;Opacity&#039;) {
+				for (i = 0; i &lt; _this.models.length; i++) {
+					var opacity = _this.getOpacity(comp.text);
+					model.opacity = opacity;
+				}
+			}
+
+			if (comp.group == &#039;Radius&#039;) {
+				for (i = 0; i &lt; _this.models.length; i++) {
+					var radius = _this.getOpacity(comp.text);
+					model.radius = radius;
+				}
+			}
+
+			_this.refresh(_this.models);
+		}
+	}
+
+	return Ext.create(&#039;Ext.menu.Menu&#039;, {
+		items : [ {
+			text : &#039;Opacity&#039;,
+			menu : {
+				items : [ {
+					text : &#039;Invisible&#039;,
+					checked : false,
+					group : &#039;Opacity&#039;,
+					checkHandler : onItemCheck
+				}, {
+					text : &#039;Minimum&#039;,
+					checked : false,
+					group : &#039;Opacity&#039;,
+					checkHandler : onItemCheck
+				}, {
+					text : &#039;Medium&#039;,
+					checked : false,
+					group : &#039;Opacity&#039;,
+					checkHandler : onItemCheck
+				}, {
+					text : &#039;High&#039;,
+					checked : false,
+					group : &#039;Opacity&#039;,
+					checkHandler : onItemCheck
+				}, {
+					text : &#039;Opaque&#039;,
+					checked : false,
+					group : &#039;Opacity&#039;,
+					checkHandler : onItemCheck
+				} ]
+			}
+		}
+
+		]
+	});
+};
+
+PDBViewer.prototype.getTbar = function() {
+	var _this = this;
+
+	var tb = Ext.create(&#039;Ext.toolbar.Toolbar&#039;);
+
+	var colorItems = [];
+	for (var i = 0; i &lt; this.models.length; i++) {
+		tb.add({
+			text : this.models[i].title,
+			menu : this.getMenu(this.models[i])
+		});
+		var color = &quot;#&quot; + this.models[i].color.replace(&quot;0x&quot;, &quot;&quot;);
+		colorItems.push({
+			html : &quot;&lt;table&gt;&lt;tr&gt;&lt;td width=&#039;15px&#039;&gt;&quot; + BUI.getRectangleColorDIV(color, 10, 10) + &quot;&lt;/td&gt;&lt;td&gt;&quot; + this.models[i].title + &quot;&lt;/td&gt;&lt;/table&gt;&quot;
+		});
+	}
+
+	tb.add({
+		xtype : &#039;numberfield&#039;,
+		labelWidth : 50,
+		width : 120,
+		fieldLabel : &#039;Radius&#039;,
+		value : 3,
+		maxValue : 10,
+		step : 0.2,
+		minValue : 0.1,
+		listeners : {
+			change : function(cmp) {
+				var radius = cmp.getValue();
+				for (var i = 0; i &lt; _this.models.length; i++) {
+					_this.models[i].radius = radius;
+				}
+				_this.refresh(_this.models);
+			}
+		}
+	});
+	tb.add(&quot;-&gt;&quot;);
+	tb.add(colorItems);
+	return tb;
+};
+
+PDBViewer.prototype.getPanel = function() {
+	var _this = this;
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		margin : this.margin,
+		border : 0,
+		layout : {
+			type : &#039;vbox&#039;
+		},
+		width : this.width - 4,
+		height : this.height + 30,
+		items : [ {
+			html : this.getCanvas()
+		} ],
+		listeners : {
+			afterRender : function() {
+			}
+		}
+	});
+
+	this.panel.setLoading(&quot;Rendering&quot;);
+	return this.panel;
+};
+
+PDBViewer.prototype.webGLNotAvailable = function() {
+	document.getElementById(_this.id).innerHTML = BUI.getWarningHTML(&quot;Your browser doesn&#039;t support WebGL&quot;);
+	document.getElementById(_this.id).innerHTML = document.getElementById(_this.id).innerHTML + &quot;&lt;br /&gt;&quot;;
+	document.getElementById(_this.id).innerHTML = document.getElementById(_this.id).innerHTML
+			+ BUI.getTipHTML(&quot;&lt;a href=&#039;http://www.browserleaks.com/webgl#howto-enable-disable-webgl&#039;&gt;How to enable WebGL&lt;/a&gt;&quot;);
+	document.getElementById(_this.id).innerHTML = document.getElementById(_this.id).innerHTML + &quot;&lt;br /&gt;&quot;;
+	document.getElementById(_this.id).innerHTML = document.getElementById(_this.id).innerHTML + BUI.getTipHTML(&quot;&lt;a href=&#039;http://caniuse.com/webgl&#039;&gt;Can I use WebGL?&lt;/a&gt;&quot;);
+};
+
+/** Deprecated **/
+PDBViewer.prototype.draw = function(models) {
+	this.models = models;
+	var _this = this;
+	this.panel = Ext.create(&#039;Ext.panel.Panel&#039;, {
+		margin : 2,
+		layout : {
+			type : &#039;vbox&#039;
+		},
+		tbar : this.getTbar(),
+		width : this.width - 4,
+		height : this.height + 30,
+		items : [ {
+			html : this.getCanvas()
+		}
+
+		],
+		listeners : {
+			afterRender : function() {
+				_this.refresh(models);
+			}
+		}
+	});
+
+	this.panel.setLoading(&quot;Rendering&quot;);
+	return this.panel;
+};
+
+SuperpositionPDBViewer.prototype.draw = PDBViewer.prototype.draw;
+SuperpositionPDBViewer.prototype.getBar = PDBViewer.prototype.getBar;
+SuperpositionPDBViewer.prototype.getCanvas = PDBViewer.prototype.getCanvas;
+SuperpositionPDBViewer.prototype.getDownload = PDBViewer.prototype.getDownload;
+SuperpositionPDBViewer.prototype.getMenu = PDBViewer.prototype.getMenu;
+SuperpositionPDBViewer.prototype.getOpacity = PDBViewer.prototype.getOpacity;
+SuperpositionPDBViewer.prototype.getPanel = PDBViewer.prototype.getPanel;
+SuperpositionPDBViewer.prototype.getTbar = PDBViewer.prototype.getTbar;
+SuperpositionPDBViewer.prototype.getTextAreaId = PDBViewer.prototype.getTextAreaId;
+SuperpositionPDBViewer.prototype.getTitle = PDBViewer.prototype.getTitle;
+SuperpositionPDBViewer.prototype.refresh = PDBViewer.prototype.refresh;
+SuperpositionPDBViewer.prototype.webGLNotAvailable = PDBViewer.prototype.webGLNotAvailable;
+
+function SuperpositionPDBViewer(args) {
+	this.width = 550;
+	this.height = 500;
+	if (args != null) {
+		if (args.actions != null) {
+			this.actions = args.actions;
+		}
+	}
+
+	var _this = this;
+	this.form = new BufferForm();
+	this.onSuccess = new Event();
+	PDBViewer.prototype.constructor.call(this, args);
+};
+
+SuperpositionPDBViewer.prototype.refresh = function(superpositions) {
+	var _this = this;
+	if (BUI.isWebGLEnabled()) {
+		this.models = superpositions;
+		var adapter = new BiosaxsDataAdapter();
+		_this.panel.setLoading(&quot;Rendering&quot;);
+		adapter.onSuccess.attach(function(sender, data) {
+			document.getElementById(_this.getTextAreaId()).innerHTML = data.XYZ;
+			if (_this.glMol == null) {
+				_this.glMol = new GLmol(_this.id);
+			} else {
+				_this.glMol.loadMolecule();
+			}
+			_this.panel.setLoading(false);
+		});
+		adapter.onError.attach(function(sender, data) {
+			_this.panel.setLoading(&quot;Not available&quot;);
+		});
+		adapter.getAbinitioPDBContentBySuperpositionList(superpositions);
+	} else {
+		this.webGLNotAvailable();
+	}
+};
+
+
+
+
+AlignedSuperpositionPDBViewer.prototype.draw = PDBViewer.prototype.draw;
+AlignedSuperpositionPDBViewer.prototype.getBar = PDBViewer.prototype.getBar;
+AlignedSuperpositionPDBViewer.prototype.getCanvas = PDBViewer.prototype.getCanvas;
+AlignedSuperpositionPDBViewer.prototype.getDownload = PDBViewer.prototype.getDownload;
+AlignedSuperpositionPDBViewer.prototype.getMenu = PDBViewer.prototype.getMenu;
+AlignedSuperpositionPDBViewer.prototype.getOpacity = PDBViewer.prototype.getOpacity;
+AlignedSuperpositionPDBViewer.prototype.getPanel = PDBViewer.prototype.getPanel;
+AlignedSuperpositionPDBViewer.prototype.getTbar = PDBViewer.prototype.getTbar;
+AlignedSuperpositionPDBViewer.prototype.getTextAreaId = PDBViewer.prototype.getTextAreaId;
+AlignedSuperpositionPDBViewer.prototype.getTitle = PDBViewer.prototype.getTitle;
+AlignedSuperpositionPDBViewer.prototype.refresh = PDBViewer.prototype.refresh;
+AlignedSuperpositionPDBViewer.prototype.webGLNotAvailable = PDBViewer.prototype.webGLNotAvailable;
+
+function AlignedSuperpositionPDBViewer(args) {
+	this.width = 550;
+	this.height = 500;
+	if (args != null) {
+		if (args.actions != null) {
+			this.actions = args.actions;
+		}
+	}
+
+	var _this = this;
+	this.form = new BufferForm();
+	this.onSuccess = new Event();
+	PDBViewer.prototype.constructor.call(this, args);
+};
+
+AlignedSuperpositionPDBViewer.prototype.refresh = function(superpositions) {
+	var _this = this;
+	if (BUI.isWebGLEnabled()) {
+		this.models = superpositions;
+		
+		_this.panel.setLoading(&quot;Rendering PDB&quot;);
+		
+
+		var adapter = new BiosaxsDataAdapter();
+		adapter.onError.attach(function(sender, pdbContent){
+			console.log(sender);
+		});
+		adapter.onSuccess.attach(function(sender, data){
+			var superposition = data.superpositions[0][superpositions[0]];
+			document.getElementById(_this.id).innerHTML = &quot;&quot;;
+			_this.glMol = new GLmol(_this.id, false, false, superposition.apriori.data);
+			_this.glMol.addSuperpositionXYZ(superposition.aligned.XYZ, &quot;0xFFFFFF&quot;, 0.3, 1);
+			
+			var view = _this.glMol.getView();
+			_this.glMol.setView(view);
+   
+			
+			_this.panel.setLoading(false);
+		});
+		if (superpositions != null){
+			if (superpositions.length != 0){
+				adapter.getDataPDB([], superpositions);
+			}
+		}
+		
+		
+		
+	} else {
+		this.webGLNotAvailable();
+	}
+};
+
+
+
+
+
+
+
+StructurePDBViewer.prototype.draw = PDBViewer.prototype.draw;
+StructurePDBViewer.prototype.getBar = PDBViewer.prototype.getBar;
+StructurePDBViewer.prototype.getCanvas = PDBViewer.prototype.getCanvas;
+StructurePDBViewer.prototype.getDownload = PDBViewer.prototype.getDownload;
+StructurePDBViewer.prototype.getMenu = PDBViewer.prototype.getMenu;
+StructurePDBViewer.prototype.getOpacity = PDBViewer.prototype.getOpacity;
+StructurePDBViewer.prototype.getPanel = PDBViewer.prototype.getPanel;
+StructurePDBViewer.prototype.getTbar = PDBViewer.prototype.getTbar;
+StructurePDBViewer.prototype.getTextAreaId = PDBViewer.prototype.getTextAreaId;
+StructurePDBViewer.prototype.getTitle = PDBViewer.prototype.getTitle;
+StructurePDBViewer.prototype.refresh = PDBViewer.prototype.refresh;
+StructurePDBViewer.prototype.webGLNotAvailable = PDBViewer.prototype.webGLNotAvailable;
+
+function StructurePDBViewer(args) {
+	this.width = 550;
+	this.height = 500;
+	if (args != null) {
+		if (args.actions != null) {
+			this.actions = args.actions;
+		}
+	}
+
+	var _this = this;
+	this.form = new BufferForm();
+	this.onSuccess = new Event();
+	PDBViewer.prototype.constructor.call(this, args);
+};
+
+StructurePDBViewer.prototype.refresh = function(structures) {
+	var _this = this;
+	if (BUI.isWebGLEnabled()) {
+		this.models = structures;
+		_this.panel.setLoading(&quot;Rendering&quot;);
+		
+		var adapter = new BiosaxsDataAdapter();
+		adapter.onSuccess.attach(function(sender, pdbContent){
+			document.getElementById(_this.getTextAreaId()).innerHTML = pdbContent;
+			var glmol02 = new GLmol(_this.id);
+			
+			_this.panel.setLoading(false);
+		});
+		adapter.onError.attach(function(sender, data) {
+			_this.panel.setLoading(&quot;Not available&quot;);
+		});
+		adapter.getDataPDB(models, []);
+	} else {
+		this.webGLNotAvailable();
+	}
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
