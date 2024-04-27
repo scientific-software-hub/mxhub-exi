@@ -33,10 +33,10 @@ function PrepareMainView(args) {
             _this.loadSampleChangerView.sampleChangerName = "";
             _this.save("sampleChangerName","");     
             if (dewar.shippingStatus == "processing"){
-                if (EXI.credentialManager.getSiteName().startsWith("MAXIV")){
-                    _this.updateStatus(dewar.shippingId, "at_MAXIV");
+                if(EXI.credentialManager.getSiteName().startsWith("DESY")){
+                    _this.updateStatus(dewar.shippingId, "at_DESY");
                 } else {
-                    _this.updateStatus(dewar.shippingId, "at_ESRF");
+                    _this.updateStatus(dewar.shippingId, "at_FACILITY");
                 }
 
             } 

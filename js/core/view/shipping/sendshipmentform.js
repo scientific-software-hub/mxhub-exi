@@ -46,7 +46,7 @@ SendShipmentForm.prototype.save = function(){
         }
         this.shipment.deliveryAgentShippingDate = moment().toDate();
         this.shipment.deliveryAgentDeliveryDate = date.toDate();
-        this.shipment.shippingStatus = "sent to ESRF";
+        this.shipment.shippingStatus = "sent to DESY";
         var onSuccess = function (sender) {
             _this.onSend.notify();
             $("#" + _this.id + "-modal").modal('hide');
