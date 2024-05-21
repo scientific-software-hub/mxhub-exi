@@ -22,6 +22,9 @@ module.exports = function(grunt) {
                 },
 
                 concat : {
+                    options: {
+                        sourceMap: true
+                    },
                     prod : {
                         files : {
                             'min/ispyb-client.js' : [ "js/ispyb-client/**/*js" ],
@@ -64,7 +67,11 @@ module.exports = function(grunt) {
                 },
                 uglify : {
                     prod : {
-                        options : { beautify:true },
+                        options : {
+                            beautify:true,
+                            sourceMap: true,
+                            sourceMapIncludeSources: true
+                        },
 
                         files : {
                            'min/exi.min.js' : ['min/exi.tools.js', 'min/ispyb-client.js', 'min/exi.js', 'min/exi.mx.js', 'min/exi.saxs.js', 'min/exi.em.js',
@@ -84,7 +91,8 @@ module.exports = function(grunt) {
                     prod : {
                         options : {
                             shorthandCompacting : true,
-                            roundingPrecision : -1
+                            roundingPrecision : -1,
+                            sourceMap: true
                         },
                         files : {
                             'min/exi.min.css' : [
