@@ -68,23 +68,6 @@ MXManagerMenu.prototype.getMenuItems = function() {
 			cls : 'ExiSAXSMenuToolBar',
 			menu : this.getHelpMenu()
 		},
-
-		{
-			text : this._convertToHTMLWhiteSpan("<button type='button' class='btn btn-default'> <span class='glyphicon glyphicon-refresh'></span> " +synchTxt +"</button>"),
-			cls : 'ExiSAXSMenuToolBar',
-			handler : function(){
-				EXI.setLoadingMainPanel("Synch is running");
-				var onSuccess = function(sender, data){
-					EXI.setLoadingMainPanel(false);
-				}
-				var onError = function(sender,data){
-					EXI.setLoadingMainPanel(false);
-				}
-
-				EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).proposal.proposal.synchSMIS();
-
-			}
-		},
 		'->',
 		{
 			xtype : 'textfield',

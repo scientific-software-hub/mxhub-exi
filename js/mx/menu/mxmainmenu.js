@@ -58,32 +58,6 @@ MXMainMenu.prototype.getMenuItems = function() {
             disabled : true,
 			menu : this.getOnlineDataAnalisysMenu()
 		},
-
-		{
-			text : this._convertToHTMLWhiteSpan("<button type='button' class='btn btn-default'> <span class='glyphicon glyphicon-refresh'></span> " +synchTxt +"</button>"),
-			cls : 'ExiSAXSMenuToolBar',
-			handler : function(){
-				EXI.setLoadingMainPanel("Synch is running");
-				var onSuccess = function(sender, data){
-					EXI.setLoadingMainPanel(false);
-				}
-				var onError = function(sender,data){
-					EXI.setLoadingMainPanel(false);
-				}
-
-                if (EXI.credentialManager.hasActiveProposal()) {
-                    EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).proposal.proposal.synchSMIS();
-                } else {
-                    if (EXI.credentialManager.getSiteName().startsWith("MAXIV")){
-                        EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).proposal.proposal.synchSMISByUsername();
-                    } else {
-                        EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).proposal.proposal.synchSMIS();
-                    }
-                }
-
-
-			}
-		},
 		'->',
 		{
 			xtype : 'textfield',
