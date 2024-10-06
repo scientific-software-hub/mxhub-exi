@@ -17,6 +17,13 @@
 
 
 <!-- JS -->
+    <script src="../dependency/elastic-apm-rum.umd.min-5.16.1.js" crossorigin></script>
+    <script>
+        elasticApm.init({
+            serviceName: 'exi',
+            serverUrl: '/apm',
+        })
+    </script>
 <script type="text/javascript" src="../dependency/ext/build/bootstrap.js"></script>
 <script type="text/javascript" src="../dependency/ext/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
 
