@@ -79,7 +79,7 @@ ProposalManager.prototype.getBufferColors = function() {
 * @method getLabcontacts
 */
 ProposalManager.prototype.getLabcontacts = function() {
-	var get = this.get();
+	var get = this.get(true); // force update of proposal's lab contacts
 	if (get) {
 		return this.get()[0].labcontacts;
 	} else {
