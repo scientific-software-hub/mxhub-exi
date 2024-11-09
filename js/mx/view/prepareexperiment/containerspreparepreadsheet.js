@@ -166,29 +166,17 @@ ContainerPrepareSpreadSheet.prototype.getPanel = function() {
                 type: 'autocomplete',
                 filter: 'true',
                 flex: 1,
-                source: EXI.credentialManager.getBeamlineNames()
+                source: 'P11'//EXI.credentialManager.getBeamlineNames()
             },
              {
                 header: 'Beamline',
                 dataIndex: 'beamlineCombo',
                 type: 'text',
                 flex: 1,
+                 // hidden: true,
                 readOnly: true,
                 renderer : function(value, metaData, record, rowIndex){
-                    var beamlines = _.map(EXI.credentialManager.getBeamlinesByTechnique("MX"),"name");
-                    beamlines = _.union(beamlines,[record.data.beamlineName]);
-                    _.remove(beamlines, function (beamline) {return _.indexOf(['ID14-4', 'BM14U', 'ID30A-2'], beamline) !== -1});
-                    var templateData = {
-                                            beamlines   : beamlines,
-                                            selected    : record.data.beamlineName,
-                                            containerId : record.data.containerId,
-                                            id          : _this.id
-                                        }
-                    var html = "";
-                    dust.render("beamlines.combobox.template", templateData, function(err, out){
-                        html = out;
-                    });
-                    return html;
+                    return record.data.beamlineName;
                 }
                 
             },
@@ -390,7 +378,7 @@ ContainerPrepareSpreadSheet.prototype.load = function(containers, sampleChangerW
                 containerCode : container.containerCode,
                 containerType : containerType,
                 sampleCount : container.sampleCount,
-                beamlineName : container.beamlineLocation,
+                beamlineName : container.beamlineName,
                 sampleChangerLocation : container.sampleChangerLocation,
                 dewarId : container.dewarId,
                 containerId : container.containerId,
@@ -407,13 +395,7 @@ ContainerPrepareSpreadSheet.prototype.load = function(containers, sampleChangerW
     }
 
     this.store.loadData(data);
-    //Define listener for beamline combobox
-    $('.beamlines-select').change(function(sender) {
-        var beamline = $("#" + _this.id + "-" + sender.target.value + " option:selected").text();
-        var containerId = sender.target.value;
-        _this.updateBeamlineName(containerId,beamline);
-        _this.onBeamlineChanged.notify(beamline);
-    });
+
     //Check if any row should be selected
     if (this.preselectedRowContainerId) {
         var row = _.filter(this.panel.getStore().data.items,function (o) {return o.data.containerId == parseInt(_this.preselectedRowContainerId);});
@@ -457,19 +439,6 @@ ContainerPrepareSpreadSheet.prototype.updateSampleChangerLocation = function (co
     }
 };
 
-ContainerPrepareSpreadSheet.prototype.updateBeamlineName = function (containerId, beamline) {
-    var _this = this;
-
-    var onSuccess = function(sender, containers) {
-        _this.preselectedRowContainerId = containerId
-        _this.loadProcessingDewars();
-    };
-    var onError = function(sender, error) {        
-        EXI.setError("Ops, there was an error");
-    };
-
-    EXI.getDataAdapter({onSuccess : onSuccess, onError:onError}).proposal.dewar.updateSampleLocation([containerId], [beamline], [""]);
-};
 
 /**
 * Returns the row with the given containerId
