@@ -171,6 +171,8 @@ CSVPuckFormView.prototype.addProtein = function(){
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
 */
 CSVPuckFormView.prototype.save = function() {
+	var forceUpdate = true;
+	EXI.proposalManager.getProteins(forceUpdate);
     var _this = this;
     var parcels = this.containerSpreadSheet.getParcels();   
 
