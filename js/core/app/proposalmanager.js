@@ -239,8 +239,7 @@ ProposalManager.prototype.getProteins = function(forceUpdate) {
 * @method getProteinById
 */
 ProposalManager.prototype.getProteinById = function(proteinId) {
-	var forceUpdate = true;
-	return _.find(this.getProteins(forceUpdate), function(o) { return o.proteinId == proteinId; });
+	return _.find(this.getProteins(), function(o) { return o.proteinId == proteinId; });
 };
 
 /**
@@ -261,8 +260,7 @@ ProposalManager.prototype.getLigands = function() {
 * @method getProteinByAcronym
 */
 ProposalManager.prototype.getProteinByAcronym = function(acronym) {
-	var forceUpdate = true;
-	return _.filter(this.getProteins(forceUpdate), function(o) { return o.acronym == acronym; });
+	return _.filter(this.getProteins(), function(o) { return o.acronym == acronym; });
 };
 
 /**
