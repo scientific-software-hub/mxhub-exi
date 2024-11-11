@@ -48,7 +48,8 @@ ProteinController.prototype.init = function() {
 			EXI.setLoadingMainPanel("Searching for proteins");
 			var main = new ProteinListMainView();
 			EXI.addMainPanel(main);			
-			var onSuccessProtein = function(sender, proteins) {				
+			var onSuccessProtein = function(sender, proteins) {
+				EXI.proposalManager.get(true);
 				main.load(proteins);
 				EXI.setLoadingMainPanel(false);
 			};

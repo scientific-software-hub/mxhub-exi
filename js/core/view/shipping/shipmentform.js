@@ -131,7 +131,7 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 
         // Only the manager can delete a shipment if is not processing or has datacollection associated to it
 		$("#" + _this.id + "-delete-button").addClass("disabled");
-		if (EXI.credentialManager.getSiteName().startsWith("MAXIV") && EXI.credentialManager.getCredentials()[0].isManager()){
+		if (EXI.credentialManager.getSiteName().startsWith("DESY") && EXI.credentialManager.getCredentials()[0].isManager()){
 		    if (!this.hasDataCollections(shipment) && shipment.shippingStatus != this.processingStatus){
 		        $("#" + _this.id + "-delete-button").removeClass("disabled");
 		    }
