@@ -57,7 +57,7 @@ DewarListSelectorGrid.prototype.load = function(dewars){
         }
     });
         
-    this.panel.setTitle(data.length + " shipments candidates for " + EXI.proposalManager.getProposals()[0].code + EXI.proposalManager.getProposals()[0].number);    
+    this.panel.setTitle(data.length + " shipments candidates for " + EXI.proposalManager.getProposals()[0].proposalCode + EXI.proposalManager.getProposals()[0].proposalNumber);
 
     /** Parsing dates */
     

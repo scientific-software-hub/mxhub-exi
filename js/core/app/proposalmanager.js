@@ -198,7 +198,7 @@ ProposalManager.prototype.getProposals = function() {
 	var result = [];
 	if (proposals) {
 		for (var i = 0; i < proposals.length; i++) {
-			proposals[i].proposal[0]["proposal"] = proposals[i].proposal[0].code + proposals[i].proposal[0].number;
+			proposals[i].proposal[0]["proposal"] = proposals[i].proposal[0].proposalCode + proposals[i].proposal[0].proposalNumber;
 			result = result.concat(proposals[i].proposal);
 		}
 	}

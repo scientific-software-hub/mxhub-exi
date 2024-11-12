@@ -303,7 +303,7 @@ StockSolutionGrid.prototype.load = function(stockSolutions) {
 		if (EXI.proposalManager.getBufferById(stockSolution.bufferId) != null){
 			stockSolution.buffer = EXI.proposalManager.getBufferById(stockSolution.bufferId).acronym;
 		}
-		stockSolution.proposal = EXI.proposalManager.getProposalById(stockSolution.proposalId).code + EXI.proposalManager.getProposalById(stockSolution.proposalId).number;
+		stockSolution.proposal = EXI.proposalManager.getProposalById(stockSolution.proposalId).proposalCode + EXI.proposalManager.getProposalById(stockSolution.proposalId).proposalNumber;
 		if (EXI.proposalManager.getMacromoleculeById(stockSolution.macromoleculeId) != null){
 			stockSolution.macromolecule = EXI.proposalManager.getMacromoleculeById(stockSolution.macromoleculeId).acronym;
 		}
