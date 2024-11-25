@@ -469,6 +469,7 @@ LoadSampleChangerView.prototype.reloadSampleChangerWidget = function () {
 */
 LoadSampleChangerView.prototype.cleanPreviewPanel = function () {
     this.previewPanelView.clean();
+    this.previewPanelView.panel.destroy();
     if (this.previewPanelView.getPanel()){
         if(this.previewPanelView.getPanel().body){
             this.verticalPanel.remove(this.previewPanelView.getPanel());
