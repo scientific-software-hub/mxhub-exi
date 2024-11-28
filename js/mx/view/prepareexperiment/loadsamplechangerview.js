@@ -331,7 +331,7 @@ LoadSampleChangerView.prototype.load = function (containers) {
         this.containers = containers;
         for (var i = 0 ; i < containers.length ; i++){
             var container = containers[i];
-            if (container.beamlineLocation == this.sampleChangerWidget.beamlineName){
+            if (container.beamlineName == this.sampleChangerWidget.beamlineName){
                 var sampleChangerLocation = container.sampleChangerLocation;
                 if (sampleChangerLocation != "" && sampleChangerLocation != null){
                     var puckId = this.sampleChangerWidget.convertSampleChangerLocationToId(Number(sampleChangerLocation));

@@ -30,7 +30,7 @@ ProteinDataAdapter.prototype.getProteinStatsByProposalId= function(){
 * @method saveProtein
 */
 ProteinDataAdapter.prototype.saveProtein= function(protein){
-	 this.post(('/{token}/proposal/{proposal}/mx/protein/save'), protein);;
+	 this.post(('/{token}/proposal/{proposal}/mx/protein/save'), protein);
 };
 
 

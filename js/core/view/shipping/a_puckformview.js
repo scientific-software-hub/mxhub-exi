@@ -64,7 +64,7 @@ PuckFormView.prototype.load = function(containerId, shippingId, shippingStatus) 
 			} else {
 				$.notify("ERROR: The capacity of the container is not defined.", "error");
 			}
-            Ext.getCmp(_this.id + "puck_beamline").setValue(_this.puck.beamlineLocation);
+            Ext.getCmp(_this.id + "puck_beamline").setValue(_this.puck.beamlineName);
             Ext.getCmp(_this.id + "puck_sampleChangerLocation").setValue(_this.puck.sampleChangerLocation);
             Ext.getCmp(_this.id + "puck_status").setValue(_this.puck.containerStatus);                
         }

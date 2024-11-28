@@ -306,7 +306,7 @@ ParcelPanel.prototype.addContainerToDewar = function(containerVO) {
 			container.sampleChangerLocation = _this.dewar.storageLocation;
 			if (_this.shipment) {
 				if (_this.shipment.sessions && _this.shipment.sessions.length > 0) {
-					container.beamlineLocation = _this.shipment.sessions[0].beamlineName;
+					container.beamlineName = _this.shipment.sessions[0].beamlineName;
 				}
 			}
 			container.sampleVOs = [];
