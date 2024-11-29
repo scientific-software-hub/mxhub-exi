@@ -393,7 +393,14 @@ LoadSampleChangerView.prototype.getPanel = function () {
             align: 'center',
             pack: 'center'
         },
-        items : [{html : "<div id='" + this.id + "-notifications' class='container-fluid' align='center' ><div class='row' style='width:370px;'><div class='col-md-9'><span id='" + this.id + "-scw-label' class='" + this.id + "-lab' style='width:500px;font-size:20px;font-weight:100;'></span></div><div class='col-md-2'><button id='" + this.id + "-unloadSC-button' type='button' class='btn btn-default btn-xs' style='background:rgb(68, 68, 68);color: #ffffff;'><b>Unload SC</b></button></div></div></div>"},
+        items : [{html : "<div id='" + this.id + "-notifications' class='container-fluid' align='center' >" +
+                "<div class='row' style='width:370px;'>" +
+                "<div class='col-md-9'>" +
+                "<span id='" + this.id + "-scw-label' class='" + this.id + "-lab' style='width:500px;font-size:20px;font-weight:100;'>" +
+                "</span>" +
+                "</div>" +
+                "</div>" +
+                "</div>"},
                     this.widgetContainer    
         ]
     });
