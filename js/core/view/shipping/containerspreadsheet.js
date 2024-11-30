@@ -321,7 +321,7 @@ ContainerSpreadSheet.prototype.getHeader = function() {
                                                                         width : 100,
                                                                         type: 'autocomplete',
                                                                         filter: 'true',
-                                                                        source: [ "", "MXPressE","MXPressF", "MXPressO", "MXPressI", "MXPressE_SAD", "MXScore", "MXPressM", "MXPressP", "MXPressP_SAD" ]
+                                                                        source: [ "Default", "OSC"]
                                                                     }
             },
 			{ text :'Aimed<br /> resolution',  id :'Aimed resolution', column : {width : 60}},
