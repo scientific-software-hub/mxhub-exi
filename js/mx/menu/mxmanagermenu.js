@@ -36,7 +36,13 @@ MXManagerMenu.prototype.getMenuItems = function() {
 	return [
     	this.getHomeItem(homeLabel),
     	this.getShipmentItem(),
-    	{
+		{
+			text : this._convertToHTMLWhiteSpan("Proteins & Crystals <sub style='font-size:10px;color:orange'>NEW</sub>"),
+			cls : 'ExiSAXSMenuToolBar',
+			menu : this.getProteinCrystalsMenu()
+		},
+
+		{
                 text : this._convertToHTMLWhiteSpan("Prepare Experiment"),
 				cls : 'ExiSAXSMenuToolBar',
                 handler : function(){
@@ -44,12 +50,6 @@ MXManagerMenu.prototype.getMenuItems = function() {
 
 				}
 		},
-
-		{
-                text : this._convertToHTMLWhiteSpan("Proteins & Crystals <sub style='font-size:10px;color:orange'>NEW</sub>"),
-                cls : 'ExiSAXSMenuToolBar',
-                menu : this.getProteinCrystalsMenu()
-        },
 
 		{
 				text : this._convertToHTMLWhiteSpan("Data Explorer"),
