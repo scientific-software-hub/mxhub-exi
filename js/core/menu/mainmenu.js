@@ -55,23 +55,23 @@ MainMenu.prototype.getHomeItem = function(homeLabel) {
 MainMenu.prototype.getShipmentItem = function() { 
 	var _this = this;
 
-	function getBiosaxsMenu() {
-		var _this = this;
-		function onItemCheck(item, checked) {
-			if (item.text == "Stock Solutions") {
-				location.hash = "/saxs/stocksolution/nav";
-			}
-		}
-
-		return Ext.create('Ext.menu.Menu', {
-			items : [ 
-						{
-							text : 'Stock Solutions',
-							icon : '../images/icon/testtube.png',
-							handler : onItemCheck 
-						} 
-			] });
-	}
+	// function getBiosaxsMenu() {
+	// 	var _this = this;
+	// 	function onItemCheck(item, checked) {
+	// 		if (item.text == "Stock Solutions") {
+	// 			location.hash = "/saxs/stocksolution/nav";
+	// 		}
+	// 	}
+	//
+	// 	return Ext.create('Ext.menu.Menu', {
+	// 		items : [
+	// 					{
+	// 						text : 'Stock Solutions',
+	// 						icon : '../images/icon/testtube.png',
+	// 						handler : onItemCheck
+	// 					}
+	// 		] });
+	// }
 
 	function getLabContactsMenu() {
 		var _this = this;
@@ -192,12 +192,12 @@ MainMenu.prototype.getShipmentItem = function() {
         disabled : false,
 		menu : Ext.create('Ext.menu.Menu', {
 			items : [ 
-						{
-						    id   : 'biosax_item',
-							text : 'BioSAXS',
-							icon : '../images/icon/macromolecule.png',
-							menu: getBiosaxsMenu()
-						}, 
+						// {
+						//     id   : 'biosax_item',
+						// 	text : 'BioSAXS',
+						// 	icon : '../images/icon/macromolecule.png',
+						// 	menu: getBiosaxsMenu()
+						// },
 						{
 						    id   : 'addresses_item',
 							text : 'Manage shipping addresses',
@@ -214,11 +214,11 @@ MainMenu.prototype.getShipmentItem = function() {
 					 listeners : {
                                      'beforeshow' : function(menu) {
                                          if (EXI.credentialManager.hasActiveProposal()) {
-                                            Ext.getCmp('biosax_item').enable();
+                                            // Ext.getCmp('biosax_item').enable();
                                             Ext.getCmp('addresses_item').enable();
                                             Ext.getCmp('shipments_item').enable();
                                          } else {
-                                            Ext.getCmp('biosax_item').disable();
+                                            // Ext.getCmp('biosax_item').disable();
                                             Ext.getCmp('addresses_item').disable();
                                             Ext.getCmp('shipments_item').disable();
                                          }
