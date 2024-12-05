@@ -153,6 +153,10 @@ ShipmentEditForm.prototype.saveShipment = function() {
 		BUI.showError("Name field is mandatory");
 		return;
 	}
+	if (json.sessionId == "") {
+		BUI.showError("Session field is mandatory. Please, choose the date.");
+		return;
+	}
 
 	if (json.sendingLabContactId == null) {
 		BUI.showError("Lab contact for sending field is mandatory");
