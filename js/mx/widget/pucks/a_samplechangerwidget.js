@@ -15,7 +15,7 @@ function SampleChangerWidget (args) {
 	this.label = '';
 	
 	this.sampleChangerCapacity = 0; //This is set in each sample changer type
-	this.beamlineName = "";
+	this.beamlineName = "P11";
 
     this.data = {};
 	if (args) {

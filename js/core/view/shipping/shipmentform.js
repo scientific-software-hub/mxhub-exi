@@ -69,7 +69,7 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 	var fromData = $.extend(EXI.proposalManager.getLabcontacts(), [{ cardName : 'Same as for shipping to beamline', labContactId : -1}, { cardName : 'No return requested', labContactId : 0}]);
 
     var html = "";
-	var beamlineName = "";
+	var beamlineName = "P11";
 	var startDate = "";
 	var reimbText = "";
 	var fedexCode = "";
