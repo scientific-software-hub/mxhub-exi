@@ -92,7 +92,7 @@ ReimbForm.prototype.getDeclarationText = function(shipment, dewar){
 	
 	if (shipment){
 		startDate = moment(shipment.sessions[0].startDate).format("DD-MM-YYYY");
-		this.fedexCode = shipment.sessions[0].proposalVO.code + "-" + shipment.sessions[0].proposalVO.number + "/" 
+		this.fedexCode = shipment.sessions[0].proposalVO.proposalCode + "-" + shipment.sessions[0].proposalVO.proposalNumber + "/"
 		+ shipment.sessions[0].beamlineName + "/" + startDate;
 	}
 	boxLabel1 = '<br>By setting this parcel to reimbursed, the labels that will be generated for sending the parcel by courier will use the ESRF account. '

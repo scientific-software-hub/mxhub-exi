@@ -83,7 +83,7 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 			beamlineName = shipment.sessions[0].beamlineName;
 			nbReimbDewars = shipment.sessions[0].nbReimbDewars;
 			startDate = moment(shipment.sessions[0].startDate).format("DD-MM-YYYY");			
-			fedexCode = shipment.sessions[0].proposalVO.code + "-" + shipment.sessions[0].proposalVO.number + "/" + beamlineName+ "/" + startDate;
+			fedexCode = shipment.sessions[0].proposalVO.proposalCode + "-" + shipment.sessions[0].proposalVO.proposalNumber + "/" + beamlineName+ "/" + startDate;
 		}
 	}
 
