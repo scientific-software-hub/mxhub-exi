@@ -42,8 +42,8 @@ LabcontactDataAdapter.prototype.getLabContactById = function(labContactId){
 */
 LabcontactDataAdapter.prototype.saveLabContact = function(labcontact){
     var url = ('/{token}/proposal/{proposal}/shipping/labcontact/save');
-	this.post(url, {
-		labcontact : JSON.stringify(labcontact)
+	this.post(url, JSON.stringify(labcontact), {
+		contentType: "application/json",
 	});
 };
 

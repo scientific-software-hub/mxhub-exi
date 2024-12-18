@@ -114,31 +114,13 @@ DataAdapter.prototype.get = function(url){
 * @param {String} url Relative path to the resource to be access. For instance: "/{token}/proposal/{proposal}/saxs/buffer/list"
 * @param {String} data It is a string with the data to be sent within the POST call
 */
-DataAdapter.prototype.post = function(url, data){
+DataAdapter.prototype.post = function(url, data, parameters = {}){
 	var _this = this;
 	
 	 url = this.getUrl(url);
 	 $.ajax({
 		  type: "POST",
 		  async : this.async,
-          /* statusCode: {
-                   401 : function(){     
-                                        
-		            	_this.onError.notify('401 Unauthorized');
-		            },
-		            404 : function(){
-                        
-		            	_this.onError.notify('404 : not found');
-		            },
-		            415 : function(){
-                        
-		                _this.onError.notify('415 : type not allowed');
-		            },
-		            500 : function(){
-                        
-		                _this.onError.notify('500 : internal server error');
-		            }
-		        },*/
 		  url: url,
 		  data: data,
 		  success: function(data){ 
@@ -149,7 +131,8 @@ DataAdapter.prototype.post = function(url, data){
               
 			  _this.onError.notify(error);
 			 
-		  }
+		  },
+		  ...parameters,
 	});
 	 
 };
