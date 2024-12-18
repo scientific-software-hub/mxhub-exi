@@ -48,9 +48,9 @@ This section describes how to enter information about the parcels, containers an
 
 ### Adding New Protein and Creating New Sample
 If you are sending crystals of a new protein, it is important that you create an entry for the protein, since you will not be able to upload or save information from an unknown sample. To create a protein follow these steps:
-    * Click on **Proteins and Crystals** in the upper menu bar.
-    * Select **Add new protein**.
-    * You can also display the **List** to check is the protein is already present.
+* Click on **Proteins and Crystals** in the upper menu bar.
+* Select **Add new protein**.
+* You can also display the **List** to check is the protein is already present.
 ![](images/CreateSample.png)
 
 Enter the *Protein Name* and *Acronym* in the dialog box and click **Save**.
@@ -63,7 +63,7 @@ To add containers and sample information go back to your shipment by selecting *
 A practical way to enter information about the parcels, containers and samples included in the shipment is by uploading a CSV file.
 ![](images/FillSamples.png)
 
-The upload menu is accessed by clicking the *Import from CSV* button in the shipment card. The example [](Shipment.csv) file will generate a parcel called Dewar1 containing seven Unipucks fully loaded with crystals of different proteins.
+The upload menu is accessed by clicking the *Import from CSV* button in the shipment card. The example [Shipment.csv](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/Shipment.csv) file will generate a parcel called Dewar1 containing seven Unipucks fully loaded with crystals of different proteins.
 
 After saving the sample list, you can edit the information by going to the shipment page, clicking on the containers and selecting **Edit**. That will display the sample list for that container. 
 
@@ -88,9 +88,9 @@ Click on the Unipuck and select **Edit**. This will direct to the spreadsheet fo
 ![](images/FillSamplesInTableManually.png)
 
 In the table:
-    * Select the protein from the drop down menu. If it is not there, create a new sample as either from the **Proteins and Crystals** menu as described above or by clicking on the **Add Protein** button in the container sample list spreadsheet form. Refresh the page to show the newly created protein.
-    * Enter a sample name. It must be unique for each sample of each protein.
-    * After filling up the sample information, click on **Shipment** button above the spreadsheet and reply *Yes* to save the changes to the container or click on **Save**
+* Select the protein from the drop down menu. If it is not there, create a new sample as either from the **Proteins and Crystals** menu as described above or by clicking on the **Add Protein** button in the container sample list spreadsheet form. Refresh the page to show the newly created protein.
+* Enter a sample name. It must be unique for each sample of each protein.
+* After filling up the sample information, click on **Shipment** button above the spreadsheet and reply *Yes* to save the changes to the container or click on **Save**
  button.
  
 ## Send the Shipment to DESY
