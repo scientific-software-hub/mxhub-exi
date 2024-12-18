@@ -176,7 +176,7 @@ Ext.onReady(function() {
     function makeLabel (ns, cls, name) {
         var docs = '../..';
         //docs = '../../../.build/sdk'; // for development/testing
-        return '<a href="'+docs+'/docs/#!/api/'+ns+'.'+cls+'-cfg-'+name+'" target="docs" tabIndex="-1">' + cls + ' ' + name + '</a>';
+        return ''+docs+''+ns+'<a href="/documentation/#!/api/.-cfg-" target="docs" tabIndex="-1">'+cls+''+name+'' + cls + ' ' + name + '</a>';
     }
 
     var logPanel = new Ext.Panel({
