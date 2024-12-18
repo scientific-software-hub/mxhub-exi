@@ -128,3 +128,7 @@ Inform the expected pick-up date and time at least a day in advance.
 If you are sending to and from **outside EU** please enclose the Proforma invoice.
 
 
+---
+This documentation is written with the support of Helena Taberman.
+
+
