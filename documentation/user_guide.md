@@ -63,7 +63,7 @@ To add containers and sample information go back to your shipment by selecting *
 A practical way to enter information about the parcels, containers and samples included in the shipment is by uploading a CSV file.
 ![](images/FillSamples.png)
 
-The upload menu is accessed by clicking the *Import from CSV* button in the shipment card. The example Shipment.csv file ![](Shipment.csv) will generate a parcel called Dewar1 containing seven Unipucks fully loaded with crystals of different proteins.
+The upload menu is accessed by clicking the *Import from CSV* button in the shipment card. The example [](Shipment.csv) file will generate a parcel called Dewar1 containing seven Unipucks fully loaded with crystals of different proteins.
 
 After saving the sample list, you can edit the information by going to the shipment page, clicking on the containers and selecting **Edit**. That will display the sample list for that container. 
 
@@ -100,10 +100,10 @@ Click on the *Print labels* icon to the right of each parcel to generate a PDF-f
 If everything is correct, print the labels. Please, attach the dewar label and the shipping label on your dewars, and enclose the return label within the dewar box with other return forms (courier waybill or invoice).
 
 If you are sending to and from **outside EU** and need customs declarations:
-    * You need to fill in a Proforma invoice to send along with the shipment.
-    * Be sure to use a proper description of the content of the shipment, as an example: “Dry shipper containing small frozen protein crystals for scientific experiments. Crystals are non-hazardous. Dewar contains non-flammable gas (liquid N2).”
+* You need to fill in a Proforma invoice to send along with the shipment.
+* Be sure to use a proper description of the content of the shipment, as an example: “Dry shipper containing small frozen protein crystals for scientific experiments. Crystals are non-hazardous. Dewar contains non-flammable gas (liquid N2).”
 
-The button *Send Shipment* to the facility will be activated once you print the labels (you need to refresh the page for this). When you click it, the status of the dewar will change to “Mark shipment at facility”. This will let beamline staff know that the shipment is on its way.
+The button *Send Shipment* to the facility will be activated once you print the labels (you need to refresh the page for this). When you click it, the status of the dewar will change to *“Mark shipment at facility”*. This will let beamline staff know that the shipment is on its way.
 
 When the dewar arrives at DESY, staff will click the button again and the shipment status will be set to *“Send shipment to the user”* to wait for the return transport.
 
