@@ -60,12 +60,12 @@ ProteinEditForm.prototype.saveProtein = function() {
         proteinId = 0;
     }
 
-    if (this.protein.name == null) {
+    if (this.protein.name == null || this.protein.name =="") {
         BUI.showError("Protein name is mandatory");
         return;
     }
 
-    if (this.protein.acronym == null) {
+    if (this.protein.acronym == null || this.protein.acronym =="") {
         BUI.showError("Protein acronym is mandatory");
         return;
     }
