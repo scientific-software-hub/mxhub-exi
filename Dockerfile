@@ -1,10 +1,7 @@
 #TODO use multi stage build
 
 # Use the official Nginx base image
-FROM nginx:1.25.3-perl-alpine
-
-# Set a non-root user for running Nginx
-RUN addgroup -S nginx && adduser -S nginx -G nginx
+FROM nginx:1.25.3-alpine
 
 # Set the working directory to /usr/share/nginx/html
 WORKDIR /usr/share/nginx/html
