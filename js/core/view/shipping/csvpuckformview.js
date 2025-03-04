@@ -175,7 +175,12 @@ CSVPuckFormView.prototype.save = function() {
 	var forceUpdate = true;
 	EXI.proposalManager.getProteins(forceUpdate);
     var _this = this;
-    var parcels = this.containerSpreadSheet.getParcels();   
+    var parcels = this.containerSpreadSheet.getParcels();
+	if(parcels.length === 0){
+		$.notify("Sorry. There are no Dewars to safe! Please use Browse button to upload Dewars", "error");
+		return;
+	}
+
 
 	if (!this.containerSpreadSheet.isDataValid()){	
 		$.notify("Sorry. Your data contain errors!", "error");
