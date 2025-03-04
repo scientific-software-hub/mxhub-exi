@@ -773,7 +773,7 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 	 
         header = [
             // { text :'', id :'crystalId', column : {width : 100}}, 
-            { text : 'Parcel  <br /> Name', 	id: 'parcel', column : {width : 80, renderer: parcelDisplayCell}}, 
+            { text : 'Dewar <br /> Name', 	id: 'parcel', column : {width : 80, renderer: parcelDisplayCell}},
 			{ text : 'Container <br /> Name', 	id: 'containerCode', column : {width : 80, renderer: containerNameParameterRenderer}}, 
 			{ text : 'Container <br />Type', 	id: 'containerType', column : {width : 80, 
 																				type: 'dropdown',
