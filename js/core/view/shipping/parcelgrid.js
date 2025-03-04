@@ -244,6 +244,12 @@ ParcelGrid.prototype.edit = function(dewar) {
 		buttons : [ {
 			text : 'Save',
 			handler : function() {
+				const hasErrors = false === caseForm.panel.getForm().isValid();
+				if (hasErrors) {
+					BUI.showError("Name field is mandatory. Please, put the Name.");
+					return;
+				}
+
 				var adapter = new DataAdapter();
 				_this.panel.setLoading();
 				var dewar = caseForm.getDewar();

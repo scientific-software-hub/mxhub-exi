@@ -56,53 +56,46 @@ function AddContainerForm(args) {
 
 AddContainerForm.prototype.getPanel = function (dewar) {
     this.panel = Ext.create('Ext.form.Panel', {
-        width : this.width - 10,
-        height : this.height,
-//			cls : 'border-grid',
-//			margin : 10,
-        padding : 10,
-        buttons : this.getButtons(),
-        items : [ {
-                        xtype : 'container',
-                        margin : "2 2 2 2",
-                        collapsible : false,
-                        defaultType : 'textfield',
-                        layout : 'anchor',
-                        items : [ {
-                            xtype : 'container',
-                            margin : '5 0 5 5',
-                            layout : 'vbox',
-                            items : [ {
-                                xtype : 'textfield',
-                                fieldLabel : 'Name',
-                                name : 'code',
-                                id : this.id + 'container_code',
-                                labelWidth : 200,
-                                width : 500
-                            }
-                            ]
-                        }, 
-                        this.containerTypeComboBox.getPanel()
-            ]
-        } ]
+        width: this.width - 10,
+        height: this.height,
+        padding: 10,
+        buttons: this.getButtons(),
+        items: [{
+            margin: '5 0 5 5',
+            layout: 'vbox',
+            xtype: 'requiredtextfield',
+            fieldLabel: 'Name',
+            name: 'code',
+            id: this.id + 'container_code',
+            labelWidth: 200,
+            width: 500,
+            allowBlank: false,
+        },
+            this.containerTypeComboBox.getPanel()
+        ]
     });
     return this.panel;
 };
 
 AddContainerForm.prototype.getButtons = function () {
     var _this = this;
-    return [ {
-                text : 'Save',
-                id : this.id + "-save-button",
-                handler : function() {
-                    _this.onSave.notify(_this.getContainer());
-                }
-            }, {
-                text : 'Cancel',
-                handler : function() {
-                    _this.onCancel.notify();
-                }
-            } ]
+    return [{
+        text: 'Save',
+        id: this.id + "-save-button",
+        handler: function () {
+            const hasErrors = false === _this.panel.getForm().isValid();
+            if (hasErrors) {
+                BUI.showError("Name field is mandatory. Please, put the Name.");
+                return;
+            }
+            _this.onSave.notify(_this.getContainer());
+        }
+    }, {
+        text: 'Cancel',
+        handler: function () {
+            _this.onCancel.notify();
+        }
+    }]
 }
 
 AddContainerForm.prototype.getContainer = function () {

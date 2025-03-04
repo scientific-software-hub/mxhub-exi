@@ -356,6 +356,11 @@ ParcelPanel.prototype.showCaseForm = function() {
 	    buttons : [ {
 						text : 'Save',
 						handler : function() {
+							const hasErrors = false === caseForm.panel.getForm().isValid();
+							if (hasErrors) {
+								BUI.showError("Name field is mandatory. Please, put the Name.");
+								return;
+							}
 							_this.onSavedClick.notify(caseForm.getDewar());
 							window.close();
 							if (_this.currentTab == "content") {

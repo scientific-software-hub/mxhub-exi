@@ -83,25 +83,21 @@ CaseForm.prototype.getPanel = function(dewar, hideReimb) {
 			padding : 10,
 			height : 320,
 			items : [ {
-				xtype : 'container',
-				margin : "2 2 2 2",
-				collapsible : false,
-				defaultType : 'textfield',
-				layout : 'anchor',
-				items : [ {
-					xtype : 'container',
-					layout : 'vbox',
-					items : [ {
-						xtype : 'requiredtextfield',
-						fieldLabel : 'Name',
-						allowBlank : false,
-						name : 'code',
-						id : this.id + 'dewar_code',
-						labelWidth : 200,
-						width : 500
+				xtype: 'container',
+				margin: "2 2 2 2",
+				collapsible: false,
+				defaultType: 'textfield',
+				layout: 'anchor',
+				items: [
+					{
+						xtype: 'requiredtextfield',
+						fieldLabel: 'Name',
+						name: 'code',
+						id: this.id + 'dewar_code',
+						labelWidth: 200,
+						width: 500,
+						allowBlank: false,
 					},
-					]
-					}, 
 					this.getStorageLocationCombo(),
 					{
 						xtype : 'numberfield',
