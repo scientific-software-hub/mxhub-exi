@@ -147,8 +147,7 @@ CSVContainerSpreadSheet.prototype.isDataValid = function() {
 		var key = proteinName + "__" + sampleName;
 		if (keySampleName[key] == null){
 			keySampleName[key] = true;
-		}
-		else{
+		} else{
 			isValid = false;			
 		}
 	}
@@ -169,7 +168,7 @@ CSVContainerSpreadSheet.prototype.validateRow = function(row, rowIndex) {
 	var containerType = row[this.CONTAINERTYPE_INDEX];
 	var samplePosition = row[this.SAMPLEPOSITION_INDEX];
 	var proteinName = row[this.PROTEINACRONYM_INDEX];	
-	var sampleName = row[this.SAMPLENAME_INDEX];	
+	var sampleName = row[this.SAMPLENAME_INDEX];
 
 	if (this.isParcelNameValid(parcelName)){
 		if (this.isContainerNameValid(containerName)){
@@ -770,7 +769,7 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
                                                                                         source: this.getAcronyms(true)
                                                                                     }
             }, 
-            { text :'Sample<br /> Name', id :'Sample Name', column : {
+            { text :'Sample <br /> Name', id :'Sample Name', column : {
 																		width : 120,
 																	  	renderer: sampleParameterRenderer	
 			}}, 
@@ -798,27 +797,20 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
          
             { text :'Beam <br />Diameter', id :'Beam Diameter',column : {width : 60, renderer:numericParameterRenderer}}, 
             { text :'Number of<br /> positions', id :'Number Of positions', column : {width : 60, renderer:numericParameterRenderer}},
-			{ text :'Aimed<br /> Multiplicity', id :'Aimed Multiplicity', column : {width : 60, renderer:numericParameterRenderer}}, 
-            { text :'Aimed<br /> Completeness', id :'Aimed Completeness', column : {width : 80, renderer:numericParameterRenderer}},  
+			{ text :'Aimed <br /> Multiplicity', id :'Aimed Multiplicity', column : {width : 60, renderer:numericParameterRenderer}},
+            { text :'Aimed <br /> Completeness', id :'Aimed Completeness', column : {width : 80, renderer:numericParameterRenderer}},
 			{ text :'Forced <br /> SPG',  id :'forcedSpaceGroup', column : {
                                                                         width : 60,  
                                                                         type: 'dropdown',
 																		source: _.concat([""], ExtISPyB.spaceGroups)
                                                                     }}, 
-            { text :'Radiation<br /> Sensitivity', id :'Radiation Sensitivity', column : {width : 60, renderer:numericParameterRenderer}}, 
-
-                     
-			
-
-            { text :'SMILES', id :'Smiles', column : {width : 60}}, 
+            { text :'Radiation <br /> Sensitivity', id :'Radiation Sensitivity', column : {width : 60, renderer:numericParameterRenderer}},
+            { text :'SMILES', id :'Smiles', column : {width : 60}},
 			{ text :'Tot Rot. <br />Angle', id :'axisRange',column : {width : 60, renderer:numericParameterRenderer}},
-			{ text :'Min Osc.<br />Angle', id :'minOscWidth',column : {width : 60, renderer:numericParameterRenderer}},
+			{ text :'Min Osc. <br />Angle', id :'minOscWidth',column : {width : 60, renderer:numericParameterRenderer}},
 			{ text :'Observed <br />Resolution', id :'Observed Resolution',column : {width : 60, renderer:numericParameterRenderer}},
             { text :'Comments', id :'Comments', column : {width : 200}}
             ];
    /* }*/
-
-    
-
     return header;
 };
