@@ -267,6 +267,7 @@ CSVContainerSpreadSheet.prototype.loadData = function(data){
 				colHeaders: this.getHeaderText(),
 				stretchH: 'last',
 				columns: this.getColumns(),
+			  	licenseKey: ExtISPyB.handsontable_licenseKey,
 		});
 }
 

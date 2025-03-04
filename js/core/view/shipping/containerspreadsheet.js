@@ -188,6 +188,7 @@ ContainerSpreadSheet.prototype.load = function(puck){
 				colHeaders: this.getHeaderText(),
 				stretchH: 'last',
 				columns: this.getColumns(),
+		  		licenseKey: ExtISPyB.handsontable_licenseKey,
 		});
 };
 
