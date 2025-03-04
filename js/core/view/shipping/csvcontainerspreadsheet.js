@@ -108,7 +108,8 @@ CSVContainerSpreadSheet.prototype.resetErrors = function() {
 		INCORRECT_CONTAINER_NAME : [],
 		INCORRECT_CONTAINER_TYPE : [],
 		INCORRECT_SAMPLE_POSITION : [],
-		INCORRECT_SAMPLE_NAME : []
+		INCORRECT_SAMPLE_NAME : [],
+		NO_PROTEIN_IN_DB : []
 	};
 };
 
@@ -170,49 +171,51 @@ CSVContainerSpreadSheet.prototype.validateRow = function(row, rowIndex) {
 	var proteinName = row[this.PROTEINACRONYM_INDEX];	
 	var sampleName = row[this.SAMPLENAME_INDEX];
 
-	if (this.isParcelNameValid(parcelName)){
-		if (this.isContainerNameValid(containerName)){
-			if (this.isContainerTypeValid(containerType)){
-				if (this.isSamplePositionValid(containerType, samplePosition)){
-					if (this.isSampleNameValid(sampleName, proteinName)){
-						return true;
-					}
-					else{
-						this.errors.INCORRECT_SAMPLE_NAME.push({
-							value 		: samplePosition,
-							rowIndex	: rowIndex
-						});
-					}					
-				}
-				else{
-					this.errors.INCORRECT_SAMPLE_POSITION.push({
-						value 		: samplePosition,
-						rowIndex	: rowIndex
-					});
+	var validateRow = true
 
-				}
-			}
-			else{				
-				this.errors.INCORRECT_CONTAINER_TYPE.push({
-					value 		: containerType,
-					rowIndex	: rowIndex
-				});
-			}
-		}
-		else{
-			this.errors.INCORRECT_CONTAINER_NAME.push({
-				value 		: containerName,
-				rowIndex	: rowIndex
-			});
-		}
-	}
-	else{				
+	if (!this.isParcelNameValid(parcelName)){
 		this.errors.INCORRECT_PARCEL_NAME.push({
 			value 		: parcelName,
 			rowIndex	: rowIndex
 		});
-	}	
-	return false;
+		validateRow = false;
+	}
+	if (!this.isContainerNameValid(containerName)){
+		this.errors.INCORRECT_CONTAINER_NAME.push({
+			value 		: containerName,
+			rowIndex	: rowIndex
+		});
+		validateRow = false;
+	}
+	if (!this.isContainerTypeValid(containerType)){
+		this.errors.INCORRECT_CONTAINER_TYPE.push({
+			value 		: containerType,
+			rowIndex	: rowIndex
+		});
+		validateRow = false;
+	}
+	if (!this.isSamplePositionValid(containerType, samplePosition)){
+		this.errors.INCORRECT_SAMPLE_POSITION.push({
+			value 		: samplePosition,
+			rowIndex	: rowIndex
+		});
+		validateRow = false;
+	}
+	if(!this.isProteinInDB(proteinName)){
+		this.errors.NO_PROTEIN_IN_DB.push({
+			value 		: proteinName,
+			rowIndex	: rowIndex
+		});
+		validateRow =  false;
+	}
+	if (!this.isSampleNameValid(sampleName, proteinName)){
+		this.errors.INCORRECT_SAMPLE_NAME.push({
+			value 		: samplePosition,
+			rowIndex	: rowIndex
+		});
+		validateRow = false;
+	}
+	return validateRow;
 };
 
 
@@ -571,6 +574,21 @@ CSVContainerSpreadSheet.prototype.isParcelNameValid = function(parcelName) {
 	}
 	return true;
 };
+
+/**
+ * Checks the name of the parcel. It checks that parcel name does not exist within the shipment. It means in the list of dewarNameControlledList
+ * @method isParcelNameValid
+ *  @param {String} parcelName Name of the parcel read from CSV
+ * @return {Boolean} Returns true if name of the parcel is ok
+ */
+CSVContainerSpreadSheet.prototype.isProteinInDB = function(proteinName) {
+	var protein = this.getProteinByAcronym(proteinName);
+	if ((protein == undefined)||(protein == "")||(protein == null)){
+		return false;
+	}
+	return true;
+};
+
 
 
 /**

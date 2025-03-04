@@ -26,6 +26,7 @@ function CSVPuckFormView(args) {
     this.acceptedContainerListPanelId = this.id + "_acceptedContainerListPanelId";
 	this.uniquenessContainerNamelPanelId = this.id + "_uniquenessContainerNamelPanelId";
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
+	this.noProteinInDb = this.id + "_noProteinInDbPanelId";
 
 
 	if (args != null) {
@@ -193,7 +194,10 @@ CSVPuckFormView.prototype.save = function() {
 		}	
 		if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.uniquenessSampleNamePanelId, "")){
 			return;
-		}			
+		}
+		if (this.displayErrors(errors.NO_PROTEIN_IN_DB, this.noProteinInDb, "")){
+			return;
+		}
 	}
 
     var onError = function(sender, error, mesg){
@@ -227,6 +231,7 @@ CSVPuckFormView.prototype.getWarningPanelsHTML = function() {
 	}
 	dust.render("csvpuckformview.template", 
 					{
+								noProteinInDb					: this.noProteinInDb,
 								uniquenessParcelPanelId			: this.uniquenessParcelPanelId,
 								acceptedContainerListPanelId 	: this.acceptedContainerListPanelId,
 								uniquenessContainerNamelPanelId : this.uniquenessContainerNamelPanelId,
