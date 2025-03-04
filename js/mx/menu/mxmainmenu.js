@@ -52,12 +52,12 @@ MXMainMenu.prototype.getMenuItems = function() {
 			cls : 'ExiSAXSMenuToolBar',
 			menu : this.getDataExplorerMenu()
 		},
-		{
+/*		{
 			text : this._convertToHTMLWhiteSpan("Offline Data Analysis"),
 			cls : 'ExiSAXSMenuToolBar',
             disabled : true,
 			menu : this.getOnlineDataAnalisysMenu()
-		},
+		},*/
 		'->',
 		{
 			xtype : 'textfield',

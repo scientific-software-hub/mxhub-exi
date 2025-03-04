@@ -39,11 +39,11 @@ ManagerMenu.prototype.getMenuItems = function() {
 //			hidden : this.isHidden,
 //			menu : this.getOnlineDataAnalisysMenu() 
 //		}, 
-		{
+/*		{
 			text : this._convertToHTMLWhiteSpan("Help"),
 			cls : 'ExiSAXSMenuToolBar',
-			menu : this.getHelpMenu() 
-		}, 
+			menu : this.getHelpMenu()
+		}, */
 		'->', 
 		{
 			xtype : 'textfield',

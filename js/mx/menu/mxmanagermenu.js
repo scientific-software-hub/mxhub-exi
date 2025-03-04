@@ -63,11 +63,11 @@ MXManagerMenu.prototype.getMenuItems = function() {
 			cls : 'ExiSAXSMenuToolBar',
 			menu : this.getManagerMenu()
 		},
-		{
+/*		{
 			text : this._convertToHTMLWhiteSpan("Help"),
 			cls : 'ExiSAXSMenuToolBar',
 			menu : this.getHelpMenu()
-		},
+		},*/
 		'->',
 		{
 			xtype : 'textfield',
