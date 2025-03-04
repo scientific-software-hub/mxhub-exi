@@ -196,11 +196,11 @@ CSVPuckFormView.prototype.save = function() {
 		}	
 		if (this.displayErrors(errors.INCORRECT_SAMPLE_POSITION, this.uniquenessSampleNamePanelId, "")){
 			return;
-		}	
-		if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.uniquenessSampleNamePanelId, "")){
-			return;
 		}
 		if (this.displayErrors(errors.NO_PROTEIN_IN_DB, this.noProteinInDb, "")){
+			return;
+		}
+		if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.uniquenessSampleNamePanelId, "")){
 			return;
 		}
 	}
