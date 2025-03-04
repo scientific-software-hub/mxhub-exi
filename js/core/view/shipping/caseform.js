@@ -120,7 +120,7 @@ CaseForm.prototype.getPanel = function(dewar, hideReimb) {
 			]}]			
 		});
 
-if (EXI.credentialManager.getSiteName().startsWith("MAXIV")){
+if (EXI.credentialManager.getSiteName().startsWith("DESY")){
     Ext.getCmp(this.id + 'dewar_transportValue').hide();
 }
 	this.refresh(dewar);

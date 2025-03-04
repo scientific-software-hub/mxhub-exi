@@ -1033,10 +1033,7 @@ var BIOSAXS_COMBOMANAGER = {
 			storageLocations = Ext.create('Ext.data.Store', {
 				fields: ['value', 'name'],
 				data : [
-					{"value":"-20", "name":"-20"},
-					{"value":"+4", "name":"+4"},
-					{"value":"Dry shipper", "name":"Dry Shipper"},
-					{"value":"Room Temperature", "name":"Room Temperature"}
+					{"value":"Dry shipper", "name":"Dry Shipper"}
 				]
 			});
 		} else {

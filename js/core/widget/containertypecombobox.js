@@ -46,7 +46,7 @@ ContainerTypeComboBox.prototype.getPanel = function () {
         data : this.data
     });
 
-    var defaultContainerType = "SPINE";
+    var defaultContainerType = "UNIPUCK";
     if (EXI.credentialManager.getSiteName().startsWith("MAXIV")){
         defaultContainerType = "UNIPUCK";
     }
