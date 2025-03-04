@@ -34,9 +34,9 @@ function PrepareMainView(args) {
             _this.save("sampleChangerName","");     
             if (dewar.shippingStatus == "processing"){
                 if(EXI.credentialManager.getSiteName().startsWith("DESY")){
-                    _this.updateStatus(dewar.shippingId, "at_DESY");
+                    _this.updateStatus(dewar.shippingId, "at DESY");
                 } else {
-                    _this.updateStatus(dewar.shippingId, "at_FACILITY");
+                    _this.updateStatus(dewar.shippingId, "at FACILITY");
                 }
 
             } 

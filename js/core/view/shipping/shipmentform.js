@@ -32,10 +32,10 @@ function ShipmentForm(args) {
 	this.openedStatus = "opened";
 	this.sentToUserStatus = "sent to User";
 	this.sentToUserStatus2 = "Sent_to_User"
-	this.sentToFacilityStatus = "sent to " +EXI.credentialManager.getSiteName();
-	this.sentToFacilityStatus2 = "Sent_to_" +EXI.credentialManager.getSiteName();
-	this.atFacilityStatus = "at " +EXI.credentialManager.getSiteName();
-	this.atFacilityStatus2 = "at_" +EXI.credentialManager.getSiteName();
+	this.sentToFacilityStatus = "sent to DESY";
+	this.sentToFacilityStatus2 = "Sent_to_DESY";
+	this.atFacilityStatus = "at DESY";
+	this.atFacilityStatus2 = "at_DESY";
 	this.processingStatus = "processing";
 }
 
@@ -131,7 +131,7 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 
         // Only the manager can delete a shipment if is not processing or has datacollection associated to it
 		$("#" + _this.id + "-delete-button").addClass("disabled");
-		if (EXI.credentialManager.getSiteName().startsWith("DESY") && EXI.credentialManager.getCredentials()[0].isManager()){
+		if (EXI.credentialManager.getCredentials()[0].isManager()){
 		    if (!this.hasDataCollections(shipment) && shipment.shippingStatus != this.processingStatus){
 		        $("#" + _this.id + "-delete-button").removeClass("disabled");
 		    }
