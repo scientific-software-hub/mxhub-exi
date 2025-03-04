@@ -48,13 +48,13 @@
                                     </a>
                                 </td>
                             </tr>
-                             <tr>
+                             <!--tr>
                                 <td>
                                     <a id="{id}-import-button" class="btn btn-xs">
                                          <span class="glyphicon glyphicon-import"></span> Import from CSV
                                     </a>
                                 </td>
-                            </tr>
+                            </tr-->
                              
 
                         </table>
