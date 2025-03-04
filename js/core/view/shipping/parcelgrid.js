@@ -90,7 +90,7 @@ ParcelGrid.prototype.refreshReimbursementContentHTML = function(currentReimburse
 };
 
 ParcelGrid.prototype.displayContentLabel = function(dewars,nSamples,nMeasured, currentReimbursedDewars, maxReimbursedDewars ) {	
-	$("#" + this.id + "-label").html("Content (" + dewars.length + " Parcels " + this.getReimbursementContentHTML(currentReimbursedDewars, maxReimbursedDewars) + " - " + nSamples + " Samples - " + nMeasured + " Measured )");
+	$("#" + this.id + "-label").html("Content (" + dewars.length + " Dewars " + this.getReimbursementContentHTML(currentReimbursedDewars, maxReimbursedDewars) + " - " + nSamples + " Samples - " + nMeasured + " Measured )");
 };
 
 ParcelGrid.prototype.getAuthorizedReimbursedDewars = function(sessions) {
@@ -223,12 +223,12 @@ ParcelGrid.prototype.fillTab = function (tabName, dewars) {
 	this.parcelPanels[tabName].doLayout();
 	this.panel.doLayout();
 }
-
+// "Add new Dewar manually" button in Shipment
 ParcelGrid.prototype.edit = function(dewar) {
 	var _this = this;
 	var caseForm = new CaseForm();
 	var window = Ext.create('Ext.window.Window', {
-		title : 'Parcel',
+		title : 'New Dewar',
 		height : 450,
 		width : 600,
 		modal : true,

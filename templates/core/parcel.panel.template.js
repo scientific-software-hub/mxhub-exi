@@ -26,7 +26,7 @@
                             <tr>
                                 <td>
                                     <a id="{id}-edit-button" class="btn btn-xs disabled">
-                                        <span class="glyphicon glyphicon-edit"></span> Edit
+                                        <span class="glyphicon glyphicon-edit"></span> Edit dewar info
                                     </a>
                                 </td>
                             </tr>
@@ -41,9 +41,9 @@
                                 <td>
                                     <a id="{id}-print-button" class="btn btn-xs" target="_blank">
                                         {?dewar.dewarStatus}
-                                            <span class="glyphicon glyphicon-print"></span> Print labels
+                                            <span class="glyphicon glyphicon-print"></span> Print dewar label
                                         {:else}
-                                             <div class="alert-warning" role="alert"><span class="glyphicon glyphicon-alert"></span> Print labels</div>
+                                             <div class="alert-warning" role="alert"><span class="glyphicon glyphicon-alert"></span>  Print dewar label</div>
                                         {/dewar.dewarStatus}
                                     </a>
                                 </td>

@@ -1,6 +1,6 @@
 
 /**
-* This is a form  for parcels. It includes all items includes in a parcel. Include pucks
+* This is a form  for parcels (Dewars). It includes all items includes in a parcel. Include pucks
 *
 * @class ParcelPanel
 * @constructor
@@ -329,7 +329,7 @@ ParcelPanel.prototype.addContainerToDewar = function(containerVO) {
 
 
 /**
-* It displays a window with a case form
+* "Edit Dewar info" button in Shipment
 *
 * @method showCaseForm
 */
@@ -345,7 +345,7 @@ ParcelPanel.prototype.showCaseForm = function() {
 	/** Opens a window with the cas form **/
 	var caseForm = new CaseForm();
 	var window = Ext.create('Ext.window.Window', {
-	    title: 'Parcel',
+	    title: 'Edit Dewar',
 	    height: 450,
 	    width: 600,
 	    modal : true,
