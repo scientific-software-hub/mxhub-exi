@@ -57,7 +57,7 @@ DataCollectionDataAdapter.prototype.getDataCollectionViewBySessionId= function(s
 * @method getThumbNailById
 */
 DataCollectionDataAdapter.prototype.getThumbNailById= function(imageId){
-	return this.getUrl('/{token}/proposal/{proposal}/mx/image/{0}/thumbnail'.format([ imageId]));
+	return "../images/1_comingSoon.jpg";//this.getUrl('/{token}/proposal/{proposal}/mx/image/{0}/thumbnail'.format([ imageId]));
 };
 
 /**
@@ -78,7 +78,7 @@ DataCollectionDataAdapter.prototype.getWilsonPlot= function(dataCollectionId){
 * @method getWilsonPlot
 */
 DataCollectionDataAdapter.prototype.getQualityIndicatorPlot= function(dataCollectionId){
-	return this.getUrl('/{token}/proposal/{proposal}/mx/datacollection/{0}/qualityindicatorplot'.format([ dataCollectionId]));
+	return "../images/3_comingSoon.jpg";//this.getUrl('/{token}/proposal/{proposal}/mx/datacollection/{0}/qualityindicatorplot'.format([ dataCollectionId]));
 };
 
 
@@ -86,7 +86,7 @@ DataCollectionDataAdapter.prototype.getQualityIndicatorPlot= function(dataCollec
 * @method getCrystalSnapshotByDataCollectionId
 */
 DataCollectionDataAdapter.prototype.getCrystalSnapshotByDataCollectionId= function(dataCollectionId, id){
-	return this.getUrl('/{token}/proposal/{proposal}/mx/datacollection/{0}/crystalsnaphot/{1}/get'.format([ dataCollectionId, id]));
+	return "../images/2_comingSoon.jpg";//this.getUrl('/{token}/proposal/{proposal}/mx/datacollection/{0}/crystalsnaphot/{1}/get'.format([ dataCollectionId, id]));
 };
 
 
