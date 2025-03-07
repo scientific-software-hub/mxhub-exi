@@ -9,12 +9,6 @@ WORKDIR /usr/share/nginx/html
 # Copy the local static content into the container at /usr/share/nginx/html
 COPY --chown=nginx:nginx . /usr/share/nginx/html
 
-# Ensure permissions are correct for static files
-RUN chmod -R 400 /usr/share/nginx/html
-
-# Drop root privileges for better security
-USER nginx
-
 # Environment variable to set the timezone for the containers
 ENV TZ=Europe/Berlin
 
