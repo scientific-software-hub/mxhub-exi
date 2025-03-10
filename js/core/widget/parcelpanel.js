@@ -106,7 +106,13 @@ ParcelPanel.prototype.load = function(dewar, shipment, samples, withoutCollectio
 	$("#" + this.id + "-print-button").click(function () {
 		var dewarId = _this.dewar.dewarId;
 		var url = EXI.getDataAdapter().proposal.shipping.getDewarLabelURL(dewarId, dewarId);
-		location.href = url;	
+		location.href = url;
+		Ext.Msg.show({
+			title : 'You have printed dewar label.',
+			msg : "To proceed further, please, reload the EXI page or press F5  to update its content.",
+			icon : Ext.Msg.INFO,
+			animEl : 'elId'
+		});
 		return;
 	});
 	

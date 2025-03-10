@@ -104,10 +104,11 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
             warningProcessingLabel = "The shipment and all its contents cannot be modified while it's in 'Processing' status";
         } else if (shipment.shippingStatus == _this.atFacilityStatus || shipment.shippingStatus == _this.atFacilityStatus2){
             statusButtonLabel = "Send shipment to the user";
-        } /*else if (shipment.shippingStatus == _this.sentToUserStatus || shipment.shippingStatus == _this.sentToUserStatus2){
+        } else if (shipment.shippingStatus == _this.sentToUserStatus || shipment.shippingStatus == _this.sentToUserStatus2){
+			statusButtonLabel = "Sent to the user";
+			$("#" + _this.id + "-send-button").removeClass("enabled");
             $("#" + _this.id + "-send-button").addClass("disabled");
-            $("#" + _this.id + "-send-button").removeClass("enabled");
-        }*/
+        }
     }
 
     dust.render("shipping.form.template", {id : this.id, to : toData, 
@@ -148,15 +149,40 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
         if (_this.shipment != null){
             if (_this.shipment.shippingStatus == _this.openedStatus){
                 _this.updateStatus(_this.shipment.shippingId, _this.sentToFacilityStatus);
+				Ext.Msg.show({
+					title : 'You have sent your shipment to the facility.',
+					msg : "To proceed further, please, reload the EXI page or press F5  to update its content.",
+					icon : Ext.Msg.INFO,
+					animEl : 'elId'
+				});
             } else {
                 if (EXI.credentialManager.getCredentials()[0].isManager()){
                     if (_this.shipment.shippingStatus == _this.sentToFacilityStatus || _this.shipment.shippingStatus == _this.sentToFacilityStatus2){
                         _this.updateStatus(_this.shipment.shippingId, _this.atFacilityStatus);
+						Ext.Msg.show({
+							title : 'You have marked that the shipment is at the facility.',
+							msg : "To proceed further, please, reload the EXI page or press F5  to update its content.",
+							icon : Ext.Msg.INFO,
+							animEl : 'elId'
+						});
                     } else if (_this.shipment.shippingStatus == _this.processingStatus){
                         _this.updateStatus(_this.shipment.shippingId, _this.atFacilityStatus);
                     } else if (_this.shipment.shippingStatus == _this.atFacilityStatus || _this.shipment.shippingStatus == _this.atFacilityStatus2){
                         _this.updateStatus(_this.shipment.shippingId, _this.sentToUserStatus);
-                    }
+						Ext.Msg.show({
+							title : 'You have sent the shipment to the user.',
+							msg : "To proceed further, please, reload the EXI page or press F5 to update its content.",
+							icon : Ext.Msg.INFO,
+							animEl : 'elId'
+						});
+                    } else {
+						Ext.Msg.show({
+							title : 'Notification',
+							msg : "You have already sent the shipment to the user.",
+							icon : Ext.Msg.INFO,
+							animEl : 'elId'
+						});
+					}
                 }
             }
         }
