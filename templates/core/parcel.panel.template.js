@@ -30,21 +30,17 @@
                                     </a>
                                 </td>
                             </tr>
-                            <tr>
+                            <!--tr>
                                 <td>
                                     <a id="{id}-euro-button" class="btn btn-xs disabled">
                                         <span class="glyphicon glyphicon-euro"></span> Reimburse
                                     </a>
                                 </td>
-                            </tr>
+                            </tr-->
                             <tr>
                                 <td>
                                     <a id="{id}-print-button" class="btn btn-xs" target="_blank">
-                                        {?dewar.dewarStatus}
                                             <span class="glyphicon glyphicon-print"></span> Print dewar label
-                                        {:else}
-                                             <div class="alert-warning" role="alert"><span class="glyphicon glyphicon-alert"></span>  Print dewar label</div>
-                                        {/dewar.dewarStatus}
                                     </a>
                                 </td>
                             </tr>
@@ -55,8 +51,6 @@
                                     </a>
                                 </td>
                             </tr-->
-                             
-
                         </table>
                     </td>
                 </tr>
