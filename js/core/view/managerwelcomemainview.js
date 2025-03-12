@@ -147,6 +147,7 @@ ManagerWelcomeMainView.prototype.loadByDate = function(username, start, end) {
           /** Increasing one day */
           end = moment(end, "YYYYMMDD").add(1, 'days').format("YYYYMMDD");                    
           if (this.isUser(username)){
+              //TODO the method is for proposal but parameter is username - don't work!
 		        EXI.getDataAdapter({onSuccess:onSuccess}).proposal.session.getSessionsByProposalAndDate(start, end, username);
           }
           else{
@@ -202,11 +203,13 @@ ManagerWelcomeMainView.prototype.getToolbar = function() {
         items: [
             {
                text: 'Choose a Date',
+               hidden: EXI.credentialManager.getCredentials()[0].roles[0]=="User",
                icon : '../images/icon/sessions.png',
                menu: dateMenu 
             },
             {
                 xtype: 'button',
+                hidden: EXI.credentialManager.getCredentials()[0].roles[0]=="User",
                 icon : '../images/icon/sessions.png',
                 text: 'Choose a period of time',
                 handler: function () {
