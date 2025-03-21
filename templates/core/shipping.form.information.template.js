@@ -23,7 +23,7 @@
          </tr>
       </table>
    </div>
-    <div class="col-md-2" >
+    <!--div class="col-md-2" >
         <a id="{id}-send-button" class="btn btn-md enabled">
                 <span class="glyphicon glyphicon-plane"></span>
                 <button class="btn btn-primary btn-md" style="margin-left:10px;height:40px;" >{statusButtonLabel}</button>
@@ -34,7 +34,7 @@
             </div>
              
         {/eq}   
-   </div>
+   </div-->
 
    <div class="col-md-3" style="margin-left:10px">
       <div class="form-group row" style="margin:5px">
@@ -42,16 +42,6 @@
          <textarea  class="col-md-9 disabled" rows="2" >{shipment.comments}</textarea >
       </div>
    </div>
-   <div class="col-md-1" style="padding:0px">
-      <div class="form-group row" style="margin:5px">
-         <button id="{id}-edit-button" class="btn btn-primary btn-md disabled" style="margin-left:10px;height:40px;">Edit</button>
-      </div>
-   </div>
-   <div class="col-md-1" style="padding:0px">
-         <div class="form-group row" style="margin:5px">
-            <button id="{id}-delete-button" class="btn btn-primary btn-md disabled" style="margin-left:10px;height:40px;">Delete</button>
-         </div>
-      </div>
 </div>
 
 
@@ -100,14 +90,14 @@
       </table> 
    </div>
  
-   <div class="col-md-6" style="margin-left:10px">  
+   <div class="col-md-3" style="margin-left:10px">
       <table class="table">
-         <tr>
+         <!--tr>
             <td>Allowed Reimb. parcels</td>
             <td class='column_parameter_value'>{.nbReimbDewars}</td>
-         </tr>
+         </tr-->
          <tr>
-            <td>Fedex Reference</td>
+            <td>Shipping Reference</td>
             <td class='column_parameter_value'>
                 {?fedexCode} 
                     <kbd style="background-color:#207a7a;">{.fedexCode}</kbd>
@@ -116,10 +106,23 @@
          </tr>
       </table>
    </div>
-
-
+   <div class="col-md-3" style="margin-left:10px">
+                   <table class="table">
+                   <div class="col-md-2" style="padding:0px">
+                   <div class="form-group row" style="margin:5px">
+                   <button id="{id}-edit-button" class="btn btn-primary btn-md disabled" style="margin-left:10px;height:40px;">Edit</button>
+                   </div>
+                   </div>
+                   <div class="col-md-2" style="padding:0px">
+                   <div class="form-group row" style="margin:5px">
+                   <button id="{id}-delete-button" class="btn btn-primary btn-md disabled" style="margin-left:10px;height:40px;">Delete</button>
+                   </div>
+                   </div>
+                   </table>
+   </div>
 </div>
 
+{!
 {@ne key=warningProcessingLabel value=""}
 <div class="form-group row">
    <div class="col-md-12" >
@@ -129,8 +132,6 @@
    </div>
 </div>
 {/ne}
-
-{!
 
    <table class="table small-padding-rows borderless" style="margin:0px">
       <tr>

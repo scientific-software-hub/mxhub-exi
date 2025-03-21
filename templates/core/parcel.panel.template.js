@@ -37,13 +37,13 @@
                                     </a>
                                 </td>
                             </tr-->
-                            <tr>
+                            <!--tr>
                                 <td>
                                     <a id="{id}-print-button" class="btn btn-xs" target="_blank">
                                             <span class="glyphicon glyphicon-print"></span> Print dewar label
                                     </a>
                                 </td>
-                            </tr>
+                            </tr-->
                              <!--tr>
                                 <td>
                                     <a id="{id}-import-button" class="btn btn-xs">
