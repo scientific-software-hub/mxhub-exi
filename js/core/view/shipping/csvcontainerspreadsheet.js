@@ -138,18 +138,29 @@ CSVContainerSpreadSheet.prototype.isDataValid = function(sampleNamesProteinIds) 
 	var data = this.spreadSheet.getData();
 	var keySampleName = {};
 	var isValid = true;
-	for (var i = 0; i< data.length; i++){
-		if (this.validateRow(data[i], i) == false){
+
+	const sampleNames = this.spreadSheet.getDataAtCol(this.SAMPLENAME_INDEX);
+	const proteinIds = this.spreadSheet.getDataAtCol(this.PROTEINACRONYM_INDEX)
+		.map(acronym => this.getProteinByAcronym(acronym))
+		.filter(protein => protein)
+		.map(protein => protein.proteinId);
+
+	const conflicts = this.puckValidator.checkSampleNames(
+		sampleNames, //sampleNames
+		proteinIds, //proteinIds
+		sampleNamesProteinIds
+	);
+	isValid = conflicts.length === 0;
+
+	for (let i = 0; i< data.length; i++){
+		if (this.validateRow(data[i], i, sampleNamesProteinIds) == false){
 			isValid = false;
 		}
-		/** Are protein + sample Names unique */
-		var proteinName = data[i][this.PROTEINACRONYM_INDEX];
-		var sampleName = data[i][this.SAMPLENAME_INDEX];
-		var key = proteinName + "__" + sampleName;
-		if (keySampleName[key] == null){
-			keySampleName[key] = true;
-		} else{
-			isValid = false;			
+		if(conflicts.includes(data[i][this.SAMPLENAME_INDEX])){
+			this.errors.INCORRECT_SAMPLE_NAME.push({
+						value 		: data[i][this.SAMPLEPOSITION_INDEX],
+						rowIndex	: i
+					});
 		}
 	}
 	return isValid;
@@ -208,13 +219,6 @@ CSVContainerSpreadSheet.prototype.validateRow = function(row, rowIndex, sampleNa
 		});
 		validateRow =  false;
 	}
-	if (!this.isSampleNameValid(sampleName, proteinName)){
-		this.errors.INCORRECT_SAMPLE_NAME.push({
-			value 		: samplePosition,
-			rowIndex	: rowIndex
-		});
-		validateRow = false;
-	}
 	return validateRow;
 };
 
@@ -270,6 +274,8 @@ CSVContainerSpreadSheet.prototype.loadData = function(data){
 				colHeaders: this.getHeaderText(),
 				stretchH: 'last',
 				columns: this.getColumns(),
+			    rowHeaders: true,
+			    invalidCellClassName:"custom-row-text-required",
 			  	licenseKey: ExtISPyB.handsontable_licenseKey,
 		});
 }
@@ -597,7 +603,7 @@ CSVContainerSpreadSheet.prototype.isProteinInDB = function(proteinName) {
  *  @param {String} parcelName Name of the parcel read from CSV
  * @return {Boolean} Returns true if name of the parcel is ok
  */
-CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, proteinName) {			
+CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, proteinName, sampleNamesProteinIds) {
 	if ((sampleName == undefined)||(sampleName == "")){					
 			return false;		
 	}
