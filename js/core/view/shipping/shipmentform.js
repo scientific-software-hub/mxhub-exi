@@ -279,7 +279,7 @@ ShipmentForm.prototype.edit = function(dewar) {
 	});
 
 	var window = Ext.create('Ext.window.Window', {
-		title : 'Shipment',
+		title : 'Edit Shipment',
 		height : 450,
 		width : 600,
 		modal : true,

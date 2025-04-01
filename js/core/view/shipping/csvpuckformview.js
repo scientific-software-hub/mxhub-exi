@@ -124,7 +124,8 @@ CSVPuckFormView.prototype.displayErrors = function(errors, panelId, message) {
 	if (errors){
 		if (errors.length > 0){			
 			var rows = _.map(errors, function(o){ return Number(o.rowIndex)+1; });
-			$("#" + panelId).notify("Rows " + rows + " " +  message, { position:"bottom" });
+			$("#" + panelId).notify("Rows: " + rows + " " +  message, { position:"bottom" });
+			$("#" + panelId).className = "error";
 			$("#" + panelId).fadeIn().fadeOut().fadeIn().fadeOut().fadeIn().fadeOut().fadeIn();
 			return true;
 		}
