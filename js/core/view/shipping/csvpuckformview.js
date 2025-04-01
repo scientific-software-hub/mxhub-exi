@@ -172,6 +172,7 @@ CSVPuckFormView.prototype.addProtein = function(){
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
 */
 CSVPuckFormView.prototype.save = function() {
+	const sampleNamesProteinIds = _.cloneDeep(this.proposalSamples);
 	var forceUpdate = true;
 	EXI.proposalManager.getProteins(forceUpdate);
     var _this = this;
@@ -181,8 +182,25 @@ CSVPuckFormView.prototype.save = function() {
 		return;
 	}
 
+    const isValid = this.containerSpreadSheet.isDataValid(sampleNamesProteinIds);
+	if (isValid) {
+		var onError = function (sender, error, mesg) {
+			_this.panel.setLoading(false);
+			EXI.setError(error.responseText);
+			$.notify(error.responseText, "error");
+		};
 
-	if (!this.containerSpreadSheet.isDataValid()){	
+		var onSuccess = function (sender, puck) {
+			_this.panel.setLoading(false);
+			_this.returnToShipment();
+		};
+		this.panel.setLoading("Saving CSV");
+
+		EXI.getDataAdapter({
+			onSuccess: onSuccess,
+			onError: onError
+		}).proposal.shipping.addDewarsToShipment(this.shippingId, parcels);
+	} else {
 		$.notify("Sorry. Your data contain errors!", "error");
 		var errors = (this.containerSpreadSheet.getErrors());
 		if (this.displayErrors(errors.INCORRECT_PARCEL_NAME, this.uniquenessParcelPanelId, " contain parcel names that are not unique within the proposal")){
@@ -205,19 +223,7 @@ CSVPuckFormView.prototype.save = function() {
 		}
 	}
 
-    var onError = function(sender, error, mesg){
-			_this.panel.setLoading(false);                        
-			EXI.setError(error.responseText);
-			$.notify(error.responseText, "error");
-		};
-		
-		var onSuccess = function(sender, puck){
-			_this.panel.setLoading(false); 
-			_this.returnToShipment();         
-	};
-	this.panel.setLoading("Saving CSV");
-		
-	EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).proposal.shipping.addDewarsToShipment(this.shippingId, parcels);
+
 
 };
 

@@ -132,7 +132,7 @@ CSVContainerSpreadSheet.prototype.getErrors = function() {
 * @method isDataValid
 * @return {Boolean} isValid Return true if data is valid or false otherwise
 */
-CSVContainerSpreadSheet.prototype.isDataValid = function() {
+CSVContainerSpreadSheet.prototype.isDataValid = function(sampleNamesProteinIds) {
 	/** Reset errors */
 	this.errors = this.resetErrors();
 	var data = this.spreadSheet.getData();
@@ -163,7 +163,7 @@ CSVContainerSpreadSheet.prototype.isDataValid = function() {
 * @param {Array} rowIndex Index of the row in the table
 * @return {Boolean} Return true if data is valid or false otherwise
 */
-CSVContainerSpreadSheet.prototype.validateRow = function(row, rowIndex) {		
+CSVContainerSpreadSheet.prototype.validateRow = function(row, rowIndex, sampleNamesProteinIds) {
 	var parcelName = row[this.PARCELNAME_INDEX];
 	var containerName = row[this.CONTAINERNAME_INDEX];
 	var containerType = row[this.CONTAINERTYPE_INDEX];
