@@ -697,10 +697,10 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 				instance.setDataAtCell(row, col, value);
 			}
 		} **/
-		var proteinName = instance.getSourceDataAtCell(row, _this.PROTEINACRONYM_INDEX);				
-		if (!_this.isSampleNameValid(value, proteinName)){					
-			td.className = 'custom-row-text-required';			
-		}
+		//var proteinName = instance.getSourceDataAtCell(row, _this.PROTEINACRONYM_INDEX);
+		// if (!_this.isSampleNameValid(value, proteinName)){
+		// 	td.className = 'custom-row-text-required';
+		// }
 		
 		td.innerHTML = value;		
 				
