@@ -603,18 +603,10 @@ CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, prote
 	}
 	var protein = this.getProteinByAcronym(proteinName);
 	if (protein){
-		var conflicts = this.puckValidator.checkSampleNames([sampleName], [protein.proteinId], null, this.proposalSamples);
-		if (conflicts){
-			if (conflicts.length > 0){
-				return false;
-			}
-			return true;
-		}
-		else{
-			return true;
-		}
-	}
-	else{
+		const conflicts = this.puckValidator.checkSampleNames([sampleName], [protein.proteinId], sampleNamesProteinIds);
+		const isValidSampleName = conflicts.length === 0;
+		return isValidSampleName;
+	} else {
 		return false;
 	}
 	

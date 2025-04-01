@@ -341,8 +341,8 @@ PuckFormView.prototype.displayUniquenessWarning = function(message) {
 };
 
 
-PuckFormView.prototype.checkSampleNames = function(sampleNames, proteinIds, containerId) {	
-	 return new PuckValidator().checkSampleNames(sampleNames, proteinIds, containerId, this.proposalSamples);
+PuckFormView.prototype.checkSampleNames = function(sampleNames, proteinIds) {
+	 return new PuckValidator().checkSampleNames(sampleNames, proteinIds, this.proposalSamples);
 	
 };
 
@@ -375,7 +375,7 @@ PuckFormView.prototype.save = function(returnToShipment) {
 		var sampleNames = _.map(puck.sampleVOs,"name");
 		var proteinIds = _.map(puck.sampleVOs,"crystalVO.proteinVO.proteinId");
 		
-		var conflicts = _this.checkSampleNames(sampleNames, proteinIds, puck.containerId);
+		var conflicts = _this.checkSampleNames(sampleNames, proteinIds);
 		if (conflicts.length > 0){
 			_this.displayUniquenessWarning("Sample names are not unique for the proposal. Please change: " + conflicts);
 			return;
