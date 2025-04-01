@@ -1,23 +1,23 @@
 <table>
    <tr>
       <td>
-         <div class="alert-info" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;">
-            <span class="glyphicon glyphicon-warning-sign" style='margin:2px;'>  </span>
-            Tip:
+         <div class="alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;">
+            <span class="glyphicon glyphicon-info-sign" style='margin:2px;'>  </span>
+            Requirements:
          </div>
       </td>
       <td>
-         <div id="{.uniquenessParcelPanelId}" class="alert alert-info" style="margin-bottom: 1px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+         <div id="{.uniquenessParcelPanelId}" class="alert alert-warning" style="margin-bottom: 1px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
             "Dewar Name" should be unique for the <u>whole shipment</u>
          </div>
       </td>
       <td>
-         <div id="{.uniquenessContainerNamelPanelId}" class="alert alert-info" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+         <div id="{.uniquenessContainerNamelPanelId}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
             "Container Name" should be unique for <u>this shipment</u>
          </div>
       </td>
       <td>
-         <div id="{.acceptedContainerListPanelId}" class="alert alert-info" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+         <div id="{.acceptedContainerListPanelId}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
          {@eq key=showOnlyUnipuckMessage value="true" type="boolean"}
             {@eq key=siteName value="MAXIV"}
                Only Unipuck container type at MAX IV
@@ -31,12 +31,12 @@
          </div>
       </td>
       <td>
-         <div id="{.noProteinInDb}" class="alert alert-info" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+         <div id="{.noProteinInDb}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
             Protein should be <u>added before</u> importing/adding.
          </div>
       </td>
       <td>
-         <div id="{.uniquenessSampleNamePanelId}" class="alert alert-info" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+         <div id="{.uniquenessSampleNamePanelId}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
             "Protein" + "Sample Name" should be unique for the <u>whole shipment</u>
          </div>
       </td>

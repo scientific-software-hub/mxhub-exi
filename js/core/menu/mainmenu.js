@@ -143,7 +143,7 @@ MainMenu.prototype.getShipmentItem = function() {
 				});
 
 				var window = Ext.create('Ext.window.Window', {
-					title : 'Shipment',
+					title : 'Create New Shipment',
 					height : 500,
 					width : 650,
 					padding : '10 10 10 10',
