@@ -93,7 +93,8 @@ module.exports = function(grunt) {
                     prod : {
                         options : {
                             shorthandCompacting : true,
-                            roundingPrecision : -1
+                            roundingPrecision : -1,
+                            sourceMap: true
                         },
                         files : {
                             'min/exi.min.css' : [

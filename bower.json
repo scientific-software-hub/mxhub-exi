@@ -54,5 +54,13 @@
   "resolutions": {
     "lightbox2": "2.8.2",
     "jquery": "2.2.4"
+  },
+  "overrides": {
+    "handsontable": {
+      "main": [
+        "dist/handsontable.full.js",
+        "dist/handsontable.full.css"
+      ]
+    }
   }
 }
