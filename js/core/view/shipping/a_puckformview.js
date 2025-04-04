@@ -14,8 +14,6 @@ function PuckFormView(args) {
 	this.height = 500;
 	this.width = 500;
 	this.unsavedChanges = false;
-
-	this.escapeSampleNameValidation = false;
 	
 	/** When getPanel it will load all the samples for this proposal */
 	this.proposalSamples = [];
@@ -83,7 +81,6 @@ PuckFormView.prototype.fillSamplesGrid = function (puck) {
 		if (samples) {
 			if (samples.length > 0) {
 				_this.containerSpreadSheet.setRenderCrystalFormColumn(true);
-				_this.escapeSampleNameValidation = true;
 			} else {
 				_this.containerSpreadSheet.setRenderCrystalFormColumn(false);
 			}
@@ -374,7 +371,11 @@ PuckFormView.prototype.save = function(returnToShipment) {
 
 
 	/** Check if protein + sample name is unique for the proposal or within the shipment*/
-	if (!this.escapeSampleNameValidation && (puck.sampleVOs && puck.sampleVOs.length > 0)) {
+	if (puck.sampleVOs && puck.sampleVOs.length > 0) {
+		let idSet = new Set(puck.sampleVOs.map(item => item.blSampleId));
+		this.proposalSamples.reduceRight((_, item, i, arr) => {
+			if (idSet.has(item.BLSample_blSampleId)) arr.splice(i, 1);
+		}, null);
 		var sampleNames = _.map(puck.sampleVOs,"name");
 		var proteinIds = _.map(puck.sampleVOs,"crystalVO.proteinVO.proteinId");
 		
@@ -384,7 +385,6 @@ PuckFormView.prototype.save = function(returnToShipment) {
 			return;
 		}
 	}
-
 
 	/** Updating general parameters **/
 	puck.code = Ext.getCmp(_this.id + 'puck_name').getValue();
