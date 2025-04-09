@@ -72,6 +72,8 @@ PuckFormView.prototype.load = function(containerId, shippingId, shippingStatus) 
     };
     EXI.getDataAdapter({onSuccess : onSuccess}).proposal.shipping.getContainerById(this.containerId,this.containerId,this.containerId);
 
+	this.getSamplesFromProposal();
+
 };
 
 PuckFormView.prototype.fillSamplesGrid = function (puck) {
@@ -105,27 +107,51 @@ PuckFormView.prototype.fillSamplesGrid = function (puck) {
 
 	EXI.getDataAdapter({onSuccess : onSuccess}).mx.sample.getSamplesByContainerId(puck.containerId);
 }
-
+//TODO the function returns samples for the session, not for proposal. The naming is to be changed.
 PuckFormView.prototype.getSamplesFromProposal = function() {
-	var _this =this;
-	 /** Retrieve samples for the proposal in order to check that the protein + sample name are unique */
-	var onSuccess = function(sender, data){						
-		_this.proposalSamples = data;	
-		$.notify("Retrieved " + data.length + " samples for selected proposal" , "info");		
-		_this.containerSpreadSheet.proposalSamples = _this.proposalSamples;
 
+	const _this = this;
+	const onGetShipmentsSuccess = function(sender, data) {
+
+		/** Retrieve samples for the shipmentIds in order to check that the protein + sample name are unique for the session */
+		const promises = data.map(shipmentId => {
+			return new Promise((resolve, reject) => {
+				const onGetSamplesSuccess = function (sender, data) {
+					resolve(data);
+				};
+
+				const onGetSamplesError = function(error){
+					reject(error)
+				};
+				EXI.getDataAdapter({onSuccess: onGetSamplesSuccess, onError: onGetSamplesError}).mx.sample.getSamplesByShipmentId(shipmentId);
+			})
+		});
+
+        Promise.all(promises)
+			.then((data) => {
+				_this.proposalSamples = data.flat();
+				$.notify(`Retrieved ${_this.proposalSamples.length} samples for the selected session`, "info");
+				_this.containerSpreadSheet.proposalSamples = _this.proposalSamples;
+			})
+			.catch((err) => {
+				console.error("Error was produced when getSamplesFromProposal()");
+			});
 	};
-	var onError = function(sender, data){
-		console.log("Error was produced when getSampleInfoByProposalId");
+	var onError = function (sender, data) {
+		console.log("Error was produced when getSamplesFromProposal()");
 	};
 
-	EXI.getDataAdapter({onSuccess: onSuccess, onError:onError}).mx.sample.getSampleInfoByProposalId();
+	EXI.getDataAdapter({onSuccess: onGetShipmentsSuccess, onError: onError}).proposal.shipping.getAllShipmentIdsForSessionByShippingId(_this.shippingId);
+};
+
+PuckFormView.prototype.getSessionIdFromShippingId = function(shippingId) {
+	EXI.getDataAdapter({onSuccess: onSuccess, onError:onError}).proposal.shipping.getSessionIdFromShippingId(shippingId);
 };
 
 PuckFormView.prototype.getPanel = function() {
 	var _this =this;
 
-   this.getSamplesFromProposal();
+   // this.getSamplesFromProposal();
 
 
     var html = "";
@@ -381,7 +407,7 @@ PuckFormView.prototype.save = function(returnToShipment) {
 		
 		var conflicts = _this.checkSampleNames(sampleNames, proteinIds);
 		if (conflicts.length > 0){
-			_this.displayUniquenessWarning("Sample names are not unique for the proposal. Please change: " + conflicts);
+			_this.displayUniquenessWarning("Sample names are not unique for the session. Please change: " + conflicts);
 			return;
 		}
 	}

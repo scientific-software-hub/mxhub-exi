@@ -58,6 +58,13 @@ ShippingDataAdapter.prototype.updateStatus = function(shippingId, status){
     this.get('/{token}/proposal/{proposal}/shipping/{0}/status/{1}/update'.format([shippingId, status]));   
 };
 
+ShippingDataAdapter.prototype.getSessionIdFromShippingId = function(shippingId){
+	this.get('/{token}/proposal/{proposal}/shipping/{0}/sessionId'.format([shippingId]));
+};
+
+ShippingDataAdapter.prototype.getAllShipmentIdsForSessionByShippingId = function(shippingId){
+	this.get('/{token}/proposal/{proposal}/shipping/{0}/shipmentIds'.format([shippingId]));
+};
 
 ShippingDataAdapter.prototype.getContainerById = function(shippingId, dewarId, containerId){
 	this.get('/{token}/proposal/{proposal}/shipping/{0}/dewar/{1}/puck/{2}/get'.format([shippingId, dewarId, containerId]));

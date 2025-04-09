@@ -260,7 +260,7 @@ CSVPuckFormView.prototype.getWarningPanelsHTML = function() {
 
 CSVPuckFormView.prototype.getPanel = function() {
 	/** Get Samples from Proposal */
-	this.getSamplesFromProposal();
+	//this.getSamplesFromProposal();
 
 	this.panel = Ext.create('Ext.panel.Panel', {
 		autoScroll : true,				
@@ -408,8 +408,9 @@ CSVPuckFormView.prototype.load = function(shippingId) {
 			_this.panel.setLoading(false);
 		};
 		EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).proposal.shipping.getShipment(shippingId);
-    }	
+    }
 
+	this.getSamplesFromProposal();
 
 };
 
