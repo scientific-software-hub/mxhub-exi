@@ -132,40 +132,44 @@ CSVContainerSpreadSheet.prototype.getErrors = function() {
 * This checks all rows and validate the data
 *
 * @method isDataValid
-* @return {Boolean} isValid Return true if data is valid or false otherwise
+* @return {Promise<Boolean>} isValid Return true if data is valid or false otherwise
 */
 CSVContainerSpreadSheet.prototype.isDataValid = function(sampleNamesProteinIds) {
 	/** Reset errors */
 	this.errors = this.resetErrors();
-	var data = this.spreadSheet.getData();
-	var keySampleName = {};
-	var isValid = true;
 
-	const sampleNames = this.spreadSheet.getDataAtCol(this.SAMPLENAME_INDEX);
-	const proteinIds = this.spreadSheet.getDataAtCol(this.PROTEINACRONYM_INDEX)
-		.map(acronym => this.getProteinByAcronym(acronym))
-		.filter(protein => protein)
-		.map(protein => protein.proteinId);
+	return new Promise((resolve, reject) => {
+		this.spreadSheet.validateCells((isValid) => {
+			resolve(isValid)
+		});
+	}).then(isValid => {
+		const sampleNames = this.spreadSheet.getDataAtCol(this.SAMPLENAME_INDEX);
+		const proteinIds = this.spreadSheet.getDataAtCol(this.PROTEINACRONYM_INDEX)
+			.map(acronym => this.getProteinByAcronym(acronym))
+			.filter(protein => protein)
+			.map(protein => protein.proteinId);
 
-	const conflicts = this.puckValidator.checkSampleNames(
-		sampleNames, //sampleNames
-		proteinIds, //proteinIds
-		sampleNamesProteinIds
-	);
-	isValid = conflicts.length === 0;
+		const conflicts = this.puckValidator.checkSampleNames(
+			sampleNames, //sampleNames
+			proteinIds, //proteinIds
+			sampleNamesProteinIds
+		);
+		isValid = conflicts.length === 0;
+		const data = this.spreadSheet.getData();
 
-	for (let i = 0; i< data.length; i++){
-		if (this.validateRow(data[i], i, sampleNamesProteinIds) == false){
-			isValid = false;
+		for (let i = 0; i< data.length; i++){
+			if (this.validateRow(data[i], i, sampleNamesProteinIds) == false){
+				isValid = false;
+			}
+			if(conflicts.includes(data[i][this.SAMPLENAME_INDEX])){
+				this.errors.DUPLICATE_SAMPLE_NAME.push({
+					value 		: data[i][this.SAMPLEPOSITION_INDEX],
+					rowIndex	: i
+				});
+			}
 		}
-		if(conflicts.includes(data[i][this.SAMPLENAME_INDEX])){
-			this.errors.DUPLICATE_SAMPLE_NAME.push({
-						value 		: data[i][this.SAMPLEPOSITION_INDEX],
-						rowIndex	: i
-					});
-		}
-	}
-	return isValid;
+		return isValid;
+	});
 };
 
 /**
@@ -271,7 +275,7 @@ CSVContainerSpreadSheet.prototype.loadData = function(data){
 	  }
 	  	  		
 	  // maps function to lookup string
-	  Handsontable.renderers.registerRenderer('ValueRenderer', ValueRenderer);	 
+	  Handsontable.renderers.registerRenderer('ValueRenderer', ValueRenderer);
 	  this.spreadSheet = new Handsontable(
 		  document.getElementById(this.id + '_samples'), {
 		  		afterCreateRow: function (index, numberOfRows) {
@@ -284,7 +288,11 @@ CSVContainerSpreadSheet.prototype.loadData = function(data){
 				},
 				cells: function (row, col, prop) {														
 				},
-				data: data,
+			    afterLoadData: function(){
+					this.validateCells((isValid) => {
+						//TODO notify user?
+					});
+				},
 				height : this.height,
 				width : this.width,
 				manualColumnResize: true,
@@ -296,7 +304,9 @@ CSVContainerSpreadSheet.prototype.loadData = function(data){
 			    invalidCellClassName:"custom-row-text-required",
 			  	licenseKey: ExtISPyB.handsontable_licenseKey,
 		});
+	this.spreadSheet.loadData(data);
 }
+
 
 /** Parcels and dewars are the same */
 CSVContainerSpreadSheet.prototype.getParcelsByRows = function(rows) {
@@ -616,23 +626,24 @@ CSVContainerSpreadSheet.prototype.isProteinInDB = function(proteinName) {
 
 
 /**
- * Checks the name of the sample contains special characters
+ * Checks the name of the sample. (ProteinId + sample name) should be unique for the whole proposal and not empty or null
  * @method isSampleNameValid
- *  @param {String} sampleName Name of the sample name read from CSV
- * @return {Boolean} Returns true if name of the sample name is ok
+ *  @param {String} parcelName Name of the parcel read from CSV
+ * @return {Boolean} Returns true if name of the parcel is ok
  */
-CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName) {
-	return /^[a-zA-Z0-9_-]+$/.test(sampleName);
-};
-
-/**
- * Checks the name of the sample contains special characters
- * @method isProteinNameValid
- *  @param {String} ProteinName Name of the Protein Name read from CSV
- * @return {Boolean} Returns true if name of the Protein Name is ok
- */
-CSVContainerSpreadSheet.prototype.isProteinNameValid = function(proteinName) {
-	return /^[a-zA-Z0-9_-]+$/.test(proteinName);
+CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, proteinName, sampleNamesProteinIds) {
+	if ((sampleName == undefined)||(sampleName == "")){					
+			return false;		
+	}
+	var protein = this.getProteinByAcronym(proteinName);
+	if (protein){
+		const conflicts = this.puckValidator.checkSampleNames([sampleName], [protein.proteinId], sampleNamesProteinIds);
+		const isValidSampleName = conflicts.length === 0;
+		return isValidSampleName;
+	} else {
+		return false;
+	}
+	
 };
 
 /**
@@ -706,21 +717,10 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 		
 	}
 
-	var sampleParameterRenderer = function(instance, td, row, col, prop, value, cellProperties){	
-		/** For testing purposes
-		if (value != null){
-			if (value.length < 8){						
-				value =value + 	Math.random();
-				instance.setDataAtCell(row, col, value);
-			}
-		} **/
-		//var proteinName = instance.getSourceDataAtCell(row, _this.PROTEINACRONYM_INDEX);
-		// if (!_this.isSampleNameValid(value, proteinName)){
-		// 	td.className = 'custom-row-text-required';
-		// }
-		
-		td.innerHTML = value;		
-				
+	var sampleParameterRenderer = function(value, callback){
+		const proteinName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.PROTEINACRONYM_INDEX);
+		const isSampleNameValid = _this.isSampleNameValid(value, proteinName, _this.proposalSamples);
+		callback(isSampleNameValid);
 	}
     /** Checking parcels name */
 	var parcelDisplayCell = function(instance, td, row, col, prop, value, cellProperties){				
@@ -805,7 +805,7 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
             }, 
             { text :'Sample <br /> Name', id :'Sample Name', column : {
 																		width : 120,
-																	  	renderer: sampleParameterRenderer	
+                                                                        validator: sampleParameterRenderer
 			}}, 
             { text :'Pin <br />Barcode', id : 'Pin BarCode', column : {width : 60}},  
             { text :'Space <br />group',  id : 'Space Group', column : {
