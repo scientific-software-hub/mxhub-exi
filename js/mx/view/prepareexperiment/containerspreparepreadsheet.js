@@ -242,7 +242,8 @@ ContainerPrepareSpreadSheet.prototype.getPanel = function() {
                 for (var i = 0 ; i < _this.containers.length ; i++){
                     var dewar = _this.containers[i];
                     if (record.get('containerId') != dewar.containerId && dewar.beamlineLocation == record.get('beamlineName')) {
-                        if (record.get('sampleChangerLocation') == dewar.sampleChangerLocation && dewar.sampleChangerLocation != ""){                        
+                        if (record.get('sampleChangerLocation') == dewar.sampleChangerLocation && dewar.sampleChangerLocation != ""){
+                            debugger
                             return "puck-error";
                         }
                     }
