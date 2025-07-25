@@ -15,13 +15,16 @@
 <link rel="stylesheet" type="text/css" href="../dependency/ext/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css">
 <link rel="stylesheet" type="text/css" href="../min/exi.min.css?v=1645196247039">
 
-
+    <!-- CONFIG -->
+    <script type="text/javascript" src="config.js?v=1645196247039"></script>
 <!-- JS -->
     <script type="text/javascript" src="../dependency/elastic-apm-rum.umd.min-5.16.1.js?v=1728221465265"></script>
     <script>
         elasticApm.init({
             serviceName: 'exi',
-            serverUrl: '/apm',
+            serviceVersion: ExtISPyB.version,
+            environment: ExtISPyB.default_site === "DESY" ? 'ispyb-production' : 'development',
+            serverUrl: 'https://apm.desy.de',
         })
     </script>
 <script type="text/javascript" src="../dependency/ext/build/bootstrap.js"></script>
@@ -35,8 +38,7 @@
 <!-- EXI -->
 <script type="text/javascript" src="../min/exi.min.js?v=1645196247039"></script>
 
-<!-- CONFIG -->
-<script type="text/javascript" src="config.js?v=1645196247039"></script>
+
 
 
 </head>
