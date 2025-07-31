@@ -18,6 +18,8 @@ function ContainerSpreadSheet(args){
 		}
 	}
 
+	this.puckValidator = new PuckValidator();
+
     this.crystalInfoToIdMap = {};
 
 	this.crystalFormIndex = -1;
@@ -180,7 +182,11 @@ ContainerSpreadSheet.prototype.load = function(puck){
 						}
 					}
 				},
-				data: data,
+		  		afterLoadData: function(){
+			  		this.validateCells((isValid) => {
+						  //TODO notify user?
+			 		 });
+				},
 				height : this.height,
 				width : this.width,
 				manualColumnResize: true,
@@ -188,8 +194,10 @@ ContainerSpreadSheet.prototype.load = function(puck){
 				colHeaders: this.getHeaderText(),
 				stretchH: 'last',
 				columns: this.getColumns(),
+		  		invalidCellClassName:"custom-row-text-required",
 		  		licenseKey: ExtISPyB.handsontable_licenseKey,
 		});
+	this.spreadSheet.loadData(data);
 };
 
 /**
@@ -268,6 +276,27 @@ ContainerSpreadSheet.prototype.getSamplesData = function(puck) {
 	return data;
 };
 
+/**
+ * Checks the name of the sample. (ProteinId + sample name) should be unique for the whole proposal and not empty or null
+ * @method isSampleNameValid
+ *  @param {String} parcelName Name of the parcel read from CSV
+ * @return {Boolean} Returns true if name of the parcel is ok
+ */
+ContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, proteinName, sampleNamesProteinIds) {
+	if ((sampleName == undefined)||(sampleName == "")){
+		return false;
+	}
+	var protein = EXI.proposalManager.getProteinByAcronym(proteinName);
+	if (protein){
+		const conflicts = this.puckValidator.checkSampleNames([sampleName], [protein[0].proteinId], sampleNamesProteinIds);
+		const isValidSampleName = conflicts.length === 0;
+		return isValidSampleName;
+	} else {
+		return false;
+	}
+
+};
+
 ContainerSpreadSheet.prototype.getHeader = function() {
     var _this = this;
 	var header = [];
@@ -282,6 +311,18 @@ ContainerSpreadSheet.prototype.getHeader = function() {
 			td.innerHTML = value;
 		}
 	}
+
+	const sampleParameterValidator = function(value, callback){
+		debugger
+		const proteinName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.getColumnIndex("Protein Acronym"));
+		if (proteinName) {
+			const isSampleNameValid = _this.isSampleNameValid(value, proteinName, _this.proposalSamples);
+			callback(isSampleNameValid);
+		} else {
+			callback(true);
+		}
+	}
+
     header = [
 
            /* { text : 'Parcel', 	id: 'parcel', column : {width : 40}},
@@ -295,7 +336,7 @@ ContainerSpreadSheet.prototype.getHeader = function() {
                                                                                         source: this.getAcronyms()
                                                                                     }
             },
-            { text :'Sample<br /> Name', id :'Sample Name', column : {width : 120}},
+            { text :'Sample<br /> Name', id :'Sample Name', column : {width : 120, validator: sampleParameterValidator }},
             { text :'Pin <br />BarCode', id : 'Pin BarCode', column : {width : 60}},
             { text :'Crystal Form', id : 'Crystal Form',column : {
                                                                         width : 230,

@@ -252,6 +252,7 @@ LoadSampleChangerView.prototype.loadSampleChangerPuck = function (puck, containe
 * @return A sampleChangerWidget
 */
 LoadSampleChangerView.prototype.createSampleChangerWidget = function (sampleChangerName, beamlineName) {
+    debugger
     var _this = this;
     var data = {
         radius : this.widgetRadius,
@@ -292,6 +293,7 @@ LoadSampleChangerView.prototype.createSampleChangerWidget = function (sampleChan
 };
 
 LoadSampleChangerView.prototype.changeSampleChangerWidgetByBeamline = function (beamlineName) {
+    debugger
     var newBeamline = _.filter(EXI.credentialManager.getBeamlinesByTechnique("MX"),{"name":beamlineName});
     if (newBeamline.length > 0) {
         this.createSampleChangerWidget(newBeamline[0].sampleChangerType,newBeamline[0].name);

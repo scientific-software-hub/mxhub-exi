@@ -93,16 +93,22 @@ SpreadSheet.prototype.loadData = function(data){
 	var container = document.getElementById(this.id + '_samples');
 
 	this.spreadSheet = new Handsontable(container, {
-			data: data,
-			height : this.height,
-			width : this.width,
-			manualColumnResize: true,
-			colWidths: this.getHeaderWidth(),
-			colHeaders: this.getHeaderText(),
-			stretchH: 'last',
-			columns: this.getColumns(),
-			licenseKey: ExtISPyB.handsontable_licenseKey,
+		afterLoadData: function(){
+			this.validateCells((isValid) => {
+				//TODO notify user?
+			});
+		},
+		height : this.height,
+		width : this.width,
+		manualColumnResize: true,
+		colWidths: this.getHeaderWidth(),
+		colHeaders: this.getHeaderText(),
+		stretchH: 'last',
+		columns: this.getColumns(),
+		invalidCellClassName:"custom-row-text-required",
+		licenseKey: ExtISPyB.handsontable_licenseKey,
 	});
+	this.spreadSheet.loadData(data);
 };
 
 SpreadSheet.prototype.getData = function () {
