@@ -23,7 +23,7 @@
         elasticApm.init({
             serviceName: 'exi',
             serviceVersion: ExtISPyB.version,
-            environment: ExtISPyB.default_site === "DESY" ? 'ispyb-production' : 'development',
+            environment: ExtISPyB.default_site === "DESY" ? 'ispyb-production' : 'ispyb-test',
             serverUrl: 'https://apm.desy.de',
         })
     </script>
