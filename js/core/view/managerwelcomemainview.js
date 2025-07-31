@@ -203,13 +203,13 @@ ManagerWelcomeMainView.prototype.getToolbar = function() {
         items: [
             {
                text: 'Choose a Date',
-               hidden: EXI.credentialManager.getCredentials()[0].roles[0]=="User",
+               hidden: !EXI.credentialManager.getCredentials()[0].isManager(),
                icon : '../images/icon/sessions.png',
                menu: dateMenu 
             },
             {
                 xtype: 'button',
-                hidden: EXI.credentialManager.getCredentials()[0].roles[0]=="User",
+                hidden: !EXI.credentialManager.getCredentials()[0].isManager(),
                 icon : '../images/icon/sessions.png',
                 text: 'Choose a period of time',
                 handler: function () {
