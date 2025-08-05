@@ -1,3 +1,45 @@
+const sendNotificationWhenShippingStatusIsSentToFacility = (sender, newStatus) => {
+	if (newStatus == sender.sentToFacilityStatus2 || newStatus == sender.sentToFacilityStatus){
+		// alert("===refresh.attach=== " +"to Facility");
+		const labContactName = EXI.proposalManager.getLabcontacts()[0].personVO.title + " " +
+			EXI.proposalManager.getLabcontacts()[0].personVO.givenName + " " +
+			EXI.proposalManager.getLabcontacts()[0].personVO.familyName;
+		new EmailNotification().sendEmailNotification({
+			recipientEmail: EXI.proposalManager.getLabcontacts()[0].personVO.emailAddress,
+			subject: "Dewar(s) is sent to DESY, Hamburg",
+			msgBody: `Dear ${labContactName}, you have just sent your dewar(s) to P11 beamline (DESY, Hamburg).`,
+		});
+	}
+}
+
+const sendNotificationWhenShippingStatusIsAtFacility = (sender, newStatus) => {
+	if (newStatus == sender.atFacilityStatus2 || newStatus == sender.atFacilityStatus){
+		// alert("===refresh.attach=== " +"at Facility");
+		const labContactName = EXI.proposalManager.getLabcontacts()[0].personVO.title + " " +
+			EXI.proposalManager.getLabcontacts()[0].personVO.givenName + " " +
+			EXI.proposalManager.getLabcontacts()[0].personVO.familyName;
+		new EmailNotification().sendEmailNotification({
+			recipientEmail: EXI.proposalManager.getLabcontacts()[0].personVO.emailAddress,
+			subject: "Dewar(s) is at DESY, Hamburg",
+			msgBody: `Dear ${labContactName}, your dewar(s) at P11 beamline (DESY, Hamburg).`,
+		});
+	}
+}
+
+const sendNotificationWhenShippingStatusIsSentToUser = (sender, newStatus) => {
+	if (newStatus == sender.sentToUserStatus2 || newStatus == sender.sentToUserStatus){
+		// alert("===refresh.attach=== " +"sent to User");
+		const labContactName = EXI.proposalManager.getLabcontacts()[0].personVO.title + " " +
+			EXI.proposalManager.getLabcontacts()[0].personVO.givenName + " " +
+			EXI.proposalManager.getLabcontacts()[0].personVO.familyName;
+		new EmailNotification().sendEmailNotification({
+			recipientEmail: EXI.proposalManager.getLabcontacts()[0].personVO.emailAddress,
+			subject: "Dewar(s) is sent back to User",
+			msgBody: `Dear ${labContactName}, your dewar(s) is sent back to you.`,
+		});
+	}
+}
+
 /**
  * Same form as MX part
  * 
@@ -29,6 +71,13 @@ function ShipmentForm(args) {
 	
 	this.onSaved = new Event(this);
 	this.refresh = new Event(this);
+
+	//adding listener
+	this.sentNotification = new Event(this);
+	this.sentNotification.attach(sendNotificationWhenShippingStatusIsSentToFacility);
+	this.sentNotification.attach(sendNotificationWhenShippingStatusIsAtFacility);
+	this.sentNotification.attach(sendNotificationWhenShippingStatusIsSentToUser);
+
 	this.openedStatus = "opened";
 	this.sentToUserStatus = "sent to User";
 	this.sentToUserStatus2 = "Sent_to_User"
@@ -171,8 +220,9 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 ShipmentForm.prototype.updateStatus = function(shippingId, status) {
     var _this = this;
     //_this.panel.setLoading("Updating shipment Status");
-    var onStatusSuccess = function(sender, dewar) { 						
-			_this.refresh.notify(_this.shipment.shippingId);
+    var onStatusSuccess = function(sender, dewar) {
+		_this.sentNotification.notify(status);
+		_this.refresh.notify(shippingId);
     };
     var onError = function(data){
             EXI.setError(data);
