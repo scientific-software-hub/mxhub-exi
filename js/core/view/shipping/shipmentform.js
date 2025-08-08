@@ -4,11 +4,14 @@ const sendNotificationWhenShippingStatusIsSentToFacility = (sender, newStatus) =
 		const labContactName = EXI.proposalManager.getLabcontacts()[0].personVO.title + " " +
 			EXI.proposalManager.getLabcontacts()[0].personVO.givenName + " " +
 			EXI.proposalManager.getLabcontacts()[0].personVO.familyName;
+		if (EXI.proposalManager.getProposals()[0] != null){
+		const proposalName = EXI.proposalManager.getProposals()[0].proposal;
 		new EmailNotification().sendEmailNotification({
 			recipientEmail: EXI.proposalManager.getLabcontacts()[0].personVO.emailAddress,
-			subject: "Dewar(s) is sent to DESY, Hamburg",
-			msgBody: `Dear ${labContactName}, you have just sent your dewar(s) to P11 beamline (DESY, Hamburg).`,
+			subject: `Dewar(s) is sent to DESY, Hamburg, proposal: ${proposalName}`,
+			msgBody: `Dear ${labContactName}, we have just sent dewar(s) to P11 beamline (DESY, Hamburg) for proposal ${proposalName}.`,
 		});
+		}
 	}
 }
 
