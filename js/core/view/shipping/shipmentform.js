@@ -140,32 +140,30 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 		}
 	}
 
-	/** It disables button Sent Shipment to facility if there is at least one dewar which dewarStatus is not "label printed"  */
-	if (shipment.dewarVOs.length == 0 || _.filter(shipment.dewarVOs, function(o){return o.dewarStatus != "label printed"}).length > 0){
-		$("#" + _this.id + "-send-button").addClass("disabled");
-	}
-	else{
-		$("#" + _this.id + "-send-button").removeClass("disabled");
-	}
+
 	var warningProcessingLabel = "";
 	var statusButtonLabel = "Send notification of shipping to facility";
+	let hideSendNotificationButton = false;
     if (shipment != null){
         if (shipment.shippingStatus == _this.sentToFacilityStatus || shipment.shippingStatus == _this.sentToFacilityStatus2 || shipment.shippingStatus == _this.atFacilityStatus || shipment.shippingStatus == _this.atLocal){
 			statusButtonLabel = "Notification of shipping is already sent to the facility";
-			$("#" + _this.id + "-send-button").removeClass("enabled");
-            $("#" + _this.id + "-send-button").addClass("disabled");
+			hideSendNotificationButton = true;
         }
     }
 
     dust.render("shipping.form.template", {id : this.id, to : toData, 
-		from : fromData, beamlineName : beamlineName, 
-		startDate : startDate, shipment : shipment, 
-		nbReimbDewars : nbReimbDewars, 
-		reimbText : reimbText,
-		hidePrintLabelWarning : hidePrintLabelWarning,
-		statusButtonLabel: statusButtonLabel,
-		warningProcessingLabel: warningProcessingLabel,
-		fedexCode : fedexCode}, function(err, out){
+		from : fromData,
+		beamlineName,
+		startDate,
+		shipment,
+		nbReimbDewars,
+		reimbText,
+		hideSendNotificationButton,
+		hidePrintLabelWarning,
+		statusButtonLabel,
+		warningProcessingLabel,
+		fedexCode
+	}, function(err, out){
 		html = out;
 	});
 	
@@ -190,29 +188,43 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 	
 	}
 
-	$("#" + _this.id + "-send-button").unbind('click').click(function(sender){
+	$("#" + _this.id + "-send-button").unbind('click');
+	$("#" + _this.id + "-send-button").children().unbind('click');
 
-        if (_this.shipment != null){
-            if (_this.shipment.shippingStatus == _this.openedStatus){
-                _this.updateStatus(_this.shipment.shippingId, _this.sentToFacilityStatus);
-				Ext.Msg.show({
-					title : 'You have sent your shipment to the facility.',
-					msg : "To proceed further, please, reload the EXI page or press F5  to update its content.",
-					icon : Ext.Msg.INFO,
-					animEl : 'elId'
-				});
-            }
-        }
-	});
+	/** It disables button Sent Shipment to facility if there is at least one dewar which dewarStatus is not "label printed"  */
+	if (shipment.dewarVOs.length == 0 || _.filter(shipment.dewarVOs, function(o){return o.dewarStatus != "label printed"}).length > 0){
+		$("#" + _this.id + "-send-button").children().addClass("disabled");
+	}
+	else{
+		$("#" + _this.id + "-send-button").children().removeClass("disabled");
+	}
 
 	/** It disables button Sent Shipment to facility if there is at least one dewar which dewarStatus is not "label printed"  */
 	if (!hidePrintLabelWarning){
-		$("#" + _this.id + "-send-button").addClass("disabled");
-	}/*
+		$("#" + _this.id + "-send-button").children().addClass("disabled");
+	}
 	else {
-		$("#" + _this.id + "-send-button").removeClass("disabled");
-	}*/
+		$("#" + _this.id + "-send-button").children().removeClass("disabled").addClass("enabled")
+			.unbind('click').click(function(sender){
 
+			if (_this.shipment != null){
+				if (_this.shipment.shippingStatus == _this.openedStatus){
+					_this.updateStatus(_this.shipment.shippingId, _this.sentToFacilityStatus);
+					Ext.Msg.show({
+						title : 'You have sent your shipment to the facility.',
+						msg : "To proceed further, please, reload the EXI page or press F5  to update its content.",
+						icon : Ext.Msg.INFO,
+						animEl : 'elId'
+					});
+				}
+			}
+		});
+	}
+	if (shipment != null){
+		if (shipment.shippingStatus == _this.sentToFacilityStatus || shipment.shippingStatus == _this.sentToFacilityStatus2 || shipment.shippingStatus == _this.atFacilityStatus || shipment.shippingStatus == _this.atLocal){
+			$("#" + _this.id + "-send-button").children().removeClass("enabled").addClass("disabled");
+		}
+	}
 
 
 	$("#transport-history-" + this.id).html(this.dewarTrackingView.getPanel());

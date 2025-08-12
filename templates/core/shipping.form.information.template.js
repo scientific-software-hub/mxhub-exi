@@ -46,12 +46,13 @@
             <!-- Right Column: Buttons -->
             <td style="vertical-align: top; width: 50%;">
                 <!-- Status Button -->
+                {@eq key=hideSendNotificationButton value="false" type="boolean"}
                 <div style="margin-bottom: 10px;">
                     <a id="{id}-send-button">
                         <button class="btn btn-primary btn-md" style="height: 50px;">{statusButtonLabel}</button>
                     </a>
                 </div>
-
+                {/eq}
                 <!-- Optional Warning -->
                 {@eq key=hidePrintLabelWarning value="false" type="boolean"}
                 <div class="alert alert-warning" style="font-size: 12px; max-width: 300px; margin-bottom: 10px; padding: 8px;">
