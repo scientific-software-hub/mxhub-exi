@@ -88,6 +88,7 @@ function ShipmentForm(args) {
 	this.sentToFacilityStatus2 = "Sent_to_DESY";
 	this.atFacilityStatus = "at DESY";
 	this.atFacilityStatus2 = "at_DESY";
+	this.atLocal = "at LOCAL";
 	this.processingStatus = "processing";
 }
 
@@ -149,7 +150,7 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 	var warningProcessingLabel = "";
 	var statusButtonLabel = "Send notification of shipping to facility";
     if (shipment != null){
-        if (shipment.shippingStatus == _this.sentToFacilityStatus || shipment.shippingStatus == _this.sentToFacilityStatus2){
+        if (shipment.shippingStatus == _this.sentToFacilityStatus || shipment.shippingStatus == _this.sentToFacilityStatus2 || shipment.shippingStatus == _this.atFacilityStatus || shipment.shippingStatus == _this.atLocal){
 			statusButtonLabel = "Notification of shipping is already sent to the facility";
 			$("#" + _this.id + "-send-button").removeClass("enabled");
             $("#" + _this.id + "-send-button").addClass("disabled");
