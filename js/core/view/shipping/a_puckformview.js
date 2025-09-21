@@ -380,7 +380,7 @@ PuckFormView.prototype.checkSampleNames = function(sampleNames, proteinIds) {
 */
 PuckFormView.prototype.save = function(returnToShipment) {		
 	var _this = this;
-
+debugger
 	var puck = this.containerSpreadSheet.getPuck();
 		
 	/** Check if all samples have got a name */

@@ -298,6 +298,7 @@ SampleChangerWidget.prototype.getPanel = function () {
 * @return {Array} An array of the pucks that couldn't be loaded
 */
 SampleChangerWidget.prototype.loadSamples = function (samples, containerIdsMap) {
+	//TODO refactor with JS Array
 	var pucksToBeLoaded = {};
 	var errorPucks = [];
 	for (sampleIndex in samples) {
@@ -318,15 +319,18 @@ SampleChangerWidget.prototype.loadSamples = function (samples, containerIdsMap) 
 				if (Number(sample.BLSample_location) > puck.capacity) {
 					sample.hasError = true;
 					errorPucks = _.union(errorPucks,[puck]);
+					debugger
 					$("#" + puck.id).addClass("puck-error");
 				}
 				if (sample.Dewar_dewarId != currentDewar) {
 					errorPucks = _.union(errorPucks,[puck]);
+					debugger
 					$("#" + puck.id).addClass("puck-error");
 				}
 				if (sample.BLSample_location == ""){
 					sample.hasError = true;
 					errorPucks = _.union(errorPucks,[puck]);
+					debugger
 					$("#" + puck.id).addClass("puck-error");
 				}
 			}
@@ -335,6 +339,7 @@ SampleChangerWidget.prototype.loadSamples = function (samples, containerIdsMap) 
 			// $.notify("Capacity Error: Couldn't load correctly the puck at location " + this.convertIdToSampleChangerLocation(puck.id) + ".", "error");
 			puck.containerId = pucksToBeLoaded[puck.id][0].Container_containerId;
 			errorPucks.push(puck);
+			debugger
 			$("#" + puck.id).addClass("puck-error");
 		}
 		puck.loadSamples(pucksToBeLoaded[puck.id]);
