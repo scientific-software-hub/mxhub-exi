@@ -183,6 +183,8 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 		    if (!this.hasDataCollections(shipment) && shipment.shippingStatus != this.processingStatus){
 		        $("#" + _this.id + "-delete-button").removeClass("disabled");
 		    }
+		}else{
+			$("#" + _this.id + "-delete-button").addClass("hidden");
 		}
 
 		$("#" + _this.id + "-delete-button").unbind('click').click(function(sender){
