@@ -4,12 +4,14 @@ const sendNotificationWhenShippingStatusIsSentToFacility = (sender, newStatus) =
 		const labContactName = EXI.proposalManager.getLabcontacts()[0].personVO.title + " " +
 			EXI.proposalManager.getLabcontacts()[0].personVO.givenName + " " +
 			EXI.proposalManager.getLabcontacts()[0].personVO.familyName;
+		const comments = sender.shipment?.comments || "none";
+		const sessionId = sender.shipment?.sessions[0].sessionId ?? undefined;
 		if (EXI.proposalManager.getProposals()[0] != null){
 		const proposalName = EXI.proposalManager.getProposals()[0].proposal;
 		new EmailNotification().sendEmailNotification({
 			recipientEmail: EXI.proposalManager.getLabcontacts()[0].personVO.emailAddress,
-			subject: `Dewar(s) is sent to DESY, Hamburg, proposal: ${proposalName}`,
-			msgBody: `Dear ${labContactName}, we have just sent dewar(s) to P11 beamline (DESY, Hamburg) for proposal ${proposalName}.`,
+			subject: `[exi] Dewars were sent. Proposal: ${proposalName} SessionID: ${sessionId}`,
+			msgBody: `Dewars were sent to P11 for proposal= ${proposalName} with sessionID= ${sessionId}. Comments: ${comments}.`,
 		});
 		}
 	}
@@ -53,6 +55,7 @@ function ShipmentForm(args) {
 	this.id = BUI.id();
 	this.width = 600;
 	this.padding = 10;
+	this.shipment = null;
 
 	if (args != null) {
 		if (args.creationMode != null) {

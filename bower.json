@@ -15,7 +15,9 @@
     "SAXS"
   ],
   "authors": [
-    "Alejandro de Maria Antolinos"
+    "Alejandro de Maria Antolinos",
+    "Olga Merkulova",
+    "Igor Khokhriakov"
   ],
   "private": false,
   "license": "MIT",

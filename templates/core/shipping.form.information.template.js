@@ -40,7 +40,7 @@
                     <!-- Left Column: Comments -->
                     <td style="vertical-align: top; width: 50%;">
                     <label><b>Comments:</b></label>
-                    <textarea class="form-control disabled" rows="4" style="margin-top: 10px;">{shipment.comments}</textarea>
+                    <textarea readonly class="form-control disabled" rows="4" style="margin-top: 10px;" title='Click "Edit" to change'>{shipment.comments}</textarea>
             </td>
 
             <!-- Right Column: Buttons -->
