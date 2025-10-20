@@ -66,25 +66,37 @@ module.exports = function(grunt) {
                         }
                     }
                 },
-                uglify : {
-                    prod : {
-                        options : {
-                            sourceMap: true,
-                            sourceMapIncludeSources: true,
-                            beautify:true,
-                            ecma: 6,
+                terser: {
+                    prod: {
+                        options: {
+                            sourceMap: {
+                                // Enable source maps and include the sources automatically
+                                includeSources: true
+                            },
+                            ecma: 2020, // supports ?. and ??
+                            compress: true,
+                            mangle: true,
+                            format: {
+                                beautify: true
+                            }
                         },
-
-                        files : {
-                           'min/exi.min.js' : ['min/exi.tools.js', 'min/ispyb-client.js', 'min/exi.js', 'min/exi.mx.js', 'min/exi.saxs.js', 'min/exi.em.js',
-                                    'min/exi.test.js',
-                                    'min/precompiled.templates.min.js' ],
+                        files: {
+                            'min/exi.min.js': [
+                                'min/exi.tools.js',
+                                'min/ispyb-client.js',
+                                'min/exi.js',
+                                'min/exi.mx.js',
+                                'min/exi.saxs.js',
+                                'min/exi.em.js',
+                                'min/exi.test.js',
+                                'min/precompiled.templates.min.js'
+                            ],
                             'min/exi.saxs.min.js' : ['min/ispyb-client.js', 'min/exi.tools.js', 'min/exi.js',
-                                    'min/exi.saxs.js', 'min/exi.test.js',
-                                    'min/precompiled.templates.min.js' ],
+                                'min/exi.saxs.js', 'min/exi.test.js',
+                                'min/precompiled.templates.min.js' ],
                             'min/exi.tracking.min.js' : [ 'min/exi.js',
-                                    'min/exi.tracking.js', 'min/exi.test.js',
-                                    'min/precompiled.templates.min.js' ],
+                                'min/exi.tracking.js', 'min/exi.test.js',
+                                'min/precompiled.templates.min.js' ],
                             'min/lightbox.js' : [ 'bower_components/lightbox2/dist/js/lightbox.js']
                         }
                     }
@@ -263,12 +275,12 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-wiredep');
     grunt.loadNpmTasks('grunt-include-source');
-    grunt.loadNpmTasks('grunt-contrib-uglify-es');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-watch');
     // grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-plato');
+    grunt.loadNpmTasks('grunt-terser');
     grunt.loadNpmTasks('grunt-dustjs');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -279,7 +291,7 @@ module.exports = function(grunt) {
     grunt.task
             .registerTask('report', [ 'plato:all', 'plato:saxs', 'plato:mx' ]);
     grunt.task.registerTask('default', [ 'dustjs', // 'jshint:prod',
-            'concat:prod', 'uglify:prod', 'cssmin:prod', 'yuidoc:compile', 'asset_cachebuster' ]);
+            'concat:prod', 'terser:prod', 'cssmin:prod', 'yuidoc:compile', 'asset_cachebuster' ]);
     grunt.task.registerTask('dev', [ 'dustjs', 'includeSource:dev',
             'cssmin:prod', 'wiredep', 'asset_cachebuster' ]);
 
