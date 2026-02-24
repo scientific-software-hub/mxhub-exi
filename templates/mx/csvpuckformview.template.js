@@ -30,6 +30,8 @@
          {/eq}
          </div>
       </td>
+      </tr>
+      <tr>
       <td>
          <div id="{.noProteinInDb}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
             Protein should be <u>added before</u> importing/adding.
@@ -39,6 +41,16 @@
          <div id="{.uniquenessSampleNamePanelId}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
             "Protein" + "Sample Name" should be unique for the <u>whole shipment</u>
          </div>
+      </td>
+      <td>
+         <div id="{.noSpecialSymbolsSampleNameId}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+               "Sample Name" should <u>not</u> contain special symbols
+         </div>
+      </td>
+      <td>
+          <div id="{.noSpecialSymbolsProteinNameId}" class="alert alert-warning" style="margin-bottom: 1px;height: 20px;  line-height:20px;  padding:0px 5px 0px 10px;display:inline-block;margin:5px;" role="alert">
+               "Protein" should <u>not</u> contain special symbols
+          </div>
       </td>
    </tr>
     <tr style='height:35px;'>
