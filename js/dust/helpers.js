@@ -204,6 +204,60 @@ dust.helpers.formatDate = function (chunk, context, bodies, params) {
     return chunk;
 }
 
+dust.helpers.formatDateTime = function (chunk, context, bodies, params) {
+    var raw = params.value;
+    if (!raw) return chunk.write('');
+
+    var d = new Date(raw);
+    if (isNaN(d)) return chunk.write('');
+
+    var mm = ("0" + (d.getMonth() + 1)).slice(-2);
+    var dd = ("0" + d.getDate()).slice(-2);
+    var yyyy = d.getFullYear();
+
+    var hh = ("0" + d.getHours()).slice(-2);
+    var min = ("0" + d.getMinutes()).slice(-2);
+    var ss = ("0" + d.getSeconds()).slice(-2);
+
+    var formatted = mm + "/" + dd + "/" + yyyy +
+        " " + hh + ":" + min + ":" + ss;
+
+    return chunk.write(formatted);
+};
+
+dust.helpers.calculateDuration = function (chunk, context, bodies, params) {
+
+    var startRaw = params.start;
+    var endRaw = params.end;
+
+    if (!startRaw || !endRaw) {
+        return chunk.write('');
+    }
+
+    var start = new Date(startRaw);
+    var end = new Date(endRaw);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return chunk.write('');
+    }
+
+    var diffMs = end - start;
+
+    if (diffMs < 0) {
+        return chunk.write('');
+    }
+
+    var totalSeconds = Math.floor(diffMs / 1000);
+
+    var hours = Math.floor(totalSeconds / 3600);
+    var minutes = Math.floor((totalSeconds % 3600) / 60);
+    var seconds = totalSeconds % 60;
+
+    var result = hours + "h " + minutes + "m " + seconds + "s";
+
+    return chunk.write(result);
+};
+
 dust.helpers.uppercase = function (chunk, context, bodies, params) {
     if (params.key) {
         var value = context.current()[params.key];
