@@ -109,6 +109,7 @@ CSVContainerSpreadSheet.prototype.resetErrors = function() {
 		INCORRECT_CONTAINER_TYPE : [],
 		INCORRECT_SAMPLE_POSITION : [],
 		INCORRECT_SAMPLE_NAME : [],
+		INCORRECT_PROTEIN_NAME : [],
 		NO_PROTEIN_IN_DB : []
 	};
 };
@@ -183,6 +184,22 @@ CSVContainerSpreadSheet.prototype.validateRow = function(row, rowIndex, sampleNa
 	var sampleName = row[this.SAMPLENAME_INDEX];
 
 	var validateRow = true
+
+	if (!this.isSampleNameValid(sampleName)){
+		this.errors.INCORRECT_SAMPLE_NAME.push({
+			value 		: sampleName,
+			rowIndex	: rowIndex
+		});
+		validateRow = false;
+	}
+
+	if (!this.isProteinNameValid(proteinName)){
+		this.errors.INCORRECT_PROTEIN_NAME.push({
+			value 		: proteinName,
+			rowIndex	: rowIndex
+		});
+		validateRow = false;
+	}
 
 	if (!this.isParcelNameValid(parcelName)){
 		this.errors.INCORRECT_PARCEL_NAME.push({
@@ -598,24 +615,23 @@ CSVContainerSpreadSheet.prototype.isProteinInDB = function(proteinName) {
 
 
 /**
- * Checks the name of the sample. (ProteinId + sample name) should be unique for the whole proposal and not empty or null
+ * Checks the name of the sample contains special characters
  * @method isSampleNameValid
- *  @param {String} parcelName Name of the parcel read from CSV
- * @return {Boolean} Returns true if name of the parcel is ok
+ *  @param {String} sampleName Name of the sample name read from CSV
+ * @return {Boolean} Returns true if name of the sample name is ok
  */
-CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, proteinName, sampleNamesProteinIds) {
-	if ((sampleName == undefined)||(sampleName == "")){					
-			return false;		
-	}
-	var protein = this.getProteinByAcronym(proteinName);
-	if (protein){
-		const conflicts = this.puckValidator.checkSampleNames([sampleName], [protein.proteinId], sampleNamesProteinIds);
-		const isValidSampleName = conflicts.length === 0;
-		return isValidSampleName;
-	} else {
-		return false;
-	}
-	
+CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName) {
+	return /^[a-zA-Z0-9_-]+$/.test(sampleName);
+};
+
+/**
+ * Checks the name of the sample contains special characters
+ * @method isProteinNameValid
+ *  @param {String} ProteinName Name of the Protein Name read from CSV
+ * @return {Boolean} Returns true if name of the Protein Name is ok
+ */
+CSVContainerSpreadSheet.prototype.isProteinNameValid = function(proteinName) {
+	return /^[a-zA-Z0-9_-]+$/.test(proteinName);
 };
 
 /**

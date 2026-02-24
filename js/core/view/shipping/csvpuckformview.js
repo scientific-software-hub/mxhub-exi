@@ -26,6 +26,8 @@ function CSVPuckFormView(args) {
     this.acceptedContainerListPanelId = this.id + "_acceptedContainerListPanelId";
 	this.uniquenessContainerNamelPanelId = this.id + "_uniquenessContainerNamelPanelId";
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
+	this.noSpecialSymbolsSampleNameId = this.id + "_noSpecialSymbolsSampleNameId";
+	this.noSpecialSymbolsProteinNameId = this.id + "_noSpecialSymbolsProteinNameId";
 	this.noProteinInDb = this.id + "_noProteinInDbPanelId";
 
 
@@ -219,7 +221,10 @@ CSVPuckFormView.prototype.save = function() {
 		if (this.displayErrors(errors.NO_PROTEIN_IN_DB, this.noProteinInDb, "")){
 			return;
 		}
-		if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.uniquenessSampleNamePanelId, "")){
+		if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.noSpecialSymbolsSampleNameId, "")){
+			return;
+		}
+		if (this.displayErrors(errors.INCORRECT_PROTEIN_NAME, this.noSpecialSymbolsProteinNameId, "")){
 			return;
 		}
 	}
@@ -248,6 +253,8 @@ CSVPuckFormView.prototype.getWarningPanelsHTML = function() {
 								acceptedContainerListPanelId 	: this.acceptedContainerListPanelId,
 								uniquenessContainerNamelPanelId : this.uniquenessContainerNamelPanelId,
 								uniquenessSampleNamePanelId 	: this.uniquenessSampleNamePanelId,
+						        noSpecialSymbolsSampleNameId    : this.noSpecialSymbolsSampleNameId,
+						        noSpecialSymbolsProteinNameId   : this.noSpecialSymbolsProteinNameId,
 								showOnlyUnipuckMessage          : showOnlyUnipuckMessageValue,
 								siteName    					: siteName
 					}, 
