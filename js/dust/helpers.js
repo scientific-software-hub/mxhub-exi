@@ -253,7 +253,7 @@ dust.helpers.calculateDuration = function (chunk, context, bodies, params) {
     var minutes = Math.floor((totalSeconds % 3600) / 60);
     var seconds = totalSeconds % 60;
 
-    var result = hours + "h " + minutes + "m " + seconds + "s";
+    var result = "[" + hours + "]:" + minutes + ":" + seconds;
 
     return chunk.write(result);
 };
