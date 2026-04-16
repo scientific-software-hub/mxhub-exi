@@ -1,4 +1,5 @@
 package-lock.json
+cypress.env.json
 min/
 report/
 documentation/
@@ -55,3 +56,4 @@ mx/config-localhost.js
 # Files left by MacOS
 .DS_Store
 
+.gitnexus

@@ -1,0 +1,99 @@
+[
+  {
+    "proposal": [
+      {
+        "proposalId": 1,
+        "proposalCode": "MX",
+        "proposalNumber": "1234",
+        "type": "MX"
+      }
+    ],
+    "macromolecules": [],
+    "ligands": [],
+    "crystals": [],
+    "plateTypes": [],
+    "buffers": [],
+    "stockSolutions": [],
+    "labcontacts": [],
+    "proteins": [
+      {
+        "proteinId": 1,
+        "name": "Miller protein",
+        "acronym": "VXR",
+        "safetyLevel": "GREEN",
+        "molecularMass": 373359.74,
+        "proteinType": "Ligand",
+        "sequence": null,
+        "personId": null,
+        "isCreatedBySampleSheet": 0,
+        "externalId": null,
+        "pcStateManager": null
+      },
+      {
+        "proteinId": 2,
+        "name": "Robinson protein",
+        "acronym": "WRN",
+        "safetyLevel": "RED",
+        "molecularMass": 372927.19,
+        "proteinType": "Protein",
+        "sequence": null,
+        "personId": null,
+        "isCreatedBySampleSheet": 0,
+        "externalId": null,
+        "pcStateManager": null
+      },
+      {
+        "proteinId": 3,
+        "name": "Davis protein",
+        "acronym": "DCM",
+        "safetyLevel": "RED",
+        "molecularMass": 234837.41,
+        "proteinType": "Buffer",
+        "sequence": null,
+        "personId": null,
+        "isCreatedBySampleSheet": 0,
+        "externalId": null,
+        "pcStateManager": null
+      },
+      {
+        "proteinId": 4,
+        "name": "5-HT3 Receptor",
+        "acronym": "5HT3",
+        "safetyLevel": "GREEN",
+        "molecularMass": 100000.0,
+        "proteinType": "Protein",
+        "sequence": null,
+        "personId": null,
+        "isCreatedBySampleSheet": 0,
+        "externalId": null,
+        "pcStateManager": null
+      },
+      {
+        "proteinId": 5,
+        "name": "Dectin-2",
+        "acronym": "decx2",
+        "safetyLevel": "GREEN",
+        "molecularMass": 150000.0,
+        "proteinType": "Protein",
+        "sequence": null,
+        "personId": null,
+        "isCreatedBySampleSheet": 0,
+        "externalId": null,
+        "pcStateManager": null
+      },
+      {
+        "proteinId": 6,
+        "name": "Keratin H",
+        "acronym": "krth",
+        "safetyLevel": "GREEN",
+        "molecularMass": 120000.0,
+        "proteinType": "Protein",
+        "sequence": null,
+        "personId": null,
+        "isCreatedBySampleSheet": 0,
+        "externalId": null,
+        "pcStateManager": null
+      }
+    ]
+  }
+]

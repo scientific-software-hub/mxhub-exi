@@ -23,7 +23,10 @@
     "jshint-stylish": "^2.0.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "http-server . -p 3000 -c-1",
+    "test:e2e": "cypress run --spec 'cypress/e2e/shipping/**'",
+    "cypress:open": "cypress open"
   },
   "repository": {
     "type": "git",
@@ -40,7 +43,9 @@
   },
   "homepage": "https://github.com/ispyb/EXI",
   "devDependencies": {
+    "cypress": "^13.17.0",
     "grunt": "^0.4.5",
-    "grunt-asset-cachebuster": "^0.5.0"
+    "grunt-asset-cachebuster": "^0.5.0",
+    "http-server": "^14.1.1"
   }
 }
