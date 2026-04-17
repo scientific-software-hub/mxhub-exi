@@ -92,6 +92,7 @@ CSVContainerSpreadSheet.prototype.updateNumberOfRows  = SpreadSheet.prototype.up
 CSVContainerSpreadSheet.prototype.emptyRow  = SpreadSheet.prototype.emptyRow;
 CSVContainerSpreadSheet.prototype.parseTableData  = ContainerSpreadSheet.prototype.parseTableData;
 CSVContainerSpreadSheet.prototype.disableAll  = ContainerSpreadSheet.prototype.disableAll;
+CSVContainerSpreadSheet.prototype.isSampleNameValid = ContainerSpreadSheet.prototype.isSampleNameValid;
 
 CSVContainerSpreadSheet.prototype._getContainerTypeControlledListNames = function() {
 	return _.map(this.containerTypeControlledList, "name");
@@ -663,6 +664,7 @@ CSVContainerSpreadSheet.prototype.isContainerNameValid = function(containerName)
 CSVContainerSpreadSheet.prototype.getHeader = function() {	
     var _this = this;
 	var header = [];
+	const duplicatePairsProteinSampleName= getDuplicatePairsProteinSampleNameFromCSV();
 
 	var disabledRenderer = function(instance, td, row, col, prop, value, cellProperties){
 		if (value != undefined){
@@ -717,10 +719,35 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 		
 	}
 
+	const getDuplicatePairsProteinSampleNameFromCSV = function(){
+		const seen = new Set();
+		const duplicates = [];
+		const csvData = _this.spreadSheet.getData();
+		for (const row of csvData) {
+			const key = `${row[this.PROTEINACRONYM_INDEX]}|${row[this.SAMPLENAME_INDEX]}`;
+			if (seen.has(key)) {
+				duplicates.push(row);
+			} else {
+				seen.add(key);
+			}
+		}
+		return duplicates;
+	}
+
 	var sampleParameterRenderer = function(value, callback){
-		const proteinName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.PROTEINACRONYM_INDEX);
-		const isSampleNameValid = _this.isSampleNameValid(value, proteinName, _this.proposalSamples);
-		callback(isSampleNameValid);
+		debugger
+		//This is the first creating of a shipment content and there is no data in DB for this session. We import data and have to validate file's content only
+		if (_this.proposalSamples.length === 0 && _this.spreadSheet.getData().length>0) {
+			const sampleName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.SAMPLENAME_INDEX);
+			const isSampleNameInDuplicated = duplicatePairsProteinSampleName.some(row => row[this.SAMPLENAME_INDEX] === sampleName);
+			callback(isSampleNameInDuplicated);
+		}
+		// There is data assigned to this session in DB and we also import data from CSV and have to validate for both (CSV and data from DB)
+		else {
+			const proteinName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.PROTEINACRONYM_INDEX);
+			const isSampleNameValid = _this.isSampleNameValid(value, proteinName, _this.proposalSamples);
+			callback(isSampleNameValid);
+		}
 	}
     /** Checking parcels name */
 	var parcelDisplayCell = function(instance, td, row, col, prop, value, cellProperties){				

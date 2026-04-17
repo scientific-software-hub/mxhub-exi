@@ -129,6 +129,7 @@ FlexHCDWidget.prototype.convertSampleChangerLocationToId = function (sampleChang
 };
 
 FlexHCDWidget.prototype.onRender = function () {
+	debugger
 	//Disable the 24th puck
 	var puck24 = this.findPuckById(this.id + "-8-3");
 	this.addClassToPuck(puck24,"puck-always-disabled");

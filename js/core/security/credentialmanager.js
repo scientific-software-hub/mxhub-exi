@@ -101,6 +101,7 @@ CredentialManager.prototype.getBeamlines = function () {
  * @return
  */
 CredentialManager.prototype.getDefaultSampleChanger = function () {
+  debugger
   var connections = this.getConnections();
   var sc = connections[0].defaultSampleChanger;
   return sc;
@@ -113,7 +114,6 @@ CredentialManager.prototype.getDefaultSampleChanger = function () {
 * @return
 */
 CredentialManager.prototype.getSiteName = function(){
-debugger;
 	var connections = this.getConnections();
 	var siteName = ExtISPyB.default_site;
 	if (connections != null && connections.length > 0){
