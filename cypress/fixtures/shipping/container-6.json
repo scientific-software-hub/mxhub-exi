@@ -1,0 +1,57 @@
+{
+  "containerId": 6,
+  "code": "containerA",
+  "containerType": "Unipuck",
+  "capacity": 16,
+  "beamlineName": "P11",
+  "sampleChangerLocation": null,
+  "containerStatus": "at facility",
+  "sampleVOs": [
+    {
+      "blSampleId": 101,
+      "location": 1,
+      "name": "sample-001",
+      "code": "BC001",
+      "smiles": null,
+      "comments": null,
+      "structureStage": null,
+      "crystalVO": {
+        "proteinVO": { "proteinId": 4, "acronym": "5HT3" },
+        "spaceGroup": null,
+        "cellA": null, "cellB": null, "cellC": null,
+        "cellAlpha": null, "cellBeta": null, "cellGamma": null
+      },
+      "diffractionPlanVO": {
+        "experimentKind": null,
+        "aimedResolution": null, "requiredResolution": null,
+        "preferredBeamDiameter": null, "numberOfPositions": null,
+        "aimedMultiplicity": null, "aimedCompleteness": null,
+        "forcedSpaceGroup": null, "radiationSensitivity": null,
+        "axisRange": null, "minOscWidth": null, "observedResolution": null
+      }
+    },
+    {
+      "blSampleId": 102,
+      "location": 2,
+      "name": "sample-002",
+      "code": "BC002",
+      "smiles": null,
+      "comments": null,
+      "structureStage": null,
+      "crystalVO": {
+        "proteinVO": { "proteinId": 4, "acronym": "5HT3" },
+        "spaceGroup": null,
+        "cellA": null, "cellB": null, "cellC": null,
+        "cellAlpha": null, "cellBeta": null, "cellGamma": null
+      },
+      "diffractionPlanVO": {
+        "experimentKind": null,
+        "aimedResolution": null, "requiredResolution": null,
+        "preferredBeamDiameter": null, "numberOfPositions": null,
+        "aimedMultiplicity": null, "aimedCompleteness": null,
+        "forcedSpaceGroup": null, "radiationSensitivity": null,
+        "axisRange": null, "minOscWidth": null, "observedResolution": null
+      }
+    }
+  ]
+}

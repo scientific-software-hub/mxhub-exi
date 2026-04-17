@@ -1,0 +1,14 @@
+[
+  {
+    "BLSample_blSampleId": 101,
+    "BLSample_name": "sample-001",
+    "Protein_proteinId": 4,
+    "DataCollectionGroup_dataCollectionGroupId": null
+  },
+  {
+    "BLSample_blSampleId": 102,
+    "BLSample_name": "sample-002",
+    "Protein_proteinId": 4,
+    "DataCollectionGroup_dataCollectionGroupId": null
+  }
+]

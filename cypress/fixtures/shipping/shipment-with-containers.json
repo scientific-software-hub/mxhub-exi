@@ -1,0 +1,35 @@
+{
+  "shippingId": 1,
+  "shippingName": "Shipment-001",
+  "shippingStatus": "opened",
+  "shippingType": "INTERNAL",
+  "deliveryAgentAgentName": "TNT",
+  "deliveryAgentAgentCode": "oR-327648",
+  "deliveryAgentFlightCode": "Zu5030",
+  "deliveryAgentShippingDate": "Jan 13, 2026, 12:00:00 AM",
+  "deliveryAgentDeliveryDate": "Jan 18, 2026, 12:00:00 AM",
+  "timeStamp": "Apr 16, 2026, 9:20:57 PM",
+  "creationDate": "Jan 13, 2026, 12:00:00 AM",
+  "isStorageShipping": false,
+  "comments": null,
+  "sendingLabContactVO": null,
+  "returnLabContactVO": null,
+  "returnCourier": null,
+  "dateOfShippingToUser": null,
+  "dewarVOs": [
+    {
+      "dewarId": 10,
+      "code": "dewarA",
+      "comments": null,
+      "containerVOs": [
+        {
+          "containerId": 20,
+          "code": "containerA",
+          "containerType": "Unipuck",
+          "capacity": 16
+        }
+      ]
+    }
+  ],
+  "sessions": []
+}
