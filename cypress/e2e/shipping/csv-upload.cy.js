@@ -122,6 +122,45 @@ function waitForSpreadsheetRows() {
   return cy.get('.htCore td', { timeout: 6000 }).should('have.length.greaterThan', 0);
 }
 
+// ─── Intercept setup variants ────────────────────────────────────────────────
+
+// Like setupIntercepts() but serves a shipment that already has dewarA/containerA,
+// used to test INCORRECT_PARCEL_NAME and INCORRECT_CONTAINER_NAME.
+function setupInterceptsWithExistingContainers() {
+  cy.intercept('POST', '**/authenticate*', {
+    body: { roles: ['Manager'], token: 'test-token' },
+  }).as('authenticate');
+  cy.intercept('GET', '**/session/date/**', { body: [] }).as('getSessions');
+  cy.intercept('GET', '**/proposal/list',   { body: [] }).as('getProposals');
+  cy.intercept('GET', '**/shipping/1/get',
+    { fixture: 'shipping/shipment-with-containers.json' }).as('getShipment');
+  cy.intercept('GET', '**/shipping/1/shipmentIds',     { body: [] }).as('getShipmentIds');
+  cy.intercept('GET', '**/mx/sample/shipmentid/*/list',{ body: [] }).as('getSamples');
+  cy.intercept('GET', '**/info/get', { fixture: 'proposal/info.json' }).as('getProposalInfo');
+  cy.intercept('GET', '**/shipping/1/datacollecitons/list', { body: [] }).as('getDataCollections');
+  cy.intercept('POST', '**/shipping/1/dewars/add',
+    { fixture: 'shipping/add-dewars-success.json' }).as('addDewars');
+}
+
+// Like setupIntercepts() but seeds an existing sample (sample-001 / proteinId 4)
+// in a second shipment, used to test the proposal-conflict branch of INCORRECT_SAMPLE_NAME.
+function setupInterceptsWithProposalSample() {
+  cy.intercept('POST', '**/authenticate*', {
+    body: { roles: ['Manager'], token: 'test-token' },
+  }).as('authenticate');
+  cy.intercept('GET', '**/session/date/**', { body: [] }).as('getSessions');
+  cy.intercept('GET', '**/proposal/list',   { body: [] }).as('getProposals');
+  cy.intercept('GET', '**/shipping/1/get',  { fixture: 'shipping/shipment.json' }).as('getShipment');
+  // Return a second shipment id so getSamplesFromProposal() fetches its samples
+  cy.intercept('GET', '**/shipping/1/shipmentIds', { body: [2] }).as('getShipmentIds');
+  cy.intercept('GET', '**/mx/sample/shipmentid/2/list',
+    { fixture: 'mx/samples-shipment2.json' }).as('getSamplesShipment2');
+  cy.intercept('GET', '**/info/get', { fixture: 'proposal/info.json' }).as('getProposalInfo');
+  cy.intercept('GET', '**/shipping/1/datacollecitons/list', { body: [] }).as('getDataCollections');
+  cy.intercept('POST', '**/shipping/1/dewars/add',
+    { fixture: 'shipping/add-dewars-success.json' }).as('addDewars');
+}
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('CSV Import — #/shipping/1/import/csv', () => {
@@ -198,6 +237,119 @@ describe('CSV Import — #/shipping/1/import/csv', () => {
     // Rows 4-6 have Wtg435%01, Wtg435 02, Wtg435?03 — invalid chars
     visitCsvImportPage();
     uploadCsv('2_Test_ISPyB_import_exptype-list_CELLS_EXP_TYPE_inCorrect_specialSymbols.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_PARCEL_NAME — dewar name already exists in shipment ────────────
+
+  it('shows a validation error when the dewar name already exists in the shipment', () => {
+    // Shipment fixture already contains dewarA, so the CSV row with dewarA is rejected.
+    // CSVContainerSpreadSheet.isParcelNameValid() checks dewarNameControlledList.
+    setupInterceptsWithExistingContainers();
+    visitCsvImportPage();
+    uploadCsv('valid.csv'); // valid.csv uses dewarA — already in the shipment fixture
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_CONTAINER_NAME — container name already exists in shipment ─────
+
+  it('shows a validation error when the container name already exists in the shipment', () => {
+    // Shipment fixture contains containerA inside dewarA.
+    // The CSV uses a fresh dewar name (dewarB) but reuses containerA.
+    setupInterceptsWithExistingContainers();
+    visitCsvImportPage();
+
+    const csvContent = 'dewarB,containerA,Unipuck,1,5HT3,sample-001\n';
+    cy.window().then((win) => {
+      const view = win.__testCsvView;
+      view.containerSpreadSheet.loadData([[]]);
+      view.containerSpreadSheet.spreadSheet.loadData(view.csvToArray(csvContent));
+    });
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_CONTAINER_TYPE — type not in allowed list ──────────────────────
+
+  it('shows a validation error for an unrecognised container type', () => {
+    visitCsvImportPage();
+    uploadCsv('invalid-container-type.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_SAMPLE_POSITION — position exceeds container capacity ──────────
+
+  it('shows a validation error when the sample position exceeds the container capacity', () => {
+    // Unipuck holds 16 samples; position 17 is invalid.
+    visitCsvImportPage();
+    uploadCsv('over-capacity.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_PROTEIN_NAME — protein acronym contains special characters ─────
+
+  it('shows a validation error for a protein acronym containing special characters', () => {
+    // "5HT3%" fails isProteinNameValid() regex; NO_PROTEIN_IN_DB also fires but
+    // is displayed earlier in the priority chain — either way save is blocked.
+    visitCsvImportPage();
+    uploadCsv('bad-protein.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_SAMPLE_NAME (duplicate within CSV) ─────────────────────────────
+
+  it('shows a validation error when the same protein+sample name pair appears twice in the CSV', () => {
+    // PuckValidator.checkSampleNames() detects the duplicate {proteinId, name} pair.
+    visitCsvImportPage();
+    uploadCsv('duplicate-sample.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
+    cy.get('@addDewars.all').should('have.length', 0);
+  });
+
+  // ── INCORRECT_SAMPLE_NAME (conflict with existing proposal sample) ────────────
+
+  it('shows a validation error when a protein+sample name combination already exists in the proposal', () => {
+    // Fixture mx/samples-shipment2.json seeds sample-001/proteinId-4 (5HT3) as an
+    // existing sample. The CSV adds the same combination, which PuckValidator rejects.
+    setupInterceptsWithProposalSample();
+    visitCsvImportPage();
+    uploadCsv('valid.csv'); // valid.csv: dewarA/containerA/5HT3/sample-001
+
+    // Wait for the async getSamplesFromProposal() chain to complete before saving
+    cy.wait('@getSamplesShipment2');
     waitForSpreadsheetRows();
 
     cy.contains('Save').click();
