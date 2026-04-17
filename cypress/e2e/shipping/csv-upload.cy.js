@@ -339,11 +339,13 @@ describe('CSV Import — #/shipping/1/import/csv', () => {
     cy.get('@addDewars.all').should('have.length', 0);
   });
 
-  // ── INCORRECT_SAMPLE_NAME (conflict with existing proposal sample) ────────────
+  // ── DUPLICATE_SAMPLE_NAME (conflict with existing proposal sample) ───────────
 
-  it('shows a validation error when a protein+sample name combination already exists in the proposal', () => {
+  it('shows the uniqueness warning when a protein+sample combination already exists in the proposal', () => {
     // Fixture mx/samples-shipment2.json seeds sample-001/proteinId-4 (5HT3) as an
-    // existing sample. The CSV adds the same combination, which PuckValidator rejects.
+    // existing sample. The CSV adds the same combination; PuckValidator pushes it to
+    // DUPLICATE_SAMPLE_NAME which is routed to uniquenessSampleNamePanelId, not
+    // the special-chars panel (that was the bug this test guards against).
     setupInterceptsWithProposalSample();
     visitCsvImportPage();
     uploadCsv('valid.csv'); // valid.csv: dewarA/containerA/5HT3/sample-001

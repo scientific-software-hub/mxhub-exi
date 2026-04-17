@@ -108,6 +108,7 @@ CSVContainerSpreadSheet.prototype.resetErrors = function() {
 		INCORRECT_CONTAINER_NAME : [],
 		INCORRECT_CONTAINER_TYPE : [],
 		INCORRECT_SAMPLE_POSITION : [],
+		DUPLICATE_SAMPLE_NAME : [],
 		INCORRECT_SAMPLE_NAME : [],
 		INCORRECT_PROTEIN_NAME : [],
 		NO_PROTEIN_IN_DB : []
@@ -158,7 +159,7 @@ CSVContainerSpreadSheet.prototype.isDataValid = function(sampleNamesProteinIds) 
 			isValid = false;
 		}
 		if(conflicts.includes(data[i][this.SAMPLENAME_INDEX])){
-			this.errors.INCORRECT_SAMPLE_NAME.push({
+			this.errors.DUPLICATE_SAMPLE_NAME.push({
 						value 		: data[i][this.SAMPLEPOSITION_INDEX],
 						rowIndex	: i
 					});
