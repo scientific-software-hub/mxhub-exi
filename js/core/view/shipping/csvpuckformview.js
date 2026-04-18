@@ -189,7 +189,6 @@ CSVPuckFormView.prototype.save = async function() {
 
 	const isValid= await this.containerSpreadSheet.isDataValid(sampleNamesProteinIds)
 	if(isValid){
-		debugger
 		var onError = function (sender, error, mesg) {
 			_this.panel.setLoading(false);
 			EXI.setError(error.responseText);

@@ -143,7 +143,7 @@ CSVContainerSpreadSheet.prototype.isDataValid = function(sampleNamesProteinIds) 
 		this.spreadSheet.validateCells((isValid) => {
 			resolve(isValid)
 		});
-	}).then(isValid => {
+	}).then(htIsValid => {
 		const sampleNames = this.spreadSheet.getDataAtCol(this.SAMPLENAME_INDEX);
 		const proteinIds = this.spreadSheet.getDataAtCol(this.PROTEINACRONYM_INDEX)
 			.map(acronym => this.getProteinByAcronym(acronym))
@@ -155,7 +155,8 @@ CSVContainerSpreadSheet.prototype.isDataValid = function(sampleNamesProteinIds) 
 			proteinIds, //proteinIds
 			sampleNamesProteinIds
 		);
-		isValid = conflicts.length === 0;
+		// Combine: HT cell-level validation (highlights invalid cells) AND conflict check
+		let isValid = htIsValid && conflicts.length === 0;
 		const data = this.spreadSheet.getData();
 
 		for (let i = 0; i< data.length; i++){
@@ -627,24 +628,74 @@ CSVContainerSpreadSheet.prototype.isProteinInDB = function(proteinName) {
 
 
 /**
- * Checks the name of the sample. (ProteinId + sample name) should be unique for the whole proposal and not empty or null
+ * Checks the sample name contains no special characters and is non-empty.
+ * Used by validateRow for error-bucket population.
  * @method isSampleNameValid
- *  @param {String} parcelName Name of the parcel read from CSV
- * @return {Boolean} Returns true if name of the parcel is ok
+ * @param {String} sampleName
+ * @return {Boolean}
  */
-CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName, proteinName, sampleNamesProteinIds) {
-	if ((sampleName == undefined)||(sampleName == "")){					
-			return false;		
-	}
-	var protein = this.getProteinByAcronym(proteinName);
-	if (protein){
-		const conflicts = this.puckValidator.checkSampleNames([sampleName], [protein.proteinId], sampleNamesProteinIds);
-		const isValidSampleName = conflicts.length === 0;
-		return isValidSampleName;
-	} else {
+CSVContainerSpreadSheet.prototype.isSampleNameValid = function(sampleName) {
+	return /^[a-zA-Z0-9_-]+$/.test(sampleName);
+};
+
+/**
+ * Checks the protein acronym contains no special characters.
+ * Used by validateRow for error-bucket population.
+ * @method isProteinNameValid
+ * @param {String} proteinName
+ * @return {Boolean}
+ */
+CSVContainerSpreadSheet.prototype.isProteinNameValid = function(proteinName) {
+	return /^[a-zA-Z0-9_-]+$/.test(proteinName);
+};
+
+/**
+ * Checks that a sample name is non-empty and the protein+sample combination does
+ * not already exist in the proposal. Used by the Handsontable cell validator.
+ * @method isSampleNameUniqueForProposal
+ * @param {String} sampleName
+ * @param {String} proteinName  Protein acronym for the same row
+ * @param {Array}  proposalSamples  Loaded proposal samples (BLSample_name / Protein_proteinId)
+ * @return {Boolean}
+ */
+CSVContainerSpreadSheet.prototype.isSampleNameUniqueForProposal = function(sampleName, proteinName, proposalSamples) {
+	if ((sampleName == undefined) || (sampleName == "")) {
 		return false;
 	}
-	
+	const protein = this.getProteinByAcronym(proteinName);
+	if (!protein) {
+		return false;
+	}
+	const conflicts = this.puckValidator.checkSampleNames([sampleName], [protein.proteinId], proposalSamples);
+	return conflicts.length === 0;
+};
+
+/**
+ * Returns true if the given protein+sample pair does not appear more than once
+ * in the current CSV data. Only the second (and later) occurrence of a duplicate
+ * pair is considered invalid — the first occurrence is left unmarked.
+ * Used by the Handsontable cell validator when no proposal samples are loaded yet.
+ * @method _isSampleUniqueInCsv
+ * @param {String} sampleName
+ * @param {String} proteinName  Protein acronym for the same row
+ * @return {Boolean}
+ */
+CSVContainerSpreadSheet.prototype._isSampleUniqueInCsv = function(sampleName, proteinName) {
+	const seen = new Set();
+	const duplicates = [];
+	const csvData = this.spreadSheet.getData();
+	for (const row of csvData) {
+		const key = `${row[this.PROTEINACRONYM_INDEX]}|${row[this.SAMPLENAME_INDEX]}`;
+		if (seen.has(key)) {
+			duplicates.push(row);
+		} else {
+			seen.add(key);
+		}
+	}
+	return !duplicates.some(row =>
+		row[this.SAMPLENAME_INDEX] === sampleName &&
+		row[this.PROTEINACRONYM_INDEX] === proteinName
+	);
 };
 
 /**
@@ -661,10 +712,9 @@ CSVContainerSpreadSheet.prototype.isContainerNameValid = function(containerName)
 };
 
 
-CSVContainerSpreadSheet.prototype.getHeader = function() {	
+CSVContainerSpreadSheet.prototype.getHeader = function() {
     var _this = this;
 	var header = [];
-	const duplicatePairsProteinSampleName= getDuplicatePairsProteinSampleNameFromCSV();
 
 	var disabledRenderer = function(instance, td, row, col, prop, value, cellProperties){
 		if (value != undefined){
@@ -719,36 +769,25 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 		
 	}
 
-	const getDuplicatePairsProteinSampleNameFromCSV = function(){
-		const seen = new Set();
-		const duplicates = [];
-		const csvData = _this.spreadSheet.getData();
-		for (const row of csvData) {
-			const key = `${row[this.PROTEINACRONYM_INDEX]}|${row[this.SAMPLENAME_INDEX]}`;
-			if (seen.has(key)) {
-				duplicates.push(row);
-			} else {
-				seen.add(key);
-			}
+	// Handsontable cell validator for the Sample Name column.
+	// HT calls validator(value, callback) with `this` set to the cell context (this.row available).
+	// callback(true) = valid (cell rendered normally), callback(false) = invalid (htInvalid class applied).
+	var sampleParameterRenderer = function(value, callback) {
+		if (!_this.isSampleNameValid(value)) {
+			callback(false);
+			return;
 		}
-		return duplicates;
-	}
 
-	var sampleParameterRenderer = function(value, callback){
-		debugger
-		//This is the first creating of a shipment content and there is no data in DB for this session. We import data and have to validate file's content only
-		if (_this.proposalSamples.length === 0 && _this.spreadSheet.getData().length>0) {
-			const sampleName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.SAMPLENAME_INDEX);
-			const isSampleNameInDuplicated = duplicatePairsProteinSampleName.some(row => row[this.SAMPLENAME_INDEX] === sampleName);
-			callback(isSampleNameInDuplicated);
+		const proteinName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.PROTEINACRONYM_INDEX);
+
+		if (_this.proposalSamples.length === 0) {
+			// First import — no existing proposal data: check for within-CSV duplicates only.
+			callback(_this._isSampleUniqueInCsv(value, proteinName));
+		} else {
+			// Proposal samples loaded: validate against the full proposal.
+			callback(_this.isSampleNameUniqueForProposal(value, proteinName, _this.proposalSamples));
 		}
-		// There is data assigned to this session in DB and we also import data from CSV and have to validate for both (CSV and data from DB)
-		else {
-			const proteinName = _this.spreadSheet.getSourceDataAtCell(this.row, _this.PROTEINACRONYM_INDEX);
-			const isSampleNameValid = _this.isSampleNameValid(value, proteinName, _this.proposalSamples);
-			callback(isSampleNameValid);
-		}
-	}
+	};
     /** Checking parcels name */
 	var parcelDisplayCell = function(instance, td, row, col, prop, value, cellProperties){				
 			if (!_this.isParcelNameValid(value)){
