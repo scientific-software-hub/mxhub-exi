@@ -457,6 +457,49 @@ MainMenu.prototype.isLoggedIn = function() {
 	return (EXI.credentialManager.getCredentials().length > 0);
 };
 
+MainMenu.prototype.getAboutItem = function() {
+	return {
+		text: '<span style="color:white">About</span>',
+		cls: 'ExiSAXSMenuToolBar',
+		handler: function() {
+			const version = (typeof ExtISPyB !== 'undefined') ? ExtISPyB.version : '';
+			const releaseDate = (typeof ExtISPyB !== 'undefined') ? ExtISPyB.release_date : '';
+			Ext.create('Ext.window.Window', {
+				title: 'About ExiMX',
+				modal: true,
+				width: 520,
+				autoHeight: true,
+				resizable: false,
+				bodyPadding: 0,
+				bodyStyle: 'text-align:center;',
+				html:
+					'<div style="padding:20px 20px 12px;">' +
+					'<img src="../images/logo_EXI_simple.png" style="width:90px;margin-bottom:8px;"/>' +
+					'<h2 style="margin:4px 0;">ExiMX</h2>' +
+					'<p style="color:#555;font-style:italic;margin:2px 0;">Extended ISPyB for MX</p>' +
+					'</div>' +
+					'<div style="background:#d4eeeb;padding:10px 20px;">' +
+					'<p style="margin:4px 0;"><strong>Version:</strong> ' + version +
+					' &nbsp; <strong>Released:</strong> ' + releaseDate + '</p>' +
+					'<p style="margin:4px 0;"><a href="https://github.com/scientific-software-hub/mxhub-exi" target="_blank">Source code on GitHub</a></p>' +
+					'</div>' +
+					'<div style="background:#ebebeb;padding:14px 20px;">' +
+					'<p style="margin:0 0 10px;font-weight:bold;">Collaborators</p>' +
+					'<img src="../images/logo_DESY.png" style="height:36px;margin:4px;" title="DESY"/>' +
+					'<img src="../images/logo_MAXIV.png" style="height:26px;margin:4px;vertical-align:middle;" title="MAX IV"/>' +
+					'<img src="../images/logo_EMBL.png" style="height:36px;margin:4px;" title="EMBL"/>' +
+					'<img src="../images/logo_ESRF.png" style="height:36px;margin:4px;" title="ESRF"/>' +
+					'<img src="../images/logo_CHASE.png" style="height:36px;margin:4px;" title="CHASE"/>' +
+					'</div>',
+				buttons: [{
+					text: 'Close',
+					handler: function() { this.up('window').close(); }
+				}]
+			}).show();
+		}
+	};
+};
+
 
 MainMenu.prototype.getLoginButton = function() {
 	var icon =  "../images/rsz_login.png";
