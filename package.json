@@ -1,6 +1,6 @@
 {
-  "name": "EXI",
-  "version": "5.11.0",
+  "name": "exi-ui",
+  "version": "5.13.4",
   "description": "Extended ISPyB",
   "main": "Gruntfile.js",
   "dependencies": {
@@ -47,7 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ispyb/EXI.git"
+    "url": "https://github.com/scientific-software-hub/mxhub-exi"
   },
   "keywords": [
     "ISPyB",
@@ -56,9 +56,9 @@
   "author": "Alejandro de Maria Antolinos",
   "license": "GPL-3",
   "bugs": {
-    "url": "https://github.com/ispyb/EXI/issues"
+    "url": "https://github.com/scientific-software-hub/mxhub-exi/issues"
   },
-  "homepage": "https://github.com/ispyb/EXI",
+  "homepage": "https://github.com/scientific-software-hub/mxhub-exi",
   "devDependencies": {
     "cypress": "^13.17.0",
     "grunt": "^0.4.5",
