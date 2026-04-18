@@ -1,5 +1,4 @@
-**/.DS_Store
-dependency/ext/build/examples/*
+node_modules
+bower_components
 .git
-cypress
-cypress.**.*
+mx/dev.html
