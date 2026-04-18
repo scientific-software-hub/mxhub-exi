@@ -36,33 +36,28 @@ module.exports = function(grunt) {
                             'min/exi.test.js' : [ "js/test/**/*js" ],
                             'min/exi.tracking.js' : [ "js/tracking/**/*js" ],
                             'min/exi.tools.js' : [ "js/tools/**/*js" ],
-                            'min/bower_components.min.js' : [
-
-                                    "bower_components/jquery/dist/jquery.min.js",
-                                    "bower_components/lightbox2/dist/js/lightbox.min.js",
-                                    "bower_components/jquery-lazy/jquery.lazy.min.js",
-                                    "bower_components/dustjs-linkedin/dist/dust-full.min.js",
-                                    "bower_components/dustjs-helpers/dist/dust-helpers.min.js",
-                                    "bower_components/lodash/lodash.js",
-                                    'bower_components/lightbox2/dist/js/lightbox.js',
-                                    "bower_components/Snap.svg/dist/snap.svg-min.js",
-                                    "bower_components/vis/dist/vis.min.js",
-                                    "bower_components/dygraphs/dygraph-combined.js",
-                                    "bower_components/handsontable/dist/handsontable.full.min.js",
-                                    "bower_components/bootstrap/dist/js/bootstrap.js",
-                                    "bower_components/bootstrap-year-calendar/js/bootstrap-year-calendar.min.js",
-                                    "bower_components/moment/min/moment.min.js",
-                                    "bower_components/pathjs-amd/dist/path.min.js",                                    
-                                    "bower_components/ispyb-js-api/min/ispyb-js-api.min.js",
-                                    "bower_components/exi-ui-viz/min/exi-ui-viz.min.js",
-                                    "bower_components/three/build/three.min.js",
-                                    "bower_components/notifyjs/dist/notify.js",
-									"bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
-									"bower_components/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
-									"bower_components/file-saver/FileSaver.min.js",
-									"bower_components/linkifyjs/linkify.min.js",
-									"bower_components/linkifyjs/linkify-jquery.min.js"
-									]
+                            'min/vendor.min.js' : [
+                                    "node_modules/jquery/dist/jquery.min.js",
+                                    "node_modules/lightbox2/dist/js/lightbox.min.js",
+                                    "node_modules/jquery-lazy/jquery.lazy.min.js",
+                                    "node_modules/dustjs-linkedin/dist/dust-full.min.js",
+                                    "node_modules/dustjs-helpers/dist/dust-helpers.min.js",
+                                    "node_modules/lodash/lodash.js",
+                                    "node_modules/snapsvg/dist/snap.svg-min.js",
+                                    "node_modules/vis/dist/vis.min.js",
+                                    "node_modules/dygraphs/dygraph-combined.js",
+                                    "node_modules/handsontable/dist/handsontable.full.min.js",
+                                    "node_modules/bootstrap/dist/js/bootstrap.js",
+                                    "node_modules/bootstrap-year-calendar/js/bootstrap-year-calendar.min.js",
+                                    "node_modules/moment/min/moment.min.js",
+                                    "node_modules/pathjs-amd/dist/path.min.js",
+                                    "node_modules/notifyjs-browser/dist/notify.js",
+                                    "node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
+                                    "node_modules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js",
+                                    "node_modules/file-saver/FileSaver.min.js",
+                                    "node_modules/linkifyjs/dist/linkify.min.js",
+                                    "node_modules/linkifyjs/dist/linkify-jquery.min.js"
+                                    ]
                         }
                     }
                 },
@@ -97,7 +92,7 @@ module.exports = function(grunt) {
                             'min/exi.tracking.min.js' : [ 'min/exi.js',
                                 'min/exi.tracking.js', 'min/exi.test.js',
                                 'min/precompiled.templates.min.js' ],
-                            'min/lightbox.js' : [ 'bower_components/lightbox2/dist/js/lightbox.js']
+                            'min/lightbox.js' : [ 'node_modules/lightbox2/dist/js/lightbox.js']
                         }
                     }
                 },
@@ -110,22 +105,22 @@ module.exports = function(grunt) {
                         },
                         files : {
                             'min/exi.min.css' : [
-                                    'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                                    'node_modules/bootstrap/dist/css/bootstrap.min.css',
                                     'css/templatelist.css',
                                     'css/beamlinesessionbox.css',
-                                    'bower_components/vis/dist/vis.css',
-                                    'bower_components/handsontable/dist/handsontable.full.css',
+                                    'node_modules/vis/dist/vis.css',
+                                    'node_modules/handsontable/dist/handsontable.full.css',
                                     'css/dygraph-custom.css',
                                     'css/exi.css',
                                     'css/calendar.css',
                                     'css/menu/mainmenu.css',
                                     'css/override.css',
                                     'css/grid.css',
-                                    'bower_components/lightbox2/dist/css/lightbox.css',
-                                    'bower_components/bootstrap-year-calendar/css/bootstrap-year-calendar.min.css',
-									'bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
-									'bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css',
-				                    'bower_components/handsontable/dist/handsontable.css']
+                                    'node_modules/lightbox2/dist/css/lightbox.css',
+                                    'node_modules/bootstrap-year-calendar/css/bootstrap-year-calendar.min.css',
+                                    'node_modules/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
+                                    'node_modules/bootstrap-multiselect/dist/css/bootstrap-multiselect.css',
+                                    'node_modules/handsontable/dist/handsontable.css']
                         }
                     }
                 },
@@ -235,13 +230,6 @@ module.exports = function(grunt) {
                         },
                     },
                 },
-                wiredep : {
-                    target : {
-                        src : [ 'mx/dev.html', 'saxs/dev.html',
-                                'tracking/dev.html', 'test/dev.html' ], // point to your HTML
-                                                        // file.
-                    }
-                },
                 dustjs : {
                     compile : {
                         files : {
@@ -252,10 +240,12 @@ module.exports = function(grunt) {
                 asset_cachebuster: {
                     options: {
                       buster: Date.now(),
-                      ignore: ['../dependency/ext/build/bootstrap.js',
-                                '../dependency/ext/build',
-                                '../bower_components',
-                                '../js/dust/helpers.js'],
+                      ignore: [
+                          '../dependency/ext/build/bootstrap.js',
+                          '../dependency/ext/build',
+                          '../node_modules',
+                          '../js/dust/helpers.js'
+                      ],
                       htmlExtension: 'html'
                     },
                     build: {
@@ -273,7 +263,6 @@ module.exports = function(grunt) {
                 }
             });
 
-    grunt.loadNpmTasks('grunt-wiredep');
     grunt.loadNpmTasks('grunt-include-source');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
@@ -293,6 +282,6 @@ module.exports = function(grunt) {
     grunt.task.registerTask('default', [ 'dustjs', // 'jshint:prod',
             'concat:prod', 'terser:prod', 'cssmin:prod', 'yuidoc:compile', 'asset_cachebuster' ]);
     grunt.task.registerTask('dev', [ 'dustjs', 'includeSource:dev',
-            'cssmin:prod', 'wiredep', 'asset_cachebuster' ]);
+            'cssmin:prod', 'asset_cachebuster' ]);
 
 };
