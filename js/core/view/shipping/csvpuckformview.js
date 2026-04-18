@@ -174,7 +174,7 @@ CSVPuckFormView.prototype.addProtein = function(){
 	this.uniquenessContainerNamelPanelId = this.id + "_uniquenessContainerNamelPanelId";
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
 */
-CSVPuckFormView.prototype.save = function() {
+CSVPuckFormView.prototype.save = async function() {
 	const sampleNamesProteinIds = _.cloneDeep(this.proposalSamples);
 	var forceUpdate = true;
 	EXI.proposalManager.getProteins(forceUpdate);
@@ -185,8 +185,10 @@ CSVPuckFormView.prototype.save = function() {
 		return;
 	}
 
-    const isValid = this.containerSpreadSheet.isDataValid(sampleNamesProteinIds);
-	if (isValid) {
+
+
+	const isValid= await this.containerSpreadSheet.isDataValid(sampleNamesProteinIds)
+	if(isValid){
 		var onError = function (sender, error, mesg) {
 			_this.panel.setLoading(false);
 			EXI.setError(error.responseText);
@@ -214,7 +216,7 @@ CSVPuckFormView.prototype.save = function() {
 		}
 		if (this.displayErrors(errors.INCORRECT_CONTAINER_TYPE, this.acceptedContainerListPanelId, "")){
 			return;
-		}	
+		}
 		if (this.displayErrors(errors.INCORRECT_SAMPLE_POSITION, this.uniquenessSampleNamePanelId, "")){
 			return;
 		}
@@ -231,9 +233,6 @@ CSVPuckFormView.prototype.save = function() {
 			return;
 		}
 	}
-
-
-
 };
 
 

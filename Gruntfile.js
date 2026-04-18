@@ -5,8 +5,7 @@ module.exports = function(grunt) {
     var config = {
         dustjs : {},
     };
-    grunt
-            .initConfig({
+    grunt.initConfig({
                 pkg : grunt.file.readJSON('package.json'),
                 yuidoc : {
                     compile : {
