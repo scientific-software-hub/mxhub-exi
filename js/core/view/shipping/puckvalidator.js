@@ -3,20 +3,16 @@ class PuckValidator {
         const conflicts = [];
         const samples = sampleNames.map((name, i) => ({ name, proteinId: proteinIds[i] }));
 
-        for (let i = 0; i < sampleNames.length; i++) {
-            const sameSampleName = _.filter(samples, { name: samples[i].name, proteinId: samples[i].proteinId });
-            if (sameSampleName.length > 1) {
-                conflicts.push(sameSampleName[0].name);
-                break;
-            }
-        }
+        const duplicate = samples.find((s, _, arr) =>
+            arr.filter(x => x.name === s.name && x.proteinId === s.proteinId).length > 1
+        );
+        if (duplicate) conflicts.push(duplicate.name);
 
-        for (let i = 0; i < sampleNames.length; i++) {
-            const conflict = _.find(proposalSamples, { BLSample_name: sampleNames[i], Protein_proteinId: proteinIds[i] });
-            if (conflict) {
-                conflicts.push(sampleNames[i]);
+        sampleNames.forEach((name, i) => {
+            if (_.find(proposalSamples, { BLSample_name: name, Protein_proteinId: proteinIds[i] })) {
+                conflicts.push(name);
             }
-        }
+        });
 
         return conflicts;
     }

@@ -302,14 +302,9 @@ class PuckFormView {
     save(returnToShipment) {
         const puck = this.containerSpreadSheet.getPuck();
 
-        if (puck.sampleVOs && puck.sampleVOs.length > 0) {
-            const sampleNames = _.map(puck.sampleVOs, 'name');
-            for (const name of sampleNames) {
-                if (name == undefined || name == '') {
-                    this.displaySpecialCharacterWarning('There are samples without a Sample Name');
-                    return;
-                }
-            }
+        if (puck.sampleVOs?.some(s => !s.name)) {
+            this.displaySpecialCharacterWarning('There are samples without a Sample Name');
+            return;
         }
 
         if (puck.sampleVOs && puck.sampleVOs.length > 0) {
@@ -331,14 +326,11 @@ class PuckFormView {
         puck.containerType = this.capacityCombo.getSelectedType();
 
         const format = /[ ~`!@#$%^&*()+\=\[\]{};':"\\|,.<>\/?]/;
-        const specialCharacter = [];
-        const specialCharacterRow = [];
-        for (let i = 0; i < puck.sampleVOs.length; i++) {
-            if (format.test(puck.sampleVOs[i].name)) {
-                specialCharacter.push(puck.sampleVOs[i].name);
-                specialCharacterRow.push(i + 1);
-            }
-        }
+        const badSamples = puck.sampleVOs
+            .map((s, i) => ({ name: s.name, row: i + 1 }))
+            .filter(({ name }) => format.test(name));
+        const specialCharacter = badSamples.map(s => s.name);
+        const specialCharacterRow = badSamples.map(s => s.row);
 
         if (specialCharacter.length === 0) {
             this.panel.setLoading('Saving Puck');

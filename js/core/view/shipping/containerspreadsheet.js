@@ -21,31 +21,15 @@ class ContainerSpreadSheet extends SpreadSheet {
     }
 
     parseTableData() {
-        const parsed = [];
         const data = this.spreadSheet.getData();
-        if (data != null && data.length > 0) {
-            const columnIds = this.getHeaderId();
-            for (let j = 0; j < data.length; j++) {
-                if (data[j].length > 1) {
-                    const row = {};
-                    row['location'] = j + 1;
-                    for (let k = 0; k < columnIds.length; k++) {
-                        const key = columnIds[k];
-                        row[key] = data[j][this.getColumnIndex(key)];
-                    }
-                    if (row['Protein Acronym'] && row['Protein Acronym'].length > 0) {
-                        parsed.push(row);
-                    }
-                }
-            }
-        }
-        const curated = [];
-        for (let i = 0; i < parsed.length; i++) {
-            if (parsed[i]['Protein Acronym'] != null) {
-                curated.push(parsed[i]);
-            }
-        }
-        return curated;
+        if (!data?.length) return [];
+        const columnIds = this.getHeaderId();
+        return data
+            .map((row, j) => row.length > 1 ? {
+                location: j + 1,
+                ...Object.fromEntries(columnIds.map(key => [key, row[this.getColumnIndex(key)]]))
+            } : null)
+            .filter(row => row?.['Protein Acronym']?.length > 0);
     }
 
     load(puck) {
@@ -100,33 +84,13 @@ class ContainerSpreadSheet extends SpreadSheet {
                 });
 
                 if (source == 'edit') {
-                    if (changes) {
-                        for (let i = 0; i < changes.length; i++) {
-                            const change = changes[i];
-                            if (change[2] != change[3]) {
-                                _this.manageChange(change, source);
-                            }
-                        }
-                    }
-                } else if ((source == 'autofill') || (source == 'Autofill.fill')) {
+                    changes?.filter(c => c[2] != c[3]).forEach(c => _this.manageChange(c, source));
+                } else if (source == 'autofill' || source == 'Autofill.fill') {
                     if (changes) {
                         this.lockAfterChange = true;
                         const direction = Math.sign(changes[0][0] - _this.spreadSheet.getSelected()[0][0]);
-                        if (direction == 1) {
-                            for (let i = 0; i < changes.length; i++) {
-                                const change = changes[i];
-                                if (change[2] != change[3]) {
-                                    _this.manageChange(change, source, direction);
-                                }
-                            }
-                        } else {
-                            for (let i = changes.length - 1; i >= 0; i--) {
-                                const change = changes[i];
-                                if (change[2] != change[3]) {
-                                    _this.manageChange(change, source, direction);
-                                }
-                            }
-                        }
+                        const ordered = direction == 1 ? changes : [...changes].reverse();
+                        ordered.filter(c => c[2] != c[3]).forEach(c => _this.manageChange(c, source, direction));
                         this.lockAfterChange = false;
                     }
                 }
@@ -148,13 +112,8 @@ class ContainerSpreadSheet extends SpreadSheet {
         const samples = puck.sampleVOs;
         samples.sort((a, b) => Number(a.location) - Number(b.location));
 
-        const getSampleByLocation = (samples, location) => {
-            for (let i = 0; i < samples.length; i++) {
-                if (samples[i].location == Number(location)) {
-                    return samples[i];
-                }
-            }
-        };
+        const getSampleByLocation = (samples, location) =>
+            samples.find(s => s.location == Number(location));
 
         const getValue = (value) => value || '';
 
@@ -163,7 +122,7 @@ class ContainerSpreadSheet extends SpreadSheet {
             if (sample != null) {
                 const crystal = sample.crystalVO;
                 const protein = crystal.proteinVO;
-                const diffraction = sample.diffractionPlanVO || {};
+                const diffraction = sample.diffractionPlanVO ?? {};
                 data.push([
                     (i + 1),
                     protein.acronym,
@@ -281,32 +240,24 @@ class ContainerSpreadSheet extends SpreadSheet {
     getPuck() {
         const myPuck = JSON.parse(JSON.stringify(this.puck));
         const rows = this.parseTableData();
-        const aux = [];
 
-        for (let i = 0; i < rows.length; i++) {
-            let sample = {};
-            const sampleByLocation = _.filter(myPuck.sampleVOs, (b) => b.location == rows[i].location);
-            if (sampleByLocation.length > 0) {
-                sample = sampleByLocation[0];
-            }
+        myPuck.sampleVOs = rows.map((row, i) => {
+            const sampleByLocation = _.filter(myPuck.sampleVOs, b => b.location == row.location);
+            const sample = sampleByLocation.length > 0 ? sampleByLocation[0] : {};
 
-            sample['name'] = rows[i]['Sample Name'];
-            sample['code'] = rows[i]['Pin BarCode'];
-            sample['smiles'] = rows[i]['Smiles'];
-            sample['location'] = rows[i]['location'];
-            sample['comments'] = rows[i]['Comments'];
-            sample['structureStage'] = rows[i]['Ligands'];
+            sample['name'] = row['Sample Name'];
+            sample['code'] = row['Pin BarCode'];
+            sample['smiles'] = row['Smiles'];
+            sample['location'] = row['location'];
+            sample['comments'] = row['Comments'];
+            sample['structureStage'] = row['Ligands'];
 
-            const proteins = EXI.proposalManager.getProteinByAcronym(rows[i]['Protein Acronym']);
-            if (sample['crystalVO'] == null) {
-                sample['crystalVO'] = {};
-            }
-            if (proteins != null) {
-                sample['crystalVO']['proteinVO'] = proteins[0];
-            }
+            const proteins = EXI.proposalManager.getProteinByAcronym(row['Protein Acronym']);
+            if (sample['crystalVO'] == null) sample['crystalVO'] = {};
+            if (proteins != null) sample['crystalVO']['proteinVO'] = proteins[0];
 
-            const crystal = this.parseCrystalFormColumn(rows[i]['Crystal Form'], i);
-            sample['crystalVO']['spaceGroup'] = crystal.spaceGroup ? crystal.spaceGroup : '';
+            const crystal = this.parseCrystalFormColumn(row['Crystal Form'], i);
+            sample['crystalVO']['spaceGroup'] = crystal.spaceGroup ?? '';
             sample['crystalVO']['cellA'] = crystal.cellA;
             sample['crystalVO']['cellB'] = crystal.cellB;
             sample['crystalVO']['cellC'] = crystal.cellC;
@@ -315,22 +266,21 @@ class ContainerSpreadSheet extends SpreadSheet {
             sample['crystalVO']['cellGamma'] = crystal.cellGamma;
 
             sample['diffractionPlanVO'] = {
-                radiationSensitivity: this.convertToNumberIfNotEmpty(rows[i]['Radiation Sensitivity']),
-                aimedCompleteness: this.convertToNumberIfNotEmpty(rows[i]['Aimed Completeness']),
-                aimedMultiplicity: this.convertToNumberIfNotEmpty(rows[i]['Aimed multiplicity']),
-                aimedResolution: this.convertToNumberIfNotEmpty(rows[i]['Aimed resolution']),
-                requiredResolution: this.convertToNumberIfNotEmpty(rows[i]['Needed resolution']),
-                observedResolution: this.convertToNumberIfNotEmpty(rows[i]['Pre-observed resolution']),
-                preferredBeamDiameter: this.convertToNumberIfNotEmpty(rows[i]['Pref. Diameter']),
-                numberOfPositions: this.convertToNumberIfNotEmpty(rows[i]['Number Of positions']),
-                experimentKind: rows[i]['Experiment Type'],
-                axisRange: rows[i]['axisRange'],
-                minOscWidth: rows[i]['minOscWidth'],
+                radiationSensitivity: this.convertToNumberIfNotEmpty(row['Radiation Sensitivity']),
+                aimedCompleteness: this.convertToNumberIfNotEmpty(row['Aimed Completeness']),
+                aimedMultiplicity: this.convertToNumberIfNotEmpty(row['Aimed multiplicity']),
+                aimedResolution: this.convertToNumberIfNotEmpty(row['Aimed resolution']),
+                requiredResolution: this.convertToNumberIfNotEmpty(row['Needed resolution']),
+                observedResolution: this.convertToNumberIfNotEmpty(row['Pre-observed resolution']),
+                preferredBeamDiameter: this.convertToNumberIfNotEmpty(row['Pref. Diameter']),
+                numberOfPositions: this.convertToNumberIfNotEmpty(row['Number Of positions']),
+                experimentKind: row['Experiment Type'],
+                axisRange: row['axisRange'],
+                minOscWidth: row['minOscWidth'],
             };
 
-            aux.push(sample);
-        }
-        myPuck.sampleVOs = aux;
+            return sample;
+        });
         return myPuck;
     }
 
@@ -441,13 +391,9 @@ class ContainerSpreadSheet extends SpreadSheet {
         editCrystalForm.onSaved.attach((sender, crystal) => {
             const rows = this.parseTableData();
             this.updateCrystalGroup(row, crystal);
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].location - 1 != row) {
-                    if (this.crystalInfoToIdMap[rows[i]['Crystal Form']] == crystal.crystalId) {
-                        this.updateCrystalGroup(rows[i].location - 1, crystal);
-                    }
-                }
-            }
+            rows
+                .filter(r => r.location - 1 !== row && this.crystalInfoToIdMap[r['Crystal Form']] === crystal.crystalId)
+                .forEach(r => this.updateCrystalGroup(r.location - 1, crystal));
             win.close();
         });
 
@@ -609,39 +555,28 @@ class ContainerSpreadSheet extends SpreadSheet {
     }
 
     isCrystalFormAvailable(parsedCrystalForm, proteinAcronym) {
-        const crystalsBySpaceGroupAndAcronym = _.filter(
+        return _.filter(
             EXI.proposalManager.getCrystals(),
-            (o) => (o.proteinVO.acronym == proteinAcronym) && (o.spaceGroup == parsedCrystalForm.spaceGroup)
+            o => o.proteinVO.acronym === proteinAcronym && o.spaceGroup === parsedCrystalForm.spaceGroup
+        ).some(c =>
+            c.cellA === parsedCrystalForm.cellA && c.cellB === parsedCrystalForm.cellB &&
+            c.cellC === parsedCrystalForm.cellC && c.cellAlpha === parsedCrystalForm.cellAlpha &&
+            c.cellBeta === parsedCrystalForm.cellBeta && c.cellGamma === parsedCrystalForm.cellGamma
         );
-        if (crystalsBySpaceGroupAndAcronym.length > 0) {
-            for (let i = 0; i < crystalsBySpaceGroupAndAcronym.length; i++) {
-                const crystal = crystalsBySpaceGroupAndAcronym[i];
-                if (crystal.cellA == parsedCrystalForm.cellA && crystal.cellB == parsedCrystalForm.cellB &&
-                    crystal.cellC == parsedCrystalForm.cellC && crystal.cellAlpha == parsedCrystalForm.cellAlpha &&
-                    crystal.cellBeta == parsedCrystalForm.cellBeta && crystal.cellGamma == parsedCrystalForm.cellGamma) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     getCrystalInfoByProtein(protein) {
-        if (protein) {
-            if (this.crystalFormList[protein.acronym] == null) {
-                const src = [];
-                const crystalsByProteinId = this.getCrystalsByProteinId(protein.proteinId);
-                if (crystalsByProteinId) {
-                    for (let i = 0; i < crystalsByProteinId.length; i++) {
-                        const crystalInfo = this.getCrystalInfo(crystalsByProteinId[i]);
-                        this.crystalInfoToIdMap[crystalInfo] = crystalsByProteinId[i].crystalId;
-                        src.push(crystalInfo);
-                    }
-                }
-                this.crystalFormList[protein.acronym] = _.union(['NEW'], src.sort());
-            }
-            return this.crystalFormList[protein.acronym];
+        if (!protein) return;
+        if (this.crystalFormList[protein.acronym] == null) {
+            const crystalsByProteinId = this.getCrystalsByProteinId(protein.proteinId) ?? [];
+            const src = crystalsByProteinId.map(crystal => {
+                const info = this.getCrystalInfo(crystal);
+                this.crystalInfoToIdMap[info] = crystal.crystalId;
+                return info;
+            });
+            this.crystalFormList[protein.acronym] = _.union(['NEW'], src.sort());
         }
+        return this.crystalFormList[protein.acronym];
     }
 }
 
