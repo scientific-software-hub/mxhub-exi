@@ -760,32 +760,7 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 			td.innerHTML = value;										
 	}
 
-	/*if (EXI.credentialManager.getSiteName().startsWith("MAXIV")){
-        header = [
-            // { text :'', id :'crystalId', column : {width : 100}},
-            { text : 'Parcel  <br /> Name', 	id: 'parcel', column : {width : 80, renderer: parcelDisplayCell}},
-			{ text : 'Container <br /> Name', 	id: 'containerCode', column : {width : 80, renderer: containerNameParameterRenderer}},
-			{ text : 'Container <br />Type', 	id: 'containerType', column : {width : 80,
-																				type: 'dropdown',
-																				source : this._getContainerTypeControlledListNames(),
-																				renderer: containerTypeParameterRenderer}},
-			{ text : '#', 	id: 'position', column : {width : 20, renderer: samplePositionParameterRenderer}},
-            { text :'Protein <br />Acronym', id :'Protein Acronym', 	column :  {
-                                                                                        width : 80,
-                                                                                        type: 'dropdown',
-																						renderer: proteinParameterRenderer,
-                                                                                        source: this.getAcronyms()
-                                                                                    }
-            },
-            { text :'Sample<br /> Name', id :'Sample Name', column : {
-																		width : 120,
-																	  	renderer: sampleParameterRenderer
-			}},
-            { text :'Pin <br />Barcode', id : 'Pin BarCode', column : {width : 60}},
-            { text :'Comments', id :'Comments', column : {width : 200}}
-            ];
-	} else {*/
-	 
+
         header = [
             // { text :'', id :'crystalId', column : {width : 100}}, 
             { text : 'Dewar <br /> Name', 	id: 'parcel', column : {width : 80, renderer: parcelDisplayCell}},
@@ -794,7 +769,7 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 																				type: 'dropdown',
 																				source : this._getContainerTypeControlledListNames(),
 																				renderer: containerTypeParameterRenderer}}, 
-			{ text : '#', 	id: 'position', column : {width : 20, renderer: samplePositionParameterRenderer}},
+			{ text : 'Sample <br />Position', 	id: 'position', column : {width : 80, renderer: samplePositionParameterRenderer}},
             { text :'Protein <br />Acronym', id :'Protein Acronym', 	column :  {
                                                                                         width : 80,
                                                                                         type: 'autocomplete',
@@ -845,6 +820,5 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 			{ text :'Observed <br />Resolution', id :'Observed Resolution',column : {width : 60, renderer:numericParameterRenderer}},
             { text :'Comments', id :'Comments', column : {width : 200}}
             ];
-   /* }*/
     return header;
 };
