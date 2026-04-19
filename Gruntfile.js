@@ -252,9 +252,7 @@ module.exports = function(grunt) {
                 asset_cachebuster: {
                     options: {
                       buster: Date.now(),
-                      ignore: ['../node_modules/@scientific-software-hub/extjs/build/bootstrap.js',
-                                '../node_modules/@scientific-software-hub/extjs/build',
-                                '../node_modules',
+                      ignore: ['../node_modules',
                                 '../js/dust/helpers.js'],
                       htmlExtension: 'html'
                     },
