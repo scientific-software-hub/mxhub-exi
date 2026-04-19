@@ -94,21 +94,42 @@ Cypress needs a running HTTP server. The simplest option is the bundled `http-se
 npm run serve          # serves the repo root on http://localhost:3000
 ```
 
-`cypress.config.js` points `baseUrl` at `http://localhost:3000`, so Cypress opens `http://localhost:3000/mx/index.html` automatically.
+`cypress.config.js` points `baseUrl` at `http://localhost:3000`. Tests navigate to `mx/index.html` or `mx/dev.html` depending on the `startPage` env var (see below).
 
 ### Run all E2E tests (headless)
 
 ```bash
-npm run test:e2e       # cypress run --spec 'cypress/e2e/shipping/**'
+npm run test:e2e          # production bundle (mx/index.html)
+npm run test:e2e:dev      # dev build       (mx/dev.html)
 ```
 
 ### Open interactive Cypress runner
 
 ```bash
-npm run cypress:open   # cypress open
+npm run cypress:open      # production bundle (mx/index.html)
+npm run cypress:open:dev  # dev build       (mx/dev.html)
 ```
 
 Select **E2E Testing** → choose a browser → pick a spec file.
+
+### Switching start page
+
+Tests run against `mx/index.html` by default. The target page is controlled by the
+`startPage` env var. To override without changing `package.json`, add a
+`cypress.env.json` file in the repo root (it is gitignored):
+
+```json
+{ "startPage": "dev.html" }
+```
+
+Or pass it inline for a one-off run:
+
+```bash
+npx cypress open --env startPage=dev.html
+```
+
+Switching requires restarting Cypress — the env var is read at startup and cannot
+be changed mid-session.
 
 ### How the tests work
 
