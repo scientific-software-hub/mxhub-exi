@@ -20,6 +20,9 @@ module.exports = defineConfig({
       ISPYB_PASS:     'ispyb',
       ISPYB_PROPOSAL: 'MX1234',
       ISPYB_SHIPPING_ID: '1',
+      // Switch to dev.html: cypress run --env startPage=dev.html
+      // or add {"startPage":"dev.html"} to cypress.env.json (gitignored)
+      startPage: 'index.html',
     },
 
     setupNodeEvents(on) {

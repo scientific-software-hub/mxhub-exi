@@ -12,14 +12,14 @@
 
 ## Tech Stack
 
-| Layer | Tool | Purpose |
-|---|---|---|
-| Build | **Grunt** | Template precompilation, JS bundling, CSS minification |
-| JS dependencies | **npm** | Frontend libraries (jQuery, Bootstrap, Handsontable, …) |
-| Dev tooling | **npm** | Grunt plugins, Cypress, static dev server |
-| E2E tests | **Cypress 13** | Shipping/MX widget tests with mocked ISPyB REST |
-| Framework | **ExtJS 4** (MVC) | Hash-based routing, panels, grids |
-| Templates | **Dust.js** | Precompiled to `min/precompiled.templates.min.js` |
+| Layer | Tool              | Purpose |
+|---|-------------------|---|
+| Build | **Grunt**         | Template precompilation, JS bundling, CSS minification |
+| JS dependencies | **npm**           | Frontend libraries (jQuery, ExtJS, Handsontable, …) |
+| Dev tooling | **npm**           | Grunt plugins, Cypress, static dev server |
+| E2E tests | **Cypress 13**    | Shipping/MX widget tests with mocked ISPyB REST |
+| Framework | **ExtJS 5** (MVC) | Hash-based routing, panels, grids |
+| Templates | **Dust.js**       | Precompiled to `min/precompiled.templates.min.js` |
 
 ---
 
@@ -34,9 +34,20 @@
 npm install -g grunt-cli
 ```
 
+- **GitHub Packages authentication** — ExtJS is served from a private npm registry.
+  Add the following to `~/.npmrc` (create the file if it does not exist):
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_PAT
+```
+
+Replace `YOUR_PAT` with a GitHub Personal Access Token that has the `read:packages` scope.
+Without this, `npm install` will fail to resolve `@scientific-software-hub/extjs`.
+
 ### Install dependencies
 
 ```bash
+# JS build tooling (Grunt plugins, Cypress, http-server, …)
 npm install
 ```
 
@@ -76,21 +87,42 @@ Cypress needs a running HTTP server. The simplest option is the bundled `http-se
 npm run serve          # serves the repo root on http://localhost:3000
 ```
 
-`cypress.config.js` points `baseUrl` at `http://localhost:3000`, so Cypress opens `http://localhost:3000/mx/index.html` automatically.
+`cypress.config.js` points `baseUrl` at `http://localhost:3000`. Tests navigate to `mx/index.html` or `mx/dev.html` depending on the `startPage` env var (see below).
 
 ### Run all E2E tests (headless)
 
 ```bash
-npm run test:e2e       # cypress run --spec 'cypress/e2e/shipping/**'
+npm run test:e2e          # production bundle (mx/index.html)
+npm run test:e2e:dev      # dev build       (mx/dev.html)
 ```
 
 ### Open interactive Cypress runner
 
 ```bash
-npm run cypress:open   # cypress open
+npm run cypress:open      # production bundle (mx/index.html)
+npm run cypress:open:dev  # dev build       (mx/dev.html)
 ```
 
 Select **E2E Testing** → choose a browser → pick a spec file.
+
+### Switching start page
+
+Tests run against `mx/index.html` by default. The target page is controlled by the
+`startPage` env var. To override without changing `package.json`, add a
+`cypress.env.json` file in the repo root (it is gitignored):
+
+```json
+{ "startPage": "dev.html" }
+```
+
+Or pass it inline for a one-off run:
+
+```bash
+npx cypress open --env startPage=dev.html
+```
+
+Switching requires restarting Cypress — the env var is read at startup and cannot
+be changed mid-session.
 
 ### How the tests work
 

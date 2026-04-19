@@ -2,14 +2,14 @@
 <html>
   <head>
     <title>EXI</title> 
-        <script type="text/javascript" src="../dependency/ext/build/bootstrap.js"></script>
-        <script type="text/javascript" src="../dependency/ext/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+        <script type="text/javascript" src="../node_modules/@scientific-software-hub/extjs/build/ext-all-debug.js"></script>
+        <script type="text/javascript" src="../node_modules/@scientific-software-hub/extjs/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
 
         <!--
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         ->            
         <!-- CSS-->
-        <link rel="stylesheet" type="text/css" href='../dependency/ext/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css'>
+        <link rel="stylesheet" type="text/css" href='../node_modules/@scientific-software-hub/extjs/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css'>
         <link rel="stylesheet" type="text/css" href="../min/exi.min.css">
     
     
@@ -119,8 +119,8 @@
                 enabled: true
             });
 
-            Ext.Loader.setPath('Ext.ux', '../dependency/ext/examples/ux/');
-            Ext.Loader.setPath('Ext.Extended', '../dependency/extended/');
+            Ext.Loader.setPath('Ext.ux', '../node_modules/@scientific-software-hub/extjs/examples/ux/');
+            Ext.Loader.setPath('Ext.Extended', '../node_modules/@scientific-software-hub/extjs/extended/');
         
             Ext.require([
                 'Ext.ux.statusbar.StatusBar',
