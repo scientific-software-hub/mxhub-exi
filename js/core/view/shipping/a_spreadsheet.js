@@ -1,177 +1,137 @@
-function SpreadSheet(args){
-	this.id = BUI.id();
-    this.height = 440;
-	this.width = 500;
-	this.containerType = "OTHER";
-	
-	this.acronyms;
-	this.forceUpdate = false;
-	if (args != null) {
-		if (args.height != null) {
-			this.height = args.height;
-		}
-		if (args.width != null) {
-			this.width = args.width;
-		}
-		if (args.containerType != null) {
-			this.containerType = args.containerType;
-		}
-		if (args.cells != null){
-			this.cells = args.cells;
-		}
-	}
+class SpreadSheet {
+    constructor(args) {
+        this.id = BUI.id();
+        this.height = 440;
+        this.width = 500;
+        this.containerType = 'OTHER';
 
-}
+        this.acronyms = undefined;
+        this.forceUpdate = false;
 
-SpreadSheet.prototype.getPanel = function(){
-	var _this = this;
-	this.panel = Ext.create('Ext.panel.Panel', {
-		layout : 'vbox',
-		//height 		: this.height+ 50,
-		items : [ 
-				  {
-						html 		: '<div  style="overflow: auto;overflow-y: hidden; border:1px solid gray;background-color:white;height:100px;"; id="' + this.id + '_samples"; ></div>',
-						//margin 		: '0 0 20 10',
-						height 		: this.height,
-						width 		: this.width,
-						autoScroll 	: true,
-						resizable 	: true
-					}]
-	});
-    return this.panel;
-};
-
-SpreadSheet.prototype.setLoading = function (bool) {
-	this.panel.setLoading(bool);
-}
-
-SpreadSheet.prototype.reloadAcronyms = function() {
-    this.forceUpdate = true;
-    this.acronyms = null;
-    this.acronyms = this.getAcronyms(true);
-}
-
-SpreadSheet.prototype.getAcronyms = function(force) {
-    if (force != null){
-        this.forceUpdate = force;
+        if (args != null) {
+            if (args.height != null) this.height = args.height;
+            if (args.width != null) this.width = args.width;
+            if (args.containerType != null) this.containerType = args.containerType;
+            if (args.cells != null) this.cells = args.cells;
+        }
     }
-	if (this.acronyms == null){
-		this.acronyms = _.map(EXI.proposalManager.getProteins(this.forceUpdate), 'acronym').sort(function(a, b) {
-			if (a.toLowerCase() < b.toLowerCase()) return -1;
-			if (a.toLowerCase() > b.toLowerCase()) return 1;
-			return 0;
-		});		
-	}
-	return this.acronyms;
-};
 
-SpreadSheet.prototype.setContainerType = function(containerType) {
-	this.containerType = containerType;
-};
+    getPanel() {
+        this.panel = Ext.create('Ext.panel.Panel', {
+            layout: 'vbox',
+            items: [{
+                html: '<div  style="overflow: auto;overflow-y: hidden; border:1px solid gray;background-color:white;height:100px;"; id="' + this.id + '_samples"; ></div>',
+                height: this.height,
+                width: this.width,
+                autoScroll: true,
+                resizable: true
+            }]
+        });
+        return this.panel;
+    }
 
-SpreadSheet.prototype.getHeaderWidth = function() {
-	return _.map(this.getHeader(), 'column.width');
-};
+    setLoading(bool) {
+        this.panel.setLoading(bool);
+    }
 
-SpreadSheet.prototype.getHeaderId = function(containerType) {
-	return _.map(this.getHeader(), 'id');
-};
+    reloadAcronyms() {
+        this.forceUpdate = true;
+        this.acronyms = null;
+        this.acronyms = this.getAcronyms(true);
+    }
 
-SpreadSheet.prototype.getHeaderText = function() {
-	return _.map(this.getHeader(), 'text');
-};
+    getAcronyms(force) {
+        if (force != null) {
+            this.forceUpdate = force;
+        }
+        if (this.acronyms == null) {
+            this.acronyms = _.map(EXI.proposalManager.getProteins(this.forceUpdate), 'acronym').sort((a, b) => {
+                if (a.toLowerCase() < b.toLowerCase()) return -1;
+                if (a.toLowerCase() > b.toLowerCase()) return 1;
+                return 0;
+            });
+        }
+        return this.acronyms;
+    }
 
+    setContainerType(containerType) {
+        this.containerType = containerType;
+    }
 
-SpreadSheet.prototype.getColumns = function() {	
-	return _.map(this.getHeader(), 'column');
-};
+    getHeaderWidth() {
+        return _.map(this.getHeader(), 'column.width');
+    }
 
+    getHeaderId() {
+        return _.map(this.getHeader(), 'id');
+    }
 
-SpreadSheet.prototype.loadData = function(data){
-	var _this = this;	
-	this.data = data;
-	var container = document.getElementById(this.id + '_samples');
+    getHeaderText() {
+        return _.map(this.getHeader(), 'text');
+    }
 
-	this.spreadSheet = new Handsontable(container, {
-			data: data,
-			height : this.height,
-			width : this.width,
-			manualColumnResize: true,
-			colWidths: this.getHeaderWidth(),
-			colHeaders: this.getHeaderText(),
-			stretchH: 'last',
-			columns: this.getColumns(),
-			licenseKey: ExtISPyB.handsontable_licenseKey,
-	});
-};
+    getColumns() {
+        return _.map(this.getHeader(), 'column');
+    }
 
-SpreadSheet.prototype.getData = function () {
-	return this.spreadSheet.getData();
-};
-/*
-SpreadSheet.prototype.loadData = function (data) {
-	return this.spreadSheet.loadData(data);
-};
-*/
+    loadData(data) {
+        this.data = data;
+        const container = document.getElementById(this.id + '_samples');
+        this.spreadSheet = new Handsontable(container, {
+            data: data,
+            height: this.height,
+            width: this.width,
+            manualColumnResize: true,
+            colWidths: this.getHeaderWidth(),
+            colHeaders: this.getHeaderText(),
+            stretchH: 'last',
+            columns: this.getColumns(),
+            licenseKey: ExtISPyB.handsontable_licenseKey,
+        });
+    }
 
-SpreadSheet.prototype.setDataAtCell = function (rowIndex, columnIndex, value) {
-	if ((this.getData()[rowIndex][columnIndex] == null)&&(value == "")){
-		return;
-	}
-	if (this.getData()[rowIndex][columnIndex] == value){
-		return;
-	}
-	this.spreadSheet.setDataAtCell(rowIndex, columnIndex, value);
-};
+    getData() {
+        return this.spreadSheet.getData();
+    }
 
-SpreadSheet.prototype.disableAll = function () {
-	this.spreadSheet.updateSettings({
-					readOnly: true
-				});
-};
+    setDataAtCell(rowIndex, columnIndex, value) {
+        if ((this.getData()[rowIndex][columnIndex] == null) && (value == '')) {
+            return;
+        }
+        if (this.getData()[rowIndex][columnIndex] == value) {
+            return;
+        }
+        this.spreadSheet.setDataAtCell(rowIndex, columnIndex, value);
+    }
 
-/**
-* Returns the columnIndex given the columnId
-*
-* @method getColumnIndex
-* @param {Integer} colId The column Id of the column it's column index we want to know 
-* @param {String} containerType Optional value to use if we want the header for an specific containerType
-*/
-SpreadSheet.prototype.getColumnIndex = function (colId) {
-	return _.findIndex(this.getHeader(),{id :colId});
-};
+    disableAll() {
+        this.spreadSheet.updateSettings({ readOnly: true });
+    }
 
-/**
-* Changes the number of rows in the grid
-*
-* @method updateNumberOfRows
-* @param {Integer} n The new number of rows
-*/
-SpreadSheet.prototype.updateNumberOfRows = function (n) {
-	if (this.spreadSheet) {
-		var data = this.spreadSheet.getData();
-		//Sets the appropiate number of rows according to the capacity
-		if (data.length < n){
-			for (var i = data.length + 1; i<= n; i++){
-				data.push([i]);
-			}
-		}
-		else{
-			data = data.slice(0, n);
-		}
-		this.spreadSheet.loadData(data);
-	}
-};
+    getColumnIndex(colId) {
+        return _.findIndex(this.getHeader(), { id: colId });
+    }
 
-/**
-* Sets an empty value for all the cells in a given row
-*
-* @method emptyRow
-* @param {Integer} row The row index to be emptied
-*/
-SpreadSheet.prototype.emptyRow = function (row) {
-	var columnIds = this.getHeaderId();
-	for (var i = 1 ; i < columnIds.length ; i++) {
-		this.setDataAtCell(row,i,"");
-	}
-};
+    updateNumberOfRows(n) {
+        if (this.spreadSheet) {
+            let data = this.spreadSheet.getData();
+            if (data.length < n) {
+                for (let i = data.length + 1; i <= n; i++) {
+                    data.push([i]);
+                }
+            } else {
+                data = data.slice(0, n);
+            }
+            this.spreadSheet.loadData(data);
+        }
+    }
+
+    emptyRow(row) {
+        const columnIds = this.getHeaderId();
+        for (let i = 1; i < columnIds.length; i++) {
+            this.setDataAtCell(row, i, '');
+        }
+    }
+}
+
+window.SpreadSheet = SpreadSheet;
