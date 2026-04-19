@@ -27,7 +27,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "http-server . -p 3000 -c-1",
     "test:e2e": "cypress run --spec 'cypress/e2e/shipping/**'",
-    "cypress:open": "cypress open"
+    "test:e2e:dev": "cypress run --spec 'cypress/e2e/shipping/**' --env startPage=dev.html",
+    "cypress:open": "cypress open",
+    "cypress:open:dev": "cypress open --env startPage=dev.html"
   },
   "repository": {
     "type": "git",

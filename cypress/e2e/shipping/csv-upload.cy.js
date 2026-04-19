@@ -40,7 +40,7 @@ function setupIntercepts() {
 // Simulates a real user login: fills the ExtJS auth form and clicks Login.
 // DESY_LOCAL has a single site so there is no site dropdown — just User + Password.
 function login() {
-  cy.visit('/mx/index.html');
+  cy.visitMx();
 
   // Auth form appears automatically (no credentials in localStorage)
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('hakanj');

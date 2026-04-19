@@ -52,7 +52,7 @@ function setupIntercepts() {
 // ─── Login helper ────────────────────────────────────────────────────────────
 
 function login() {
-  cy.visit('/mx/index.html');
+  cy.visitMx();
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('hakanj');
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
   cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
