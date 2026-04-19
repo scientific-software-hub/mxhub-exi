@@ -15,10 +15,9 @@
 | Layer | Tool | Purpose |
 |---|---|---|
 | Build | **Grunt** | Template precompilation, JS bundling, CSS minification |
-| JS dependencies | **Bower** | Frontend libraries (jQuery, ExtJS, Handsontable, …) |
-| Dev tooling | **npm** | Grunt plugins, Cypress, static dev server |
+| JS dependencies | **Bower** + **npm** | Frontend libraries (jQuery, Handsontable, …) via Bower; ExtJS and build tooling via npm |
 | E2E tests | **Cypress 13** | Shipping/MX widget tests with mocked ISPyB REST |
-| Framework | **ExtJS 4** (MVC) | Hash-based routing, panels, grids |
+| Framework | **ExtJS 5** (MVC) | Hash-based routing, panels, grids |
 | Templates | **Dust.js** | Precompiled to `min/precompiled.templates.min.js` |
 
 ---
@@ -39,6 +38,16 @@ npm install -g bower
 ```bash
 npm install -g grunt-cli
 ```
+
+- **GitHub Packages authentication** — ExtJS is served from a private npm registry.
+  Add the following to `~/.npmrc` (create the file if it does not exist):
+
+```
+//npm.pkg.github.com/:_authToken=YOUR_PAT
+```
+
+Replace `YOUR_PAT` with a GitHub Personal Access Token that has the `read:packages` scope.
+Without this, `npm install` will fail to resolve `@scientific-software-hub/extjs`.
 
 ### Install dependencies
 
