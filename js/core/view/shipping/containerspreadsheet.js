@@ -559,9 +559,9 @@ class ContainerSpreadSheet extends SpreadSheet {
             EXI.proposalManager.getCrystals(),
             o => o.proteinVO.acronym === proteinAcronym && o.spaceGroup === parsedCrystalForm.spaceGroup
         ).some(c =>
-            c.cellA === parsedCrystalForm.cellA && c.cellB === parsedCrystalForm.cellB &&
-            c.cellC === parsedCrystalForm.cellC && c.cellAlpha === parsedCrystalForm.cellAlpha &&
-            c.cellBeta === parsedCrystalForm.cellBeta && c.cellGamma === parsedCrystalForm.cellGamma
+            c.cellA == parsedCrystalForm.cellA && c.cellB == parsedCrystalForm.cellB &&
+            c.cellC == parsedCrystalForm.cellC && c.cellAlpha == parsedCrystalForm.cellAlpha &&
+            c.cellBeta == parsedCrystalForm.cellBeta && c.cellGamma == parsedCrystalForm.cellGamma
         );
     }
 
