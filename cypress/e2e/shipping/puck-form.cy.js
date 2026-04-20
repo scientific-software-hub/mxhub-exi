@@ -38,7 +38,8 @@ function setupIntercepts() {
   cy.intercept('GET', `**/shipping/${SHIPPING_ID}/shipmentIds`, { body: [] }).as('getShipmentIds');
   cy.intercept('GET', '**/mx/sample/shipmentid/*/list', { body: [] }).as('getSamples');
 
-  // After redirect back to shipment
+  // After redirect back to shipment — shipment page calls these two endpoints
+  cy.intercept('GET', `**/shipping/${SHIPPING_ID}/get`, { fixture: 'shipping/shipment.json' }).as('getShipment');
   cy.intercept('GET', `**/shipping/${SHIPPING_ID}/datacollecitons/list`, { body: [] }).as('getDataCollections');
 
   // saveContainer(containerId, containerId, containerId, puck) — all three params are CONTAINER_ID
@@ -126,9 +127,9 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
 
   // ── Save button enable / disable ────────────────────────────────────────────
 
-  it('disables the Save button when the container has data-collected samples', () => {
-    // Override the default no-collection fixture with the collected variant.
-    // Cypress uses LIFO for intercepts, so this registration wins over beforeEach.
+  it('enables Save even when all samples have data collections', () => {
+    // fillSamplesGrid() no longer gates Save on data-collection presence —
+    // Save is always enabled when shippingStatus is not 'processing'.
     cy.intercept(
       'GET',
       `**/mx/sample/containerid/${CONTAINER_ID}/list`,
@@ -136,14 +137,38 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
     ).as('getContainerSamples');
 
     visitPuckFormPage();
-    // fillSamplesGrid() enables Save only when withoutCollection.length == samples.length.
-    // With all samples collected that condition is false — button stays disabled.
-    cy.contains('a.x-btn', 'Save').should('have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Save').should('not.have.class', 'x-disabled');
   });
 
   it('enables the Save button when all samples have no data collections', () => {
     visitPuckFormPage();
     cy.contains('a.x-btn', 'Save').should('not.have.class', 'x-disabled');
+  });
+
+  it('disables Save and makes the grid read-only when shippingStatus is processing', () => {
+    // fillSamplesGrid() calls containerSpreadSheet.disableAll() → updateSettings({ readOnly: true })
+    // when shippingStatus == 'processing'. Save + Remove + Type combo all stay disabled.
+    login();
+    cy.wait('@getSessions');
+
+    cy.window().then((win) => {
+      win.EXI.credentialManager.setActiveProposal('ispyb', 'MX1234');
+      const origLoad = win.PuckFormView.prototype.load;
+      win.PuckFormView.prototype.load = function (...args) {
+        win.__testPuckView = this;
+        return origLoad.apply(this, args);
+      };
+      win.location.hash =
+        `#/shipping/${SHIPPING_ID}/processing/containerId/${CONTAINER_ID}/edit`;
+    });
+
+    cy.wait('@getContainerSamples');
+    cy.contains('a.x-btn', 'Save').should('have.class', 'x-disabled');
+    cy.window().then((win) => {
+      expect(
+        win.__testPuckView.containerSpreadSheet.spreadSheet.getSettings().readOnly,
+      ).to.be.true;
+    });
   });
 
   // ── Happy path ──────────────────────────────────────────────────────────────
@@ -155,6 +180,7 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
 
     cy.contains('Save').click();
     cy.wait('@saveContainer').its('request.body').should('include', 'puck');
+    cy.wait('@getShipment');
     cy.location('hash', { timeout: 8000 }).should('include', `shipping/${SHIPPING_ID}/main`);
   });
 
@@ -209,7 +235,8 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
     // PuckValidator.checkSampleNames() second loop — compares against proposalSamples
     // loaded asynchronously by getSamplesFromProposal().
     // Fixture mx/samples-shipment2.json seeds sample-001/proteinId-4 (5HT3) as an
-    // existing sample. container-6 also carries sample-001/5HT3 → conflict.
+    // existing sample in a different container. container-6 also carries sample-001/5HT3
+    // → conflict because BLSample_blSampleId is absent (undefined ≠ 101/102 → external).
     cy.intercept('GET', `**/shipping/${SHIPPING_ID}/shipmentIds`, { body: [2] }).as('getShipmentIds');
     cy.intercept('GET', '**/mx/sample/shipmentid/2/list',
       { fixture: 'mx/samples-shipment2.json' }).as('getSamplesShipment2');
@@ -224,5 +251,51 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
     cy.contains('Save').click();
     cy.contains('not unique', { timeout: 6000 }).should('be.visible');
     cy.get('@saveContainer.all').should('have.length', 0);
+  });
+
+  // ── Uniqueness fix: own samples excluded from conflict check ─────────────────
+
+  it('does not block save when the container own samples appear in proposalSamples', () => {
+    // Before the fix, proposalSamples were not filtered before the uniqueness check.
+    // The container's own sample-001/5HT3 (blSampleId 101) was in both getPuck().sampleVOs
+    // AND proposalSamples, producing a false "not unique" warning on every unedited save.
+    // Fix: externalSamples excludes entries whose BLSample_blSampleId matches
+    // this.puck.sampleVOs[].blSampleId — so own samples are never flagged.
+    cy.intercept('GET', `**/shipping/${SHIPPING_ID}/shipmentIds`, { body: [2] }).as('getShipmentIds');
+    cy.intercept('GET', '**/mx/sample/shipmentid/2/list',
+      { fixture: 'mx/samples-own-container.json' }).as('getSamplesShipment2');
+
+    visitPuckFormPage();
+    cy.wait('@getSamplesShipment2');
+    waitForGridReady();
+
+    cy.contains('Save').click();
+    cy.wait('@saveContainer');
+    cy.get('@saveContainer.all').should('have.length', 1);
+    cy.contains('not unique').should('not.exist');
+  });
+
+  // ── Return to shipment ───────────────────────────────────────────────────────
+
+  it('navigates directly to the shipment page when no changes have been made', () => {
+    visitPuckFormPage();
+    waitForGridReady();
+
+    cy.contains('Return to shipment').click();
+    cy.wait('@getShipment');
+    cy.location('hash', { timeout: 8000 }).should('include', `shipping/${SHIPPING_ID}/main`);
+  });
+
+  it('shows an unsaved-changes dialog when the container name was edited before returning', () => {
+    visitPuckFormPage();
+    waitForGridReady();
+
+    // Change the Name field (pre-filled as "containerA" from the fixture)
+    cy.window().then((win) => {
+      win.Ext.getCmp(win.__testPuckView.id + 'puck_name').setValue('containerA-renamed');
+    });
+
+    cy.contains('Return to shipment').click();
+    cy.contains('Do you want to save', { timeout: 6000 }).should('be.visible');
   });
 });
