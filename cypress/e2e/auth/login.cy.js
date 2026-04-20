@@ -37,7 +37,7 @@ function loginWithForm(user, pass) {
 
 // Login and wait for the welcome page to fully settle (both XHRs resolve).
 function loginAndWaitForWelcome() {
-  loginWithForm('hakanj', 'ispyb');
+  loginWithForm('ispyb', 'ispyb');
   cy.wait('@authenticate');
   cy.wait('@getSessions');
   cy.wait('@getProposals');
@@ -75,13 +75,13 @@ describe('Login — auth form', () => {
 
   it('Login button stays disabled when only the user field is filled', () => {
     cy.visitMx();
-    cy.get('input[name="user"]', { timeout: 10000 }).type('hakanj');
+    cy.get('input[name="user"]', { timeout: 10000 }).type('ispyb');
     cy.contains('a.x-btn', 'Login').should('have.class', 'x-disabled');
   });
 
   it('Login button enables once both fields are filled', () => {
     cy.visitMx();
-    cy.get('input[name="user"]',     { timeout: 10000 }).type('hakanj');
+    cy.get('input[name="user"]',     { timeout: 10000 }).type('ispyb');
     cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
     cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled');
   });
@@ -90,16 +90,16 @@ describe('Login — auth form', () => {
 
   it('pressing Enter in the password field submits the form', () => {
     cy.visitMx();
-    cy.get('input[name="user"]',     { timeout: 10000 }).type('hakanj');
+    cy.get('input[name="user"]',     { timeout: 10000 }).type('ispyb');
     cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb{enter}');
     cy.wait('@authenticate');
   });
 
   it('successful login calls POST /authenticate and redirects to the manager welcome page', () => {
-    loginWithForm('hakanj', 'ispyb');
-    cy.wait('@authenticate').its('request.body').should('include', 'hakanj');
+    loginWithForm('ispyb', 'ispyb');
+    cy.wait('@authenticate').its('request.body').should('include', 'ispyb');
     cy.wait('@getSessions');
-    cy.location('hash', { timeout: 8000 }).should('include', 'welcome/manager/hakanj');
+    cy.location('hash', { timeout: 8000 }).should('include', 'welcome/manager/ispyb');
   });
 
   it('auth window closes after successful login', () => {
@@ -112,7 +112,7 @@ describe('Login — auth form', () => {
 
   it('failed login (401) shows "Your credentials are invalid" dialog', () => {
     cy.intercept('POST', '**/authenticate*', { statusCode: 401, body: '' }).as('authenticate');
-    loginWithForm('hakanj', 'wrong-password');
+    loginWithForm('ispyb', 'wrong-password');
     cy.wait('@authenticate');
     // BUI.showError() calls Ext.Msg.show() — renders as .x-message-box
     cy.contains('Your credentials are invalid', { timeout: 6000 }).should('be.visible');
@@ -120,7 +120,7 @@ describe('Login — auth form', () => {
 
   it('failed login does not navigate away from the welcome/login route', () => {
     cy.intercept('POST', '**/authenticate*', { statusCode: 401, body: '' }).as('authenticate');
-    loginWithForm('hakanj', 'wrong-password');
+    loginWithForm('ispyb', 'wrong-password');
     cy.wait('@authenticate');
     cy.contains('Your credentials are invalid', { timeout: 6000 }).should('be.visible');
     // Hash must remain on the login/welcome route — not on manager welcome
@@ -164,7 +164,7 @@ describe('Login — manager welcome page', () => {
 
     loginAndWaitForWelcome();
     cy.window().then((win) => {
-      win.location.hash = '#/welcome/manager/hakanj/date/20260201/20260228/main';
+      win.location.hash = '#/welcome/manager/ispyb/date/20260201/20260228/main';
     });
     cy.wait('@getSessions');
     // Assert on content that the session.grid.mx.datacollection.template actually renders:
@@ -178,7 +178,7 @@ describe('Login — manager welcome page', () => {
     // welcome load). The second cy.wait('@getSessions') here captures the date-range request.
     loginAndWaitForWelcome();
     cy.window().then((win) => {
-      win.location.hash = '#/welcome/manager/hakanj/date/20260201/20260228/main';
+      win.location.hash = '#/welcome/manager/ispyb/date/20260201/20260228/main';
     });
     // loadByDate increments end by 1 day: 20260228 → 20260301
     cy.wait('@getSessions')

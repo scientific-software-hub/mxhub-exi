@@ -26,7 +26,7 @@ Cypress.applyAuthState = applyAuthState;
 function buildAuthState(proteins) {
   return {
     credentials: [{
-      username: 'hakanj',
+      username: 'ispyb',
       roles: ['Manager'],
       token: 'test-token',
       url: '/ispyb/ispyb-ws/rest',
