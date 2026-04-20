@@ -27,7 +27,7 @@ function setupIntercepts() {
 // ─── Login helper ──────────────────────────────────────────────────────────
 
 // Fills the ExtJS auth form and clicks Login.
-// DESY_LOCAL has a single site so there is no site dropdown.
+// LOCAL has a single site so there is no site dropdown.
 function loginWithForm(user, pass) {
   cy.visitMx();
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type(user);
