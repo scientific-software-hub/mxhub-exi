@@ -76,34 +76,6 @@ class CSVPuckFormView extends PuckFormView {
         }
     }
 
-    addProtein() {
-        const proteinEditForm = new ProteinEditForm({ width: 600, height: 700 });
-
-        proteinEditForm.onSaved.attach((sender, protein) => {
-            this.containerSpreadSheet.reloadAcronyms();
-            win.close();
-        });
-
-        const win = Ext.create('Ext.window.Window', {
-            title: 'Protein',
-            height: 500,
-            width: 700,
-            padding: '10 10 10 10',
-            modal: true,
-            layout: 'fit',
-            items: [proteinEditForm.getPanel()],
-            buttons: [{
-                text: 'Save',
-                handler: () => proteinEditForm.saveProtein()
-            }, {
-                text: 'Cancel',
-                handler: () => win.close()
-            }]
-        }).show();
-
-        proteinEditForm.load();
-    }
-
     save() {
         const sampleNamesProteinIds = _.cloneDeep(this.proposalSamples);
         EXI.proposalManager.getProteins(true);
@@ -113,32 +85,33 @@ class CSVPuckFormView extends PuckFormView {
             return;
         }
 
-        const isValid = this.containerSpreadSheet.isDataValid(sampleNamesProteinIds);
-        if (isValid) {
-            this.panel.setLoading('Saving CSV');
-            EXI.getDataAdapter({
-                onSuccess: (sender, puck) => {
-                    this.panel.setLoading(false);
-                    this.returnToShipment();
-                },
-                onError: (sender, error) => {
-                    this.panel.setLoading(false);
-                    EXI.setError(error.responseText);
-                    $.notify(error.responseText, 'error');
-                }
-            }).proposal.shipping.addDewarsToShipment(this.shippingId, parcels);
-        } else {
-            $.notify('Sorry. Your data contain errors!', 'error');
-            const errors = this.containerSpreadSheet.getErrors();
-            if (this.displayErrors(errors.INCORRECT_PARCEL_NAME, this.uniquenessParcelPanelId, ' contain parcel names that are not unique within the proposal')) return;
-            if (this.displayErrors(errors.INCORRECT_CONTAINER_NAME, this.uniquenessContainerNamelPanelId, '')) return;
-            if (this.displayErrors(errors.INCORRECT_CONTAINER_TYPE, this.acceptedContainerListPanelId, '')) return;
-            if (this.displayErrors(errors.INCORRECT_SAMPLE_POSITION, this.uniquenessSampleNamePanelId, '')) return;
-            if (this.displayErrors(errors.NO_PROTEIN_IN_DB, this.noProteinInDb, '')) return;
-            if (this.displayErrors(errors.DUPLICATE_SAMPLE_NAME, this.uniquenessSampleNamePanelId, '')) return;
-            if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.noSpecialSymbolsSampleNameId, '')) return;
-            if (this.displayErrors(errors.INCORRECT_PROTEIN_NAME, this.noSpecialSymbolsProteinNameId, '')) return;
-        }
+        this.containerSpreadSheet.isDataValid(sampleNamesProteinIds).then(isValid => {
+            if (isValid) {
+                this.panel.setLoading('Saving CSV');
+                EXI.getDataAdapter({
+                    onSuccess: (sender, puck) => {
+                        this.panel.setLoading(false);
+                        this.returnToShipment();
+                    },
+                    onError: (sender, error) => {
+                        this.panel.setLoading(false);
+                        EXI.setError(error.responseText);
+                        $.notify(error.responseText, 'error');
+                    }
+                }).proposal.shipping.addDewarsToShipment(this.shippingId, parcels);
+            } else {
+                $.notify('Sorry. Your data contain errors!', 'error');
+                const errors = this.containerSpreadSheet.getErrors();
+                if (this.displayErrors(errors.INCORRECT_PARCEL_NAME, this.uniquenessParcelPanelId, ' contain parcel names that are not unique within the proposal')) return;
+                if (this.displayErrors(errors.INCORRECT_CONTAINER_NAME, this.uniquenessContainerNamelPanelId, '')) return;
+                if (this.displayErrors(errors.INCORRECT_CONTAINER_TYPE, this.acceptedContainerListPanelId, '')) return;
+                if (this.displayErrors(errors.INCORRECT_SAMPLE_POSITION, this.uniquenessSampleNamePanelId, '')) return;
+                if (this.displayErrors(errors.NO_PROTEIN_IN_DB, this.noProteinInDb, '')) return;
+                if (this.displayErrors(errors.DUPLICATE_SAMPLE_NAME, this.uniquenessSampleNamePanelId, '')) return;
+                if (this.displayErrors(errors.INCORRECT_SAMPLE_NAME, this.noSpecialSymbolsSampleNameId, '')) return;
+                if (this.displayErrors(errors.INCORRECT_PROTEIN_NAME, this.noSpecialSymbolsProteinNameId, '')) return;
+            }
+        });
     }
 
     getWarningPanelsHTML() {
@@ -254,7 +227,7 @@ class CSVPuckFormView extends PuckFormView {
     load(shippingId) {
         this.panel.setTitle('Import CSV');
         this.shippingId = shippingId;
-        this.containerSpreadSheet.loadData([[]]);
+        this.containerSpreadSheet.loadData([]);
 
         setTimeout(() => this.setFileUploadListeners(), 1000);
 
