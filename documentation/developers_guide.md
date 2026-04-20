@@ -12,13 +12,14 @@
 
 ## Tech Stack
 
-| Layer | Tool | Purpose |
-|---|---|---|
-| Build | **Grunt** | Template precompilation, JS bundling, CSS minification |
-| JS dependencies | **Bower** + **npm** | Frontend libraries (jQuery, Handsontable, …) via Bower; ExtJS and build tooling via npm |
-| E2E tests | **Cypress 13** | Shipping/MX widget tests with mocked ISPyB REST |
+| Layer | Tool              | Purpose |
+|---|-------------------|---|
+| Build | **Grunt**         | Template precompilation, JS bundling, CSS minification |
+| JS dependencies | **npm**           | Frontend libraries (jQuery, ExtJS, Handsontable, …) |
+| Dev tooling | **npm**           | Grunt plugins, Cypress, static dev server |
+| E2E tests | **Cypress 13**    | Shipping/MX widget tests with mocked ISPyB REST |
 | Framework | **ExtJS 5** (MVC) | Hash-based routing, panels, grids |
-| Templates | **Dust.js** | Precompiled to `min/precompiled.templates.min.js` |
+| Templates | **Dust.js**       | Precompiled to `min/precompiled.templates.min.js` |
 
 ---
 
@@ -27,12 +28,6 @@
 ### Prerequisites
 
 - **Node.js** (16+) and **npm**
-- **Bower** installed globally:
-
-```bash
-npm install -g bower
-```
-
 - **Grunt CLI** installed globally:
 
 ```bash
@@ -54,10 +49,9 @@ Without this, `npm install` will fail to resolve `@scientific-software-hub/extjs
 ```bash
 # JS build tooling (Grunt plugins, Cypress, http-server, …)
 npm install
-
-# Frontend libraries (jQuery, ExtJS shim, Handsontable, …)
-bower install
 ```
+
+This installs both build tooling (Grunt plugins, Cypress, http-server) and all frontend libraries (jQuery, Bootstrap, Handsontable, …) into `node_modules/`.
 
 ### Build for development
 
@@ -65,12 +59,11 @@ bower install
 grunt dev
 ```
 
-This runs four steps in order:
+This runs three steps in order:
 
 1. **`dustjs`** — precompiles `templates/**/*.js` into `min/precompiled.templates.min.js`
 2. **`includeSource:dev`** — regenerates `mx/dev.html` from `mx/index.tpl.html`, injecting every JS source file individually (no bundling — ideal for debugging)
-3. **`wiredep`** — injects Bower component `<script>` tags into `dev.html`
-4. **`cssmin:prod`** + **`asset_cachebuster`** — minifies CSS and cache-busts asset URLs
+3. **`cssmin:prod`** + **`asset_cachebuster`** — minifies CSS and cache-busts asset URLs
 
 Run `grunt dev` any time you add a new template or change CSS. Plain JS edits require no rebuild — `dev.html` references each source file directly so a browser refresh is enough.
 
@@ -156,7 +149,7 @@ Running EXI through the same Tomcat instance as ISPyB eliminates CORS entirely �
 2. **Create an Artifact** in IntelliJ:
    - **File → Project Structure → Artifacts → + → Other**
    - Set the output directory to `<tomcat-webapps>/exi` (or configure the Tomcat deployment to map the artifact to context path `/exi`).
-   - Add the entire EXI repo root as the artifact content (so `mx/`, `js/`, `min/`, `css/`, `bower_components/` etc. are all served under `/exi`).
+   - Add the entire EXI repo root as the artifact content (so `mx/`, `js/`, `min/`, `css/`, `node_modules/` etc. are all served under `/exi`).
 
 3. **Run/Debug Configuration** — add a **Tomcat Local** server:
    - On the **Deployment** tab, add the artifact above with context path `/exi`.
