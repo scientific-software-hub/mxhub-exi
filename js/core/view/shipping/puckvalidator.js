@@ -1,41 +1,21 @@
-function PuckValidator(){
-	
+class PuckValidator {
+    checkSampleNames(sampleNames, proteinIds, proposalSamples) {
+        const conflicts = [];
+        const samples = sampleNames.map((name, i) => ({ name, proteinId: proteinIds[i] }));
+
+        const duplicate = samples.find((s, _, arr) =>
+            arr.filter(x => x.name === s.name && x.proteinId === s.proteinId).length > 1
+        );
+        if (duplicate) conflicts.push(duplicate.name);
+
+        sampleNames.forEach((name, i) => {
+            if (_.find(proposalSamples, { BLSample_name: name, Protein_proteinId: proteinIds[i] })) {
+                conflicts.push(name);
+            }
+        });
+
+        return conflicts;
+    }
 }
 
-/**
-* Check the uniqueness of proteinId + sampleName with the already created samples or within the shipment
-* If containerId is the same then protein + sampleName + containerId should match
-*
-* @method checkSampleNames
-* @param {Array} sampleNames Array with the sample names from table
-* @param {Array} proteinIds Array with the proteinIds from table
-* @param {Array} proposalSamples Array containing all samples of the proposal. At least it should contain: BLSample_name and Protein_proteinId keys
-* @return {any[]} Returns an array of sample names that conflicts with either same name of the shipment or from the proposal
-*/
-PuckValidator.prototype.checkSampleNames = function(sampleNames, proteinIds, proposalSamples){
-    var conflicts = [];
-
-	 /** Add a conflict if two samples have got the same name and the same proteinId within the shipment */
-	 var samples = [];
-	 for(var i=0; i < sampleNames.length; i++){		
-		 samples.push({name : sampleNames[i], proteinId: proteinIds[i]});
-	 }
-
-	 for(var i=0; i < sampleNames.length; i++){		
-		var sameSampleName = (_.filter(samples, { 'name': samples[i].name, 'proteinId': samples[i].proteinId }));
-		if (sameSampleName.length > 1){			
-			conflicts = conflicts.concat(sameSampleName[0].name);
-			break;
-		}
-	 }
-	 
-	 for(var i=0; i < sampleNames.length; i++){		
-		 var conflict = _.find(proposalSamples, {BLSample_name:  sampleNames[i], Protein_proteinId:  proteinIds[i] });
-		 if (conflict){
-			 conflicts.push(sampleNames[i]);
-		 }
-	 }
-	
-	 return conflicts;
-	
-};
+window.PuckValidator = PuckValidator;
