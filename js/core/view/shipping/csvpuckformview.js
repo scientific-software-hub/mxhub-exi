@@ -392,7 +392,7 @@ CSVPuckFormView.prototype.load = function(shippingId) {
     this.shippingId = shippingId;
 
     //var data = JSON.parse("[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]");
-    this.containerSpreadSheet.loadData([[]]);
+    this.containerSpreadSheet.loadData([]);
 
     function attachListeners() {
         _this.setFileUploadListeners();

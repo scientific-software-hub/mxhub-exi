@@ -26,7 +26,7 @@ Cypress.applyAuthState = applyAuthState;
 function buildAuthState(proteins) {
   return {
     credentials: [{
-      username: 'hakanj',
+      username: 'ispyb',
       roles: ['Manager'],
       token: 'test-token',
       url: '/ispyb/ispyb-ws/rest',
@@ -34,7 +34,7 @@ function buildAuthState(proteins) {
       activeProposals: ['MX1234'],
       tokenExpires: '2099-01-01T00:00:00.000Z',
       properties: {
-        siteName: 'DESY_LOCAL',
+        siteName: 'LOCAL',
         defaultSampleChanger: 'P11SC',
         beamlines: { MX: [{ name: 'P11', sampleChangerType: 'P11SC' }], SAXS: [], EM: [] },
         allow_add_proteins_roles: ['user', 'manager'],
@@ -75,4 +75,8 @@ Cypress.Commands.add('loadAuthState', () => {
 // setAuthState — Cypress command wrapper for use outside onBeforeLoad.
 Cypress.Commands.add('setAuthState', () => {
   cy.window().then(applyAuthState);
+});
+
+Cypress.Commands.add('visitMx', (hash = '') => {
+  cy.visit(`/mx/${Cypress.env('startPage')}${hash}`);
 });

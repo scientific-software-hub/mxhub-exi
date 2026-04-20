@@ -3,7 +3,7 @@ function ExiMX() {
 		 					menu: new MXMainMenu(),
 							managerMenu : new MXManagerMenu(),
 		 					anonymousMenu: new MainMenu(),
-		 					controllers : [									
+							controllers : [
 									new SessionController(), 									
 									new OfflineExiController(), 
 									new ProposalExiController(), 
@@ -21,11 +21,7 @@ function ExiMX() {
                                     new BeamlineParameterController(),
 									new SAXSExiController(),
 									new EMDataCollectionController()
-								 
-									
-							],
-		 					headerCssClass : 'mxTitlePanel'
-
+							]
 	 });
 }
 
@@ -58,21 +54,6 @@ ExiMX.prototype.afterRender = Exi.prototype.afterRender;
 
 
  
-
-ExiMX.prototype.getHeader = function(){
-    var html = "";
-    var data = {
-        version         : ExtISPyB.version,
-        release_date    : ExtISPyB.release_date,
-        site            : ExtISPyB.default_site
-       
-        
-    };
-    dust.render("mxheader", data, function(err, out){
-		html = out;
-     });
-    return html;	
-};
 
 ExiMX.prototype.getDataAdapter = function(args){
 	

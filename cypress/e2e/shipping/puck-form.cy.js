@@ -52,8 +52,8 @@ function setupIntercepts() {
 // ─── Login helper ────────────────────────────────────────────────────────────
 
 function login() {
-  cy.visit('/mx/index.html');
-  cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('hakanj');
+  cy.visitMx();
+  cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
   cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
   cy.wait('@authenticate');
@@ -73,7 +73,7 @@ function visitPuckFormPage() {
   cy.wait('@getSessions');
 
   cy.window().then((win) => {
-    win.EXI.credentialManager.setActiveProposal('hakanj', 'MX1234');
+    win.EXI.credentialManager.setActiveProposal('ispyb', 'MX1234');
 
     const origLoad = win.PuckFormView.prototype.load;
     win.PuckFormView.prototype.load = function (...args) {

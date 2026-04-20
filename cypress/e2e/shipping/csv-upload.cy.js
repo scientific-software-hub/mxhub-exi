@@ -40,10 +40,10 @@ function setupIntercepts() {
 // Simulates a real user login: fills the ExtJS auth form and clicks Login.
 // DESY_LOCAL has a single site so there is no site dropdown — just User + Password.
 function login() {
-  cy.visit('/mx/index.html');
+  cy.visitMx();
 
   // Auth form appears automatically (no credentials in localStorage)
-  cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('hakanj');
+  cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
 
   // formBind button is disabled until both fields are valid
@@ -67,7 +67,7 @@ function visitCsvImportPage() {
 
   cy.window().then((win) => {
     // Activate the proposal so getDataAdapter() resolves {token, proposal, url}
-    win.EXI.credentialManager.setActiveProposal('hakanj', 'MX1234');
+    win.EXI.credentialManager.setActiveProposal('ispyb', 'MX1234');
 
     // Patch load() to capture the view instance before the route fires.
     // CSVPuckFormView is a global function declaration so we patch its prototype

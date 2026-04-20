@@ -52,6 +52,9 @@ local.properties
 
 # development
 mx/config-localhost.js
+mx/dev.html
+saxs/dev.html
+tracking/dev.html
 
 # Files left by MacOS
 .DS_Store

@@ -15,6 +15,7 @@ MXMainMenu.prototype.getHelpMenu = MainMenu.prototype.getHelpMenu;
 MXMainMenu.prototype.getShipmentItem = MainMenu.prototype.getShipmentItem;
 MXMainMenu.prototype.getProteinCrystalsMenu = MainMenu.prototype.getProteinCrystalsMenu;
 MXMainMenu.prototype.getDataExplorerMenu = MainMenu.prototype.getDataExplorerMenu;
+MXMainMenu.prototype.getAboutItem = MainMenu.prototype.getAboutItem;
 
 
 
@@ -58,6 +59,7 @@ MXMainMenu.prototype.getMenuItems = function() {
             disabled : true,
 			menu : this.getOnlineDataAnalisysMenu()
 		},*/
+		this.getAboutItem(),
 		'->',
 		{
 			xtype : 'textfield',
