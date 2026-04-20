@@ -132,6 +132,18 @@ class SpreadSheet {
             this.setDataAtCell(row, i, '');
         }
     }
+
+    parseTableData() {
+        const data = this.spreadSheet.getData();
+        if (!data?.length) return [];
+        const columnIds = this.getHeaderId();
+        return data
+            .map((row, j) => row.length > 1 ? {
+                location: j + 1,
+                ...Object.fromEntries(columnIds.map(key => [key, row[this.getColumnIndex(key)]]))
+            } : null)
+            .filter(row => row?.['Protein Acronym']?.length > 0);
+    }
 }
 
 window.SpreadSheet = SpreadSheet;

@@ -65,12 +65,9 @@ class PuckFormView {
                 this.containerSpreadSheet.setContainerType(puck.containerType);
                 this.containerSpreadSheet.load(puck);
                 if (this.shippingStatus != 'processing') {
-                    const withoutCollection = _.filter(samples, { DataCollectionGroup_dataCollectionGroupId: null });
-                    if (withoutCollection.length == samples.length) {
-                        Ext.getCmp(this.id + '_save_button').enable();
-                        Ext.getCmp(this.id + '_remove_button').enable();
-                        this.capacityCombo.enable();
-                    }
+                    Ext.getCmp(this.id + '_save_button').enable();
+                    Ext.getCmp(this.id + '_remove_button').enable();
+                    this.capacityCombo.enable();
                 } else {
                     this.containerSpreadSheet.disableAll();
                 }
@@ -97,6 +94,7 @@ class PuckFormView {
                     this.proposalSamples = data.flat();
                     $.notify(`Retrieved ${this.proposalSamples.length} samples for the selected session`, 'info');
                     this.containerSpreadSheet.proposalSamples = this.proposalSamples;
+                    this.containerSpreadSheet.onProposalSamplesLoaded?.();
                 })
                 .catch(() => {
                     console.error('Error was produced when getSamplesFromProposal()');
@@ -308,13 +306,15 @@ class PuckFormView {
         }
 
         if (puck.sampleVOs && puck.sampleVOs.length > 0) {
-            const idSet = new Set(puck.sampleVOs.map((item) => item.blSampleId));
-            this.proposalSamples.reduceRight((_, item, i, arr) => {
-                if (idSet.has(item.BLSample_blSampleId)) arr.splice(i, 1);
-            }, null);
+            const currentIds = new Set(
+                (this.puck?.sampleVOs ?? []).map(s => s.blSampleId).filter(Boolean)
+            );
+            const externalSamples = this.proposalSamples.filter(
+                s => !currentIds.has(s.BLSample_blSampleId)
+            );
             const sampleNames = _.map(puck.sampleVOs, 'name');
             const proteinIds = _.map(puck.sampleVOs, 'crystalVO.proteinVO.proteinId');
-            const conflicts = this.checkSampleNames(sampleNames, proteinIds);
+            const conflicts = new PuckValidator().checkSampleNames(sampleNames, proteinIds, externalSamples);
             if (conflicts.length > 0) {
                 this.displayUniquenessWarning('Sample names are not unique for the session. Please change: ' + conflicts);
                 return;

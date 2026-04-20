@@ -20,18 +20,6 @@ class ContainerSpreadSheet extends SpreadSheet {
         this.count = 0;
     }
 
-    parseTableData() {
-        const data = this.spreadSheet.getData();
-        if (!data?.length) return [];
-        const columnIds = this.getHeaderId();
-        return data
-            .map((row, j) => row.length > 1 ? {
-                location: j + 1,
-                ...Object.fromEntries(columnIds.map(key => [key, row[this.getColumnIndex(key)]]))
-            } : null)
-            .filter(row => row?.['Protein Acronym']?.length > 0);
-    }
-
     load(puck) {
         const _this = this;
         this.puck = puck;

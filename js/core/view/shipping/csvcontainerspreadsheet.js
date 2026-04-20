@@ -1,19 +1,8 @@
-class CSVContainerSpreadSheet extends ContainerSpreadSheet {
+class CSVContainerSpreadSheet extends SpreadSheet {
     constructor(args) {
         super(args);
 
-        this.crystals = {};
-        this.proteins = {};
-        this.crystalFormList = {};
-
-        this.acronyms = undefined;
-        this.forceUpdate = false;
-
-        this.crystalFormIndex = -1;
-        this.spaceGroupIndex = -1;
-
         this.onModified = new Event(this);
-        this.count = 0;
 
         this.cellColorBackground = this.getParcelColors();
         this.parcelColorBackground = {};
@@ -67,30 +56,31 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
 
     isDataValid(sampleNamesProteinIds) {
         this.errors = this.resetErrors();
-        const data = this.spreadSheet.getData();
-        let isValid = true;
+        return new Promise(resolve => this.spreadSheet.validateCells(resolve))
+            .then(htIsValid => {
+                const data = this.spreadSheet.getData();
+                const sampleNames = this.spreadSheet.getDataAtCol(this.SAMPLENAME_INDEX);
+                const proteinIds = this.spreadSheet.getDataAtCol(this.PROTEINACRONYM_INDEX)
+                    .map((acronym) => this.getProteinByAcronym(acronym))
+                    .filter((protein) => protein)
+                    .map((protein) => protein.proteinId);
 
-        const sampleNames = this.spreadSheet.getDataAtCol(this.SAMPLENAME_INDEX);
-        const proteinIds = this.spreadSheet.getDataAtCol(this.PROTEINACRONYM_INDEX)
-            .map((acronym) => this.getProteinByAcronym(acronym))
-            .filter((protein) => protein)
-            .map((protein) => protein.proteinId);
+                const conflicts = this.puckValidator.checkSampleNames(sampleNames, proteinIds, sampleNamesProteinIds);
+                let isValid = htIsValid && conflicts.length === 0;
 
-        const conflicts = this.puckValidator.checkSampleNames(sampleNames, proteinIds, sampleNamesProteinIds);
-        isValid = conflicts.length === 0;
-
-        for (let i = 0; i < data.length; i++) {
-            if (this.validateRow(data[i], i, sampleNamesProteinIds) == false) {
-                isValid = false;
-            }
-            if (conflicts.includes(data[i][this.SAMPLENAME_INDEX])) {
-                this.errors.DUPLICATE_SAMPLE_NAME.push({
-                    value: data[i][this.SAMPLEPOSITION_INDEX],
-                    rowIndex: i
-                });
-            }
-        }
-        return isValid;
+                for (let i = 0; i < data.length; i++) {
+                    if (this.validateRow(data[i], i, sampleNamesProteinIds) === false) {
+                        isValid = false;
+                    }
+                    if (conflicts.includes(data[i][this.SAMPLENAME_INDEX])) {
+                        this.errors.DUPLICATE_SAMPLE_NAME.push({
+                            value: data[i][this.SAMPLEPOSITION_INDEX],
+                            rowIndex: i
+                        });
+                    }
+                }
+                return isValid;
+            });
     }
 
     validateRow(row, rowIndex, sampleNamesProteinIds) {
@@ -168,7 +158,11 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
                 },
                 cells: function (row, col, prop) {
                 },
-                data: data,
+                afterLoadData: function() {
+                    if (this.getData().length > 0) {
+                        this.validateCells(() => {});
+                    }
+                },
                 height: this.height,
                 width: this.width,
                 manualColumnResize: true,
@@ -180,6 +174,7 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
                 invalidCellClassName: 'custom-row-text-required',
                 licenseKey: ExtISPyB.handsontable_licenseKey,
             });
+        this.spreadSheet.loadData(data);
     }
 
     getParcelsByRows(rows) {
@@ -281,18 +276,6 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
         this.dewarNameControlledList = new Set(dewarNameControlledList);
     }
 
-    manageChange(change, source, direction) {
-        switch (change[1]) {
-            case this.crystalFormIndex:
-                break;
-            case this.getColumnIndex('Protein Acronym'):
-                break;
-            case this.getColumnIndex('Sample group'):
-                break;
-        }
-        $('.htInvalid').removeClass('htInvalid');
-    }
-
     getParcelColor(parcelName) {
         if (!this.parcelColorBackground[parcelName]) {
             this.parcelColorBackground[parcelName] = this.cellColorBackground[_.size(this.parcelColorBackground) % this.cellColorBackground.length];
@@ -367,6 +350,37 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
         return !(protein == undefined || protein == '' || protein == null);
     }
 
+    isSampleNameUniqueForProposal(sampleName, proteinName, proposalSamples) {
+        if (!sampleName) return false;
+        const protein = this.getProteinByAcronym(proteinName);
+        if (!protein) return false;
+        return this.puckValidator.checkSampleNames(
+            [sampleName], [protein.proteinId], proposalSamples
+        ).length === 0;
+    }
+
+    _isSampleUniqueInCsv(sampleName, proteinName) {
+        const seen = new Set();
+        for (const row of this.spreadSheet.getData()) {
+            const key = `${row[this.PROTEINACRONYM_INDEX]}|${row[this.SAMPLENAME_INDEX]}`;
+            if (seen.has(key)) {
+                if (row[this.SAMPLENAME_INDEX] === sampleName &&
+                    row[this.PROTEINACRONYM_INDEX] === proteinName) {
+                    return false;
+                }
+            } else {
+                seen.add(key);
+            }
+        }
+        return true;
+    }
+
+    onProposalSamplesLoaded() {
+        if (this.spreadSheet) {
+            this.spreadSheet.validateCells(() => {});
+        }
+    }
+
     isSampleNameValid(sampleName) {
         return /^[a-zA-Z0-9_-]+$/.test(sampleName);
     }
@@ -381,6 +395,28 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
 
     getHeader() {
         const _this = this;
+
+        // Must be a regular function: HT passes cell context as `this` (with this.row)
+        const sampleNameValidator = function(value, callback) {
+            if (!_this.isSampleNameValid(value)) {
+                callback(false);
+                return;
+            }
+            const proteinName = _this.spreadSheet.getSourceDataAtCell(
+                this.row, _this.PROTEINACRONYM_INDEX
+            );
+            if (!_this._isSampleUniqueInCsv(value, proteinName)) {
+                callback(false);
+                return;
+            }
+            if (proteinName && _this.proposalSamples.length > 0) {
+                callback(_this.isSampleNameUniqueForProposal(
+                    value, proteinName, _this.proposalSamples
+                ));
+            } else {
+                callback(true);
+            }
+        };
 
         const mandatoryParameterRenderer = (instance, td, row, col, prop, value, cellProperties) => {
             if (!this.isValueFilled(value)) {
@@ -475,7 +511,7 @@ class CSVContainerSpreadSheet extends ContainerSpreadSheet {
                     source: this.getAcronyms(true)
                 }
             },
-            { text: 'Sample <br /> Name', id: 'Sample Name', column: { width: 120, renderer: sampleParameterRenderer } },
+            { text: 'Sample <br /> Name', id: 'Sample Name', column: { width: 120, renderer: sampleParameterRenderer, validator: sampleNameValidator } },
             { text: 'Pin <br />Barcode', id: 'Pin BarCode', column: { width: 60 } },
             {
                 text: 'Space <br />group', id: 'Space Group', column: {
