@@ -225,6 +225,31 @@ dust.helpers.formatDateTime = function (chunk, context, bodies, params) {
     return chunk.write(formatted);
 };
 
+dust.helpers.secondsToDuration = function (chunk, context, bodies, params) {
+    var total = Math.floor(Number(params.value));
+    if (isNaN(total) || total < 0) return chunk.write('');
+    var h = Math.floor(total / 3600);
+    var m = Math.floor((total % 3600) / 60);
+    var s = total % 60;
+    return chunk.write(
+        ("0" + h).slice(-2) + ":" + ("0" + m).slice(-2) + ":" + ("0" + s).slice(-2)
+    );
+};
+
+dust.helpers.formatTime = function (chunk, context, bodies, params) {
+    var raw = params.value;
+    if (!raw) return chunk.write('');
+    var d = new Date(raw);
+    if (isNaN(d)) return chunk.write('');
+    return chunk.write(("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2));
+};
+
+dust.helpers.secondsToMinutes = function (chunk, context, bodies, params) {
+    var total = Number(params.value);
+    if (isNaN(total)) return chunk.write('');
+    return chunk.write(String(Math.round(total / 60)));
+};
+
 dust.helpers.calculateDuration = function (chunk, context, bodies, params) {
 
     var startRaw = params.start;

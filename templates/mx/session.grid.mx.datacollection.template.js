@@ -44,6 +44,9 @@
             <td style="text-align:center;">
                 Total Time
             </td>
+            <td style="text-align:center;">
+                Net Time
+            </td>
             <td style='width:380px;'>
                 Comments
             </td>
@@ -141,9 +144,15 @@
             </span>
             </div>
         </td>
+        <td>
+            <div style="text-align:center;">
+                <span>{#netDataCollectionTimeInSeconds}{@secondsToDuration value=netDataCollectionTimeInSeconds /}{/netDataCollectionTimeInSeconds}</span>
+            </div>
+        </td>
         <td class="mxsessiongridcell" style='width:400px;'>
             <div style="width:390px; wordWrap: break-word;">
                 <a class="btn btn-xs"><span id="{.sessionId}-edit-comments" class="glyphicon glyphicon-edit session-comment-edit"></span></a>
+                {#delays}<div>&#9888; {@formatTime value=start /} - {@formatTime value=end /} ({@secondsToMinutes value=durationSeconds /}&nbsp;min)</div>{/delays}
                 <span id="comments_{.sessionId}">{.comments}</span>
             </div>
         </td>
