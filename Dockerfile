@@ -10,7 +10,6 @@ WORKDIR /usr/share/nginx/html
 # js/, css/, node_modules/, and build tooling are intentionally excluded (build artifacts only).
 COPY --chown=nginx:nginx mx/         ./mx/
 COPY --chown=nginx:nginx min/        ./min/
-COPY --chown=nginx:nginx dependency/ ./dependency/
 COPY --chown=nginx:nginx images/     ./images/
 
 # Environment variable to set the timezone for the containers
