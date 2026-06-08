@@ -11,6 +11,7 @@ COPY --chown=nginx:nginx mx/         ./mx/
 COPY --chown=nginx:nginx min/        ./min/
 COPY --chown=nginx:nginx images/     ./images/
 COPY --chown=nginx:nginx fonts/      ./fonts/
+COPY --chown=nginx:nginx csv/        ./csv/
 ADD --chown=nginx:nginx index.html      ./index.html
 
 
