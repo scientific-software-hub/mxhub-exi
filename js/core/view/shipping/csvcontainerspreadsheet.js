@@ -93,6 +93,7 @@ CSVContainerSpreadSheet.prototype.emptyRow  = SpreadSheet.prototype.emptyRow;
 CSVContainerSpreadSheet.prototype.parseTableData  = ContainerSpreadSheet.prototype.parseTableData;
 CSVContainerSpreadSheet.prototype.disableAll  = ContainerSpreadSheet.prototype.disableAll;
 CSVContainerSpreadSheet.prototype.isSampleNameValid = ContainerSpreadSheet.prototype.isSampleNameValid;
+CSVContainerSpreadSheet.prototype.getLigandsGroupName = ContainerSpreadSheet.prototype.getLigandsGroupName;
 
 CSVContainerSpreadSheet.prototype._getContainerTypeControlledListNames = function() {
 	return _.map(this.containerTypeControlledList, "name");
@@ -884,7 +885,14 @@ CSVContainerSpreadSheet.prototype.getHeader = function() {
 			{ text :'Tot Rot. <br />Angle', id :'axisRange',column : {width : 60, renderer:numericParameterRenderer}},
 			{ text :'Min Osc. <br />Angle', id :'minOscWidth',column : {width : 60, renderer:numericParameterRenderer}},
 			{ text :'Observed <br />Resolution', id :'Observed Resolution',column : {width : 60, renderer:numericParameterRenderer}},
-            { text :'Comments', id :'Comments', column : {width : 200}}
+            { text :'Comments', id :'Comments', column : {width : 200}},
+			{ text :'Ligands', id : 'Ligands', column : {
+					width : 100,
+					type: 'autocomplete',
+					filter: 'true',
+					source: this.getLigandsGroupName()
+				}
+			}
             ];
     return header;
 };
