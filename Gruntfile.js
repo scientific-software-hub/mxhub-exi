@@ -5,8 +5,7 @@ module.exports = function(grunt) {
     var config = {
         dustjs : {},
     };
-    grunt
-            .initConfig({
+    grunt.initConfig({
                 pkg : grunt.file.readJSON('package.json'),
                 yuidoc : {
                     compile : {
@@ -272,11 +271,22 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-asset-cachebuster');
 
     /** TASKS */
+    grunt.task.registerTask('copy-extjs', 'Copy ExtJS build files to min/extjs/', function() {
+        var src = 'node_modules/@scientific-software-hub/extjs/';
+        var dest = 'min/extjs/';
+        ['build', 'examples/ux', 'extended'].forEach(function(dir) {
+            grunt.file.recurse(src + dir, function(abspath, rootdir, subdir, filename) {
+                grunt.file.copy(abspath, dest + dir + '/' + (subdir ? subdir + '/' : '') + filename);
+            });
+        });
+        grunt.log.ok('ExtJS copied to ' + dest);
+    });
+
     grunt.task.registerTask('doc', [ 'yuidoc:compile' ]);
     grunt.task
             .registerTask('report', [ 'plato:all', 'plato:saxs', 'plato:mx' ]);
     grunt.task.registerTask('default', [ 'dustjs', // 'jshint:prod',
-            'concat:prod', 'terser:prod', 'cssmin:prod', 'yuidoc:compile', 'asset_cachebuster' ]);
+            'concat:prod', 'terser:prod', 'cssmin:prod', 'yuidoc:compile', 'copy-extjs', 'asset_cachebuster' ]);
     grunt.task.registerTask('dev', [ 'dustjs', 'includeSource:dev',
             'cssmin:prod', 'asset_cachebuster' ]);
 

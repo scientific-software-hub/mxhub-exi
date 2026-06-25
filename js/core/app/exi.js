@@ -1,8 +1,6 @@
 function Exi(args) {
 	var _this = this;
-	
-	this.headerCssClass = "titlePanel";
-	
+
 	/** Active Menu **/
 	this.mainMenu = new MainMenu();
 	/** When user is not logged in **/
@@ -32,10 +30,6 @@ function Exi(args) {
 		}
 		if (args.managerMenu != null){
 			this.managerMenu = args.managerMenu;
-		}
-		
-		if (args.headerCssClass != null){
-			this.headerCssClass = args.headerCssClass;
 		}
 		
 		if (args.controllers != null){
@@ -280,10 +274,6 @@ Exi.prototype.setLoading = function(isLoading) {
 	}
 };
 
-Exi.prototype.getHeader = function(error) {
-	return '<img class="titleImage" src="images/logo_EMBL.png"><span class="title">Extended ISPyB</span>';
-};
-
 Exi.prototype.afterRender = function() {
 	var _this = this;
 	_this.mainMenu.populateCredentialsMenu();
@@ -308,14 +298,6 @@ Exi.prototype.show = function() {
 										layout : 'border',
 										items : [
 												{
-													region : 'north',
-													xtype : 'component',
-													padding : 10,
-													height : 75,
-													html : _this.getHeader(),
-													cls : _this.headerCssClass
-
-												}, {
 													region : 'north',
 													cls : 'toolbarPanel',
 													id : 'mainMenu',

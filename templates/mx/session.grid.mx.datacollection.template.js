@@ -44,6 +44,12 @@
             <td style="text-align:center;">
                 Total Time
             </td>
+            <td style="text-align:center;">
+                Net Time
+            </td>
+            <td>
+                Pauses
+            </td>
             <td style='width:380px;'>
                 Comments
             </td>
@@ -139,6 +145,16 @@
             {@calculateDuration start=firstStartTimeDataCollectionGroup end=lastEndTimeDataCollectionGroup /}
             {/lastEndTimeDataCollectionGroup}{/firstStartTimeDataCollectionGroup}
             </span>
+            </div>
+        </td>
+        <td>
+            <div style="text-align:center;">
+                <span>{#netDataCollectionTimeInSeconds}{@secondsToDuration value=netDataCollectionTimeInSeconds /}{/netDataCollectionTimeInSeconds}</span>
+            </div>
+        </td>
+        <td class="mxsessiongridcell">
+            <div>
+                {#delays}<div>{@formatTime value=start /} - {@formatTime value=end /} ({@secondsToMinutes value=durationSeconds /}&nbsp;min)</div>{/delays}
             </div>
         </td>
         <td class="mxsessiongridcell" style='width:400px;'>

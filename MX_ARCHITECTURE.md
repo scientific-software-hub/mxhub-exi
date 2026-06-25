@@ -374,6 +374,221 @@ graph TD
 
 ---
 
+## 13. Shipping — Validation Logic & Constraints
+
+The shipping module enforces sample validity at two points: **CSV bulk import** (`CSVPuckFormView`) and **single-puck edit** (`PuckFormView`). Both share the same uniqueness kernel (`PuckValidator`) but use different validation layers.
+
+### 13.1 Constraint Summary
+
+| Field | Rule | Applies to |
+|---|---|---|
+| Sample name | `^[a-zA-Z0-9_-]+$` — no spaces or special chars | CSV + puck |
+| Protein name | same regex | CSV only |
+| Protein + sample | unique across the **entire session** (all shipments) | CSV + puck |
+| Protein + sample | unique **within the CSV being imported** | CSV only |
+| Parcel / Dewar name | not already present in this shipment | CSV only |
+| Container name | not already present in this shipment | CSV only |
+| Container type | `Unipuck` or `SPINEpuck` (DESY/MAX IV: `Unipuck` only) | CSV only |
+| Sample position | 1-based integer, ≤ container capacity (Unipuck: 16, SPINEpuck: 10) | CSV only |
+
+### 13.2 `PuckValidator.checkSampleNames` — The Shared Uniqueness Kernel
+
+`js/core/view/shipping/puckvalidator.js`
+
+Called by both the CSV cell validator and `isDataValid`. Takes three arrays and returns the conflicting sample names.
+
+```
+Loop 1 — within-upload duplicates
+  for each (name, proteinId) pair in the incoming CSV:
+    if the same pair appears more than once → conflict
+
+Loop 2 — against proposal
+  for each incoming (name, proteinId):
+    if found in proposalSamples { BLSample_name, Protein_proteinId } → conflict
+```
+
+`proposalSamples` is loaded asynchronously by `getSamplesFromProposal()` (see §13.4).
+
+### 13.3 CSV Import — Two Validation Layers
+
+`js/core/view/shipping/csvcontainerspreadsheet.js`
+
+```mermaid
+flowchart TD
+    LoadCSV["CSV loaded into Handsontable\n(loadData)"]
+    AfterLoad["afterLoadData fires\nvalidateCells() → cell-level highlighting"]
+    SaveClick["User clicks Save"]
+    Async["await isDataValid(proposalSamples)"]
+    HT["validateCells()\nHT calls sampleParameterRenderer\nfor each Sample Name cell"]
+    RowLoop["validateRow() for each row\n→ fills error buckets"]
+    Conflicts["checkSampleNames()\n→ DUPLICATE_SAMPLE_NAME bucket"]
+    Combine["htIsValid && conflicts.length === 0"]
+    DisplayError["displayErrors() in priority order\n→ notifies correct warning panel"]
+    CallAPI["addDewarsToShipment()"]
+
+    LoadCSV --> AfterLoad
+    SaveClick --> Async
+    Async --> HT
+    HT --> Combine
+    Async --> RowLoop
+    Async --> Conflicts
+    RowLoop --> Combine
+    Conflicts --> Combine
+    Combine -->|false| DisplayError
+    Combine -->|true| CallAPI
+```
+
+**Cell validator (`sampleParameterRenderer`)** — called by HT per cell, async callback:
+
+```
+if proposalSamples is empty:
+    count protein+sample pairs across whole CSV
+    callback(count ≤ 1)   ← valid if not a within-CSV duplicate
+else:
+    isSampleNameUniqueForProposal(value, protein, proposalSamples)
+    callback(result)
+```
+
+**Error display priority** — `save()` short-circuits on the first non-empty bucket:
+
+| Order | Error bucket | Panel text |
+|---|---|---|
+| 1 | `INCORRECT_PARCEL_NAME` | "Dewar Name should be unique for the whole shipment" |
+| 2 | `INCORRECT_CONTAINER_NAME` | "Container Name should be unique for this shipment" |
+| 3 | `INCORRECT_CONTAINER_TYPE` | "Accepted container types: SPINEpuck, Unipuck" |
+| 4 | `INCORRECT_SAMPLE_POSITION` | "Protein + Sample Name should be unique…" ⚠ misplaced panel |
+| 5 | `NO_PROTEIN_IN_DB` | "Protein should be added before importing" |
+| 6 | `DUPLICATE_SAMPLE_NAME` | "Protein + Sample Name should be unique for the whole shipment" |
+| 7 | `INCORRECT_SAMPLE_NAME` | "Sample Name should not contain special symbols" |
+| 8 | `INCORRECT_PROTEIN_NAME` | "Protein should not contain special symbols" |
+
+> ⚠ `INCORRECT_SAMPLE_POSITION` is routed to the uniqueness panel — pre-existing UI bug, no dedicated panel exists.
+
+### 13.4 Proposal Samples — Async Loading
+
+`PuckFormView.prototype.getSamplesFromProposal` (shared by CSV and single-puck views):
+
+```
+getAllShipmentIdsForSessionByShippingId(shippingId)
+  └─ for each shipmentId (parallel via Promise.all):
+       getSamplesByShipmentId(shipmentId)
+  └─ flatten results → this.proposalSamples
+```
+
+Samples are fetched once on page load. For the uniqueness check to work correctly, `proposalSamples` must be fully loaded before `save()` is called. In Cypress tests this is enforced with `cy.wait('@getSamplesShipment2')` before clicking Save.
+
+### 13.5 Single-Puck Edit — Lighter Validation
+
+`js/core/view/shipping/a_puckformview.js` — `PuckFormView.prototype.save()`
+
+No error buckets. Three sequential guards, each `return`s on failure:
+
+```
+1. Any sampleVO.name is empty/undefined
+   → displaySpecialCharacterWarning("There are samples without a Sample Name")
+
+2. checkSampleNames(names, proteinIds, proposalSamples)
+   (existing samples from THIS container are first removed from proposalSamples
+    to avoid false conflicts when re-saving an unchanged puck)
+   → displayUniquenessWarning("Sample names are not unique for the session…")
+
+3. Regex /[ ~`!@#$%^&*()+…]/ on each name
+   → displaySpecialCharacterWarning("<name> contains special characters. Rows: #<n>")
+```
+
+---
+
+## 14. Async Evolution — Promisification
+
+### 14.1 Why `isDataValid` Had to Become Async
+
+`Handsontable.validateCells(callback)` is genuinely asynchronous: it fans out to every registered column validator (each calls `callback(bool)` on its own schedule) and only fires its own callback after all validators have responded. There is no synchronous equivalent. Before this change, `isDataValid` returned a plain boolean and simply never waited for cell validation — the HT result was silently ignored.
+
+### 14.2 Current Shape — Promise + `.then()`
+
+```mermaid
+sequenceDiagram
+    participant Save as save() [async]
+    participant IsDV as isDataValid()
+    participant HT as Handsontable.validateCells
+    participant Val as sampleParameterRenderer (validator)
+
+    Save->>IsDV: await isDataValid(proposalSamples)
+    IsDV->>HT: new Promise(resolve => validateCells(resolve))
+    HT->>Val: validator(value, callback) per cell
+    Val-->>HT: callback(true/false)
+    HT-->>IsDV: resolve(htIsValid)
+    IsDV->>IsDV: .then(): validateRow() per row + checkSampleNames()
+    IsDV->>IsDV: return htIsValid && conflicts.length === 0
+    IsDV-->>Save: isValid (boolean)
+    Save->>Save: if isValid → addDewarsToShipment() else displayErrors()
+```
+
+`save()` is declared `async` solely to use `await isDataValid(...)`. The ExtJS button handler (`function(){ _this.save(); }`) ignores the returned Promise — fire-and-forget, which is correct for UI event handlers.
+
+> **Missing guard:** `save()` has no `try/catch` around the `await`. An unexpected rejection (e.g. HT throws during validation) silently aborts the save with no user feedback. A `try/catch` with `$.notify(...)` should be added.
+
+### 14.3 Near-Term — `async/await` for `isDataValid`
+
+The `.then()` chain in `isDataValid` is a direct candidate for flattening to `async/await`. The change is purely cosmetic but eliminates one nesting level:
+
+```javascript
+// Current
+return new Promise(resolve => this.spreadSheet.validateCells(resolve))
+  .then(htIsValid => {
+      ...
+      return isValid;
+  });
+
+// After
+CSVContainerSpreadSheet.prototype.isDataValid = async function(sampleNamesProteinIds) {
+    this.errors = this.resetErrors();
+    const htIsValid = await new Promise(resolve =>
+        this.spreadSheet.validateCells(resolve)
+    );
+    ...           // flat, linear logic
+    return isValid;
+};
+```
+
+Zero behaviour change. `getSamplesFromProposal` is already written with `Promise.all` — consistent style.
+
+### 14.4 Future — Full `async/await` via Data Adapter Promisification
+
+Every ISPyB REST call uses the same callback pattern:
+
+```javascript
+EXI.getDataAdapter({ onSuccess: fn, onError: fn })
+   .proposal.shipping.getShipment(shippingId);
+```
+
+`DataAdapter.prototype.get(url)` fires an XHR and resolves by calling `this.onSuccess(sender, data)` or `this.onError(sender, error)`. The entire app uses this pattern, making a central Promisification the high-leverage path:
+
+```javascript
+// One new method on DataAdapter (or a thin wrapper factory)
+DataAdapter.prototype.request = function() {
+    return new Promise((resolve, reject) => {
+        this.onSuccess = (sender, data) => resolve(data);
+        this.onError  = (sender, error) => reject(error);
+    });
+};
+
+// Call site becomes:
+const shipment = await EXI.getDataAdapter()
+    .proposal.shipping.getShipment(shippingId)
+    .request();
+```
+
+Once the adapter layer is Promisified, the full save/load flow collapses from deeply-nested callbacks into linear `async/await` — eliminating the closure-heavy `onSuccess`/`onError` pattern throughout the codebase. This is a **separate PR** with its own test coverage requirements given the blast radius across all modules.
+
+```mermaid
+graph LR
+    A["Today\nPromise + .then()\nin isDataValid"] -->|"trivial — next PR"| B["async/await\nin isDataValid + save"]
+    B -->|"medium effort\ndata adapter PR"| C["async/await\neverywhere\nvia DataAdapter.request()"]
+```
+
+---
+
 ## Testing Priority
 
 Based on usage frequency and user impact, suggested order for writing Cypress tests:

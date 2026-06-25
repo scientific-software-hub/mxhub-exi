@@ -18,6 +18,7 @@ MXManagerMenu.prototype.getDataReductionMenu = ManagerMenu.prototype.getDataRedu
 MXManagerMenu.prototype.getDataExplorerMenu = ManagerMenu.prototype.getDataExplorerMenu;
 MXManagerMenu.prototype.getOnlineDataAnalisysMenu = ManagerMenu.prototype.getOnlineDataAnalisysMenu;
 MXManagerMenu.prototype.getProteinCrystalsMenu = MainMenu.prototype.getProteinCrystalsMenu;
+MXManagerMenu.prototype.getAboutItem = MainMenu.prototype.getAboutItem;
 
 MXManagerMenu.prototype.getMenuItems = function() {
 
@@ -68,6 +69,7 @@ MXManagerMenu.prototype.getMenuItems = function() {
 			cls : 'ExiSAXSMenuToolBar',
 			menu : this.getHelpMenu()
 		},*/
+		this.getAboutItem(),
 		'->',
 		{
 			xtype : 'textfield',
