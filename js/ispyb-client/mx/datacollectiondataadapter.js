@@ -174,8 +174,8 @@ DataCollectionDataAdapter.prototype.getRtfReportURLByFilterParam = function(filt
 * This method downloads a CSV summary for a filter parameter
 * @method getCSVReportURLByFilterParam
 */
-DataCollectionDataAdapter.prototype.getCSVReportURLByFilterParam = function(filterParam){
-   return this.getUrl('/{token}/proposal/{proposal}/mx/datacollection/filterParam/{0}/report/csv'.format([filterParam]));
+DataCollectionDataAdapter.prototype.getCSVReportURLBySessionId = function(filterParam){
+   return this.getUrl('/{token}/proposal/{proposal}/mx/datacollection/session/{0}/report/csv'.format([filterParam]));
 
 };
 

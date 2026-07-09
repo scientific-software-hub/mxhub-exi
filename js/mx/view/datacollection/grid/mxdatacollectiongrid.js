@@ -278,7 +278,7 @@ MXDataCollectionGrid.prototype.load = function(dataCollectionGroup) {
     for (sessionId in sessionsId){
         this.pdfUrl = EXI.getDataAdapter().mx.dataCollection.getReportURLBySessionId(sessionId);
         this.rtfUrl = EXI.getDataAdapter().mx.dataCollection.getRtfReportURLBySessionId(sessionId);
-        this.csvUrl = EXI.getDataAdapter().mx.dataCollection.getCSVReportURLByFilterParam(sessionId);
+        this.csvUrl = EXI.getDataAdapter().mx.dataCollection.getCSVReportURLBySessionId(sessionId);
 		this.pdfAnalysisUrl = EXI.getDataAdapter().mx.dataCollection.getAnalysisReportURLBySessionId(sessionId);
         this.rtfAnalysisUrl = EXI.getDataAdapter().mx.dataCollection.getRtfAnalysisReportURLBySessionId(sessionId);
 		this.sendPdfUrl = EXI.getDataAdapter().mx.dataCollection.sendPdfReport(sessionId);
