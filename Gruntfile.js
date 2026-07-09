@@ -222,7 +222,7 @@ module.exports = function(grunt) {
                 },
                 watch : {
                     scripts : {
-                        files : [ 'css/**/*css', 'templates/**/*js' ],
+                        files : [ 'css/**/*css', 'templates/**/*js', 'js/**/*js' ],
                         tasks : [ 'dev' ],
                         options : {
                             interrupt : true,
@@ -261,7 +261,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-include-source');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-contrib-watch');
     // grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-plato');
     grunt.loadNpmTasks('grunt-terser');
