@@ -123,7 +123,8 @@ MXDataCollectionGrid.prototype.getToolBar = function() {
             {
                 xtype: 'tbseparator'
             },
-             {                     
+            // Not used for now as if collection set is long (>150) -> Time-Out-Exception
+             /*{
                         text: "<span class='glyphicon glyphicon-download-alt'> PDF summary</span>",
                         id : 'pdfBtn',
                         tooltip: 'Download Session Summary Report',                                              
@@ -144,7 +145,7 @@ MXDataCollectionGrid.prototype.getToolBar = function() {
                                 location.href = _this.rtfUrl;                             
                             }
                         }
-                    },
+                    },*/
                     {
                         text: "<span class='glyphicon glyphicon-download-alt'> CSV summary</span>",
                         id : 'xlsBtn',
@@ -157,7 +158,7 @@ MXDataCollectionGrid.prototype.getToolBar = function() {
                             }
                         }
                     },
-					{                     
+					/*{
                         text: "<span class='glyphicon glyphicon-download-alt'> PDF analysis</span>",
                         id : 'pdfBtn2',
                         tooltip: 'Download Session Analysis Report',                                              
@@ -178,7 +179,7 @@ MXDataCollectionGrid.prototype.getToolBar = function() {
                                 location.href = _this.rtfAnalysisUrl;                             
                             }
                         }
-                },
+                },*/
 					{                     
                         text: "<span class='glyphicon glyphicon-envelope'> Send Report </span>",
                         id : 'sendPdfBtn',
