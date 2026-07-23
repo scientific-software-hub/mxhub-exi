@@ -42,7 +42,7 @@
                                         <td>
                                             {@eq key=$idx value=0}
                                                 
-                                                {.SpaceGroup_spaceGroupShortName}<br /> <kbd style="background-color:green">BEST</kbd>
+                                                {.SpaceGroup_spaceGroupShortName}<br />
                                             {:else}
                                                  <span style='color:gray'>{.SpaceGroup_spaceGroupShortName}</span>
                                             {/eq}                                        

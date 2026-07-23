@@ -88,13 +88,6 @@
                                             {@eq key=$idx value=0}                     
                                                 <a href='{.downloadFilesUrl}' ><span style='font-size: 1.5em;' class="glyphicon glyphicon-download " ></span></a>
                                              {/eq}                                                                                                                
-                                        </td>                                                                 
-                                    
-                           
-                                        <td>
-                                            {@eq key=$idx value=0}
-                                                <kbd style="background-color:green">BEST</kbd>
-                                            {/eq}  
                                         </td>
                             
                                         <td>{.PhasingProgramRun_phasingPrograms} </td>

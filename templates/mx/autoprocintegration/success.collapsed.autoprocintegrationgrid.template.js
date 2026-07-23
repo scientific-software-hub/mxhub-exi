@@ -1,15 +1,8 @@
 
  {@lt key=innerShell.rMerge value=10}
-		        {?label}
-		            {@eq key=label value="BEST"}
-		                <tr id="{.AutoProcIntegration_dataCollectionId}-{.AutoProcIntegration_autoProcIntegrationId}" style='background-color:#e6ffe6;' class='autoprocintegrationrow'>
 
-		            {:else} 
-		                <tr id="{.AutoProcIntegration_dataCollectionId}-{.AutoProcIntegration_autoProcIntegrationId}" style='background-color:#ffffff;' class='autoprocintegrationrow'>
-		            {/eq}
-		        {:else}    
 		            <tr id="{.AutoProcIntegration_dataCollectionId}-{.AutoProcIntegration_autoProcIntegrationId}"  class='autoprocintegrationrow'>
-		        {/label}  
+
 		    {:else}
 		        <tr id="{.AutoProcIntegration_dataCollectionId}-{.AutoProcIntegration_autoProcIntegrationId}" style='background-color:#ffe6e6;width:25px;' class='autoprocintegrationrow'>
 		    {/lt}
@@ -19,19 +12,6 @@
 		                <BR />
 		          {:else}                        
 		          {/eq}
-		         
-		        
-		       
-		       
-		        {?label}
-		            {@eq key=label value="BEST"}
-		                <br /><kbd style="background-color:green">{.label}</kbd>
-		            {:else}
-		                 <br /><kbd style="background-color:orange">{.label}</kbd>
-		            {/eq}
-		       {:else}
-		            {.rank}
-		       {/label}
 		       </td>
 
 		       <td >
