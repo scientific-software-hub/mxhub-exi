@@ -14,7 +14,77 @@
     "plateTypes": [],
     "buffers": [],
     "stockSolutions": [],
-    "labcontacts": [],
+    "labcontacts": [
+      {
+        "labContactId": 157,
+        "cardName": "von Moeller-Molox GmbH",
+        "defaultCourrierCompany": "-1",
+        "courierAccount": "ACC-2026-01",
+        "billingReference": "REF-2026-01",
+        "dewarAvgCustomsValue": 150,
+        "dewarAvgTransportValue": 300,
+        "pcStateManager": null,
+        "personVO": {
+          "personId": 6579,
+          "laboratoryVO": {
+            "laboratoryId": 5292,
+            "name": "Molox GmbH",
+            "address": "Thielallee 63\r\n14195 Berlin",
+            "city": "Berlin",
+            "country": "DE"
+          },
+          "familyName": "von Moeller",
+          "givenName": "Holger",
+          "title": "Dr.",
+          "emailAddress": "holger.vonmoeller@molox.de",
+          "phoneNumber": "1781387420",
+          "login": "hovomo",
+          "sessionVOs": []
+        }
+      },
+      {
+        "labContactId": 156,
+        "cardName": "Chatziefthymiou-Deutsches Elektronen-Synchrot",
+        "defaultCourrierCompany": null,
+        "courierAccount": null,
+        "billingReference": null,
+        "dewarAvgCustomsValue": 0,
+        "dewarAvgTransportValue": 0,
+        "pcStateManager": null,
+        "personVO": {
+          "personId": 21113,
+          "laboratoryVO": null,
+          "familyName": "Chatziefthymiou",
+          "givenName": "Spyridon",
+          "title": "Dr.",
+          "emailAddress": "spyros.chatziefthymiou@desy.de",
+          "phoneNumber": "87551",
+          "login": "chatzies",
+          "sessionVOs": []
+        }
+      },
+      {
+        "labContactId": 158,
+        "cardName": "Taberman-Helmholtz Lab",
+        "defaultCourrierCompany": null,
+        "courierAccount": null,
+        "billingReference": null,
+        "dewarAvgCustomsValue": 0,
+        "dewarAvgTransportValue": 0,
+        "pcStateManager": null,
+        "personVO": {
+          "personId": 7001,
+          "laboratoryVO": null,
+          "familyName": "Taberman",
+          "givenName": "Helena",
+          "title": "Dr.",
+          "emailAddress": "helena.taberman@helmholtz.de",
+          "phoneNumber": null,
+          "login": "tabhel",
+          "sessionVOs": []
+        }
+      }
+    ],
     "proteins": [
       {
         "proteinId": 1,

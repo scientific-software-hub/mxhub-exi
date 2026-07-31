@@ -1,0 +1,81 @@
+{
+  "shippingId": 1,
+  "shippingName": "Shipment-001",
+  "shippingStatus": "opened",
+  "shippingType": "INTERNAL",
+  "deliveryAgentAgentName": "TNT",
+  "deliveryAgentAgentCode": "oR-327648",
+  "deliveryAgentFlightCode": "Zu5030",
+  "deliveryAgentShippingDate": "Jan 13, 2026, 12:00:00 AM",
+  "deliveryAgentDeliveryDate": "Jan 18, 2026, 12:00:00 AM",
+  "timeStamp": "Apr 16, 2026, 9:20:57 PM",
+  "creationDate": "Jan 13, 2026, 12:00:00 AM",
+  "isStorageShipping": false,
+  "comments": null,
+  "sendingLabContactVO": {
+    "labContactId": 157,
+    "cardName": "von Moeller-Molox GmbH",
+    "personVO": {
+      "personId": 6579,
+      "familyName": "von Moeller",
+      "givenName": "Holger",
+      "title": "Dr.",
+      "emailAddress": "holger.vonmoeller@molox.de"
+    }
+  },
+  "returnLabContactVO": null,
+  "returnCourier": null,
+  "dateOfShippingToUser": null,
+  "dewarVOs": [
+    {
+      "dewarId": 10,
+      "code": "Dewar1",
+      "comments": null,
+      "dewarStatus": "label printed",
+      "isReimbursed": false,
+      "containerVOs": [
+        {
+          "containerId": 20,
+          "code": "containerA",
+          "containerType": "Unipuck",
+          "capacity": 16,
+          "beamlineLocation": "P11",
+          "containerStatus": "label printed",
+          "sampleChangerLocation": null,
+          "sampleVOs": []
+        }
+      ]
+    },
+    {
+      "dewarId": 11,
+      "code": "Dewar2",
+      "comments": null,
+      "dewarStatus": "label printed",
+      "isReimbursed": false,
+      "containerVOs": [
+        {
+          "containerId": 21,
+          "code": "containerB",
+          "containerType": "Unipuck",
+          "capacity": 16,
+          "beamlineLocation": "P11",
+          "containerStatus": "label printed",
+          "sampleChangerLocation": null,
+          "sampleVOs": []
+        }
+      ]
+    }
+  ],
+  "sessions": [
+    {
+      "sessionId": 5,
+      "beamlineName": "P11",
+      "startDate": "Jan 10, 2026, 9:00:00 AM",
+      "nbReimbDewars": 2,
+      "proposalVO": {
+        "proposalCode": "MX",
+        "proposalNumber": "1234"
+      }
+    }
+  ]
+}
