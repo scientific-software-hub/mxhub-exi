@@ -128,7 +128,7 @@ describe('Shipment Detail — ShipmentForm header (#/shipping/1/main)', () => {
     cy.contains('Shipment-001').should('be.visible');
     cy.contains('opened').should('be.visible');
     cy.contains('P11').should('be.visible');
-    cy.contains('von Moeller-Molox GmbH').should('be.visible');
+    cy.contains('Bender-Roga i Kopyta Ltd').should('be.visible');
     cy.contains('NO RETURN').should('be.visible'); // returnLabContactVO is null in the fixture
   });
 

@@ -17,7 +17,7 @@
     "labcontacts": [
       {
         "labContactId": 157,
-        "cardName": "von Moeller-Molox GmbH",
+        "cardName": "Bender-Roga i Kopyta Ltd",
         "defaultCourrierCompany": "-1",
         "courierAccount": "ACC-2026-01",
         "billingReference": "REF-2026-01",
@@ -28,23 +28,23 @@
           "personId": 6579,
           "laboratoryVO": {
             "laboratoryId": 5292,
-            "name": "Molox GmbH",
-            "address": "Thielallee 63\r\n14195 Berlin",
-            "city": "Berlin",
+            "name": "Roga i Kopyta Ltd",
+            "address": "1 Fiction Avenue\r\n00000 Chernomorsk",
+            "city": "Chernomorsk",
             "country": "DE"
           },
-          "familyName": "von Moeller",
-          "givenName": "Holger",
+          "familyName": "Bender",
+          "givenName": "Ostap",
           "title": "Dr.",
-          "emailAddress": "holger.vonmoeller@molox.de",
-          "phoneNumber": "1781387420",
-          "login": "hovomo",
+          "emailAddress": "ostap.bender@rogaikopyta.example",
+          "phoneNumber": "0000000001",
+          "login": "obender",
           "sessionVOs": []
         }
       },
       {
         "labContactId": 156,
-        "cardName": "Chatziefthymiou-Deutsches Elektronen-Synchrot",
+        "cardName": "Vorobyaninov-Chernomorsk Institute",
         "defaultCourrierCompany": null,
         "courierAccount": null,
         "billingReference": null,
@@ -54,18 +54,18 @@
         "personVO": {
           "personId": 21113,
           "laboratoryVO": null,
-          "familyName": "Chatziefthymiou",
-          "givenName": "Spyridon",
+          "familyName": "Vorobyaninov",
+          "givenName": "Ippolit",
           "title": "Dr.",
-          "emailAddress": "spyros.chatziefthymiou@desy.de",
-          "phoneNumber": "87551",
-          "login": "chatzies",
+          "emailAddress": "ippolit.vorobyaninov@chernomorsk.example",
+          "phoneNumber": "00000",
+          "login": "ivorobyaninov",
           "sessionVOs": []
         }
       },
       {
         "labContactId": 158,
-        "cardName": "Taberman-Helmholtz Lab",
+        "cardName": "Balaganov-Chernomorsk Lab",
         "defaultCourrierCompany": null,
         "courierAccount": null,
         "billingReference": null,
@@ -75,12 +75,12 @@
         "personVO": {
           "personId": 7001,
           "laboratoryVO": null,
-          "familyName": "Taberman",
-          "givenName": "Helena",
+          "familyName": "Balaganov",
+          "givenName": "Shura",
           "title": "Dr.",
-          "emailAddress": "helena.taberman@helmholtz.de",
+          "emailAddress": "shura.balaganov@chernomorsk.example",
           "phoneNumber": null,
-          "login": "tabhel",
+          "login": "sbalaganov",
           "sessionVOs": []
         }
       }

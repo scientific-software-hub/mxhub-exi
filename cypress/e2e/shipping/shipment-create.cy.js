@@ -154,9 +154,9 @@ describe('Create Shipment — "Create New Shipment" modal (Shipment ▸ Shipment
   it('From dropdown is populated from the proposal\'s lab contacts', () => {
     openCreateShipmentDialog();
     cy.get('.x-window [id$="-to"] option').should('have.length', 3);
-    cy.get('.x-window [id$="-to"]').should('contain', 'von Moeller-Molox GmbH');
-    cy.get('.x-window [id$="-to"]').should('contain', 'Chatziefthymiou-Deutsches Elektronen-Synchrot');
-    cy.get('.x-window [id$="-to"]').should('contain', 'Taberman-Helmholtz Lab');
+    cy.get('.x-window [id$="-to"]').should('contain', 'Bender-Roga i Kopyta Ltd');
+    cy.get('.x-window [id$="-to"]').should('contain', 'Vorobyaninov-Chernomorsk Institute');
+    cy.get('.x-window [id$="-to"]').should('contain', 'Balaganov-Chernomorsk Lab');
   });
 
   it('Session dropdown lists only future sessions', () => {
@@ -174,8 +174,8 @@ describe('Create Shipment — "Create New Shipment" modal (Shipment ▸ Shipment
     cy.get('.x-window [id$="-from"] option').should('have.length', 3);
     cy.get('.x-window [id$="-from"]').should('contain', 'Same as for shipping to beamline');
     cy.get('.x-window [id$="-from"]').should('contain', 'No return requested');
-    cy.get('.x-window [id$="-from"]').should('contain', 'Taberman-Helmholtz Lab');
-    cy.get('.x-window [id$="-from"]').should('not.contain', 'von Moeller-Molox GmbH');
+    cy.get('.x-window [id$="-from"]').should('contain', 'Balaganov-Chernomorsk Lab');
+    cy.get('.x-window [id$="-from"]').should('not.contain', 'Bender-Roga i Kopyta Ltd');
     // No option carries `selected` (shipment is undefined on create), so the browser defaults to
     // the first <option> in DOM order, which is the "Same as..." pseudo-option (value -1).
     cy.get('.x-window [id$="-from"]').should('have.value', '-1');
@@ -201,7 +201,7 @@ describe('Create Shipment — "Create New Shipment" modal (Shipment ▸ Shipment
     openCreateShipmentDialog();
     cy.get('.x-window [id$="-name"]').type('My-Shipment-2026');
     cy.get('.x-window [id$="-date"]').select('5');
-    cy.get('.x-window [id$="-to"]').select('von Moeller-Molox GmbH');
+    cy.get('.x-window [id$="-to"]').select('Bender-Roga i Kopyta Ltd');
     cy.contains('.x-window a.x-btn', 'Save').click();
 
     // saveShipment() POSTs jQuery-serialised form data (not JSON).
@@ -229,7 +229,7 @@ describe('Create Shipment — "Create New Shipment" modal (Shipment ▸ Shipment
     openCreateShipmentDialog();
     cy.get('.x-window [id$="-name"]').type('My-Shipment-2026');
     cy.get('.x-window [id$="-date"]').select('5');
-    cy.get('.x-window [id$="-to"]').select('von Moeller-Molox GmbH');
+    cy.get('.x-window [id$="-to"]').select('Bender-Roga i Kopyta Ltd');
     cy.contains('.x-window a.x-btn', 'Save').click();
 
     cy.wait('@saveShipment');

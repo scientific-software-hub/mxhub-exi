@@ -14,13 +14,13 @@
   "comments": null,
   "sendingLabContactVO": {
     "labContactId": 157,
-    "cardName": "von Moeller-Molox GmbH",
+    "cardName": "Bender-Roga i Kopyta Ltd",
     "personVO": {
       "personId": 6579,
-      "familyName": "von Moeller",
-      "givenName": "Holger",
+      "familyName": "Bender",
+      "givenName": "Ostap",
       "title": "Dr.",
-      "emailAddress": "holger.vonmoeller@molox.de"
+      "emailAddress": "ostap.bender@rogaikopyta.example"
     }
   },
   "returnLabContactVO": null,

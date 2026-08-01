@@ -1,0 +1,8 @@
+{
+  "proteinId": 7,
+  "acronym": "NEWP",
+  "name": "New Protein",
+  "safetyLevel": "GREEN",
+  "molecularMass": 50000.0,
+  "proteinType": "Protein"
+}

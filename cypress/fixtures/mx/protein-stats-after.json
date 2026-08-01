@@ -1,0 +1,5 @@
+[
+  { "proteinId": 1, "acronym": "ACC", "name": "Accelerator Protein" },
+  { "proteinId": 2, "acronym": "WRN", "name": "Werner Protein" },
+  { "proteinId": 7, "acronym": "NEWP", "name": "New Protein" }
+]
