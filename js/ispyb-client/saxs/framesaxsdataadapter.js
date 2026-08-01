@@ -42,3 +42,8 @@ FrameSaxsDataAdapter.prototype.getFramesURL = function(frames, averages, subtrac
 	var connection = EXI.credentialManager.getConnections()[0];
 	return connection.url + ('/{0}/proposal/{1}/saxs/frame/datplot?frame={2}&average={3}&subtracted={4}&sampleaverage={5}&bufferaverage={6}&models={7}&operation={8}'.format([ connection.token,connection.user, frames.toString(), averages.toString(),subtractions.toString(), sampleaverages.toString(), bufferaverages.toString(), models.toString(), operation ]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.FrameSaxsDataAdapter = FrameSaxsDataAdapter;

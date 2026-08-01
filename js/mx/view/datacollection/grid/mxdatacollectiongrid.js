@@ -317,3 +317,8 @@ MXDataCollectionGrid.prototype.filterBy = function(searchTerm) {
     this.rtfAnalysisUrl = EXI.getDataAdapter().mx.dataCollection.getRtfAnalysisReportURLByFilterParam(searchTerm);
     return filtered;
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.MXDataCollectionGrid = MXDataCollectionGrid;

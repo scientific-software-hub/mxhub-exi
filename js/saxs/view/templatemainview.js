@@ -238,3 +238,8 @@ TemplateMainView.prototype.load = function(experiments) {
 	EXI.getDataAdapter({onSuccess : onSuccess}).saxs.experiment.getExperimentById(experiments[0].experimentId);
 	this.panel.setTitle("Template");
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.TemplateMainView = TemplateMainView;

@@ -231,3 +231,14 @@ OctagonVertexGraphFormatter.prototype.getId = ItemGraphFormatter.prototype.getId
 OctagonVertexGraphFormatter.prototype.toJSON = ItemGraphFormatter.prototype.toJSON; 
 OctagonVertexGraphFormatter.prototype.loadFromJSON = ItemGraphFormatter.prototype.loadFromJSON; 
 OctagonVertexGraphFormatter.prototype._setEvents = ItemGraphFormatter.prototype._setEvents; 
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.VertexGraphFormatter = VertexGraphFormatter;
+window.CircleVertexGraphFormatter = CircleVertexGraphFormatter;
+window.SquareVertexGraphFormatter = SquareVertexGraphFormatter;
+window.EllipseVertexGraphFormatter = EllipseVertexGraphFormatter;
+window.RectangleVertexGraphFormatter = RectangleVertexGraphFormatter;
+window.RoundedVertexGraphFormatter = RoundedVertexGraphFormatter;
+window.OctagonVertexGraphFormatter = OctagonVertexGraphFormatter;

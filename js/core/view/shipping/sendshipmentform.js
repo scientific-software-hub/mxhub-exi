@@ -56,3 +56,8 @@ SendShipmentForm.prototype.save = function(){
         $("#" + this.id + "-modal-body").notify("Fill the required fields.",{ className : "error"});
     }
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.SendShipmentForm = SendShipmentForm;

@@ -118,3 +118,8 @@ ListView.prototype.selectRow = function(key,value) {
 		this.panel.getSelectionModel().select(index);
 	}
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ListView = ListView;

@@ -17,3 +17,8 @@ TestMainWidgetPanel.prototype.getRow = function(record){
 TestMainWidgetPanel.prototype.getFilter = function(value){
 	return [{property : "sampleName", value : value, anyMatch : true}];
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.TestMainWidgetPanel = TestMainWidgetPanel;

@@ -15,3 +15,8 @@ SpecimenSaxsDataAdapter.prototype.mergeSpecimens= function(sourceSpecimenId, tar
     var url = ('/{token}/proposal/{proposal}/saxs/specimen/merge');
 	this.post(url, {sourceSpecimenId : sourceSpecimenId, targetSpecimenId : targetSpecimenId });
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.SpecimenSaxsDataAdapter = SpecimenSaxsDataAdapter;

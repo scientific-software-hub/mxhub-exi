@@ -506,3 +506,8 @@ SamplePlateWidget.prototype.circleRelayout = function(network, rows, columns) {
 	network.getLayout().getLayout("CIRCLE");
 };
 
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.SamplePlateWidget = SamplePlateWidget;

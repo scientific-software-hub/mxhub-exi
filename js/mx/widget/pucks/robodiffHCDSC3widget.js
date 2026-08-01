@@ -86,3 +86,8 @@ RoboDiffHCDSC3Widget.prototype.convertSampleChangerLocationToId = function (samp
 		return null;
 	}
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.RoboDiffHCDSC3Widget = RoboDiffHCDSC3Widget;

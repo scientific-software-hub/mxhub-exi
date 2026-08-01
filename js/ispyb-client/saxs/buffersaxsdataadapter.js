@@ -14,3 +14,8 @@ BufferSaxsDataAdapter.prototype.saveBuffer= function(buffer){
     var url = ('/{token}/proposal/{proposal}/saxs/buffer/save');
 	this.post(url, {buffer : JSON.stringify(buffer)});
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.BufferSaxsDataAdapter = BufferSaxsDataAdapter;

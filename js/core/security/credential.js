@@ -44,3 +44,8 @@ Credential.prototype.isValid = function() {
 Credential.prototype.timeToExpire = function() {
     return  moment.duration(moment(this.tokenExpires).diff(moment())).asHours();
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.Credential = Credential;

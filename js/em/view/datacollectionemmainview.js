@@ -78,3 +78,8 @@ DataCollectionEmMainView.prototype.loadCollections = function(dataCollections) {
     var timer1 = setTimeout(function() {  $('.img-responsive').lazy(lazy);}, 500);
     //var timer2 = setTimeout(function() {  $('.smalllazy').lazy(lazy);}, 500);  
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.DataCollectionEmMainView = DataCollectionEmMainView;

@@ -92,3 +92,8 @@ CrystalFormView.prototype.load = function(containerId, sampleId, shippingId){
 
 	EXI.getDataAdapter({onSuccess : onSuccess}).proposal.shipping.getContainerById(this.containerId,this.containerId,this.containerId);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.CrystalFormView = CrystalFormView;

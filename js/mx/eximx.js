@@ -59,3 +59,8 @@ ExiMX.prototype.getDataAdapter = function(args){
 	
 	return  new MxDataAdapterFactory(this.appendDataAdapterParameters(args));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ExiMX = ExiMX;

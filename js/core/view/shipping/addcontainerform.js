@@ -110,3 +110,8 @@ AddContainerForm.prototype.addStockSolutionsList = function () {
     this.panel.insert(this.stockSolutionsGrid.getPanel());
     this.stockSolutionsGrid.load(stockSolutions);
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.AddContainerForm = AddContainerForm;

@@ -1596,3 +1596,8 @@ GraphCanvas.prototype.getEdgeFill = function(edgeId) {
 GraphCanvas.prototype.setCoordinates = function(vertexId, x, y) {
 	return this.getLayout().getEdgeById(vertexId).setCoordinates(x, y);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.GraphCanvas = GraphCanvas;

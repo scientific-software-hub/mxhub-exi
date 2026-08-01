@@ -196,3 +196,8 @@ AutoProcIntegrationDataAdapter.prototype.getFastDPCompleteness= function(autoPro
 AutoProcIntegrationDataAdapter.prototype.getFastDPRfactor= function(autoProcIntegrationIdList){
 	return this.getUrl('/{token}/proposal/{proposal}/mx/autoprocintegration/{0}/fastdp/rfactor'.format( [autoProcIntegrationIdList.toString()]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.AutoProcIntegrationDataAdapter = AutoProcIntegrationDataAdapter;

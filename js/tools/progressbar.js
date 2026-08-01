@@ -15,3 +15,8 @@ ProgressBar.prototype.getPanel = function(done, total){
 	return "<div class='progress'><div class='progress-bar' role='progressbar' aria-valuenow='10' aria-valuemin='0' aria-valuemax='100' style='background-color:"+ color + ";width:" + percentage + "%'></div></div>";
 	
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ProgressBar = ProgressBar;

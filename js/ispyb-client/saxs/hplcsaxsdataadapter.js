@@ -21,3 +21,8 @@ HPLCSaxsDataAdapter.prototype.getDownloadHDF5URL= function(experimentId){
 HPLCSaxsDataAdapter.prototype.getDownloadHDF5FramesURL= function(experimentId, start, end){
 	return this.getUrl('/{token}/proposal/{proposal}/saxs/experiment/{0}/hplc/frame/{1}/{2}/zip'.format( [experimentId,start,end]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.HPLCSaxsDataAdapter = HPLCSaxsDataAdapter;

@@ -180,3 +180,8 @@ PrimaryDataMainView.prototype.load = function (dataCollectionId) {
 	EXI.getDataAdapter({ onSuccess: onSuccessA }).saxs.dataCollection.getDataCollectionsById(dataCollectionId);
 };
 
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.PrimaryDataMainView = PrimaryDataMainView;

@@ -202,3 +202,8 @@ ContainersDataCollectionGrid.prototype.load = function(dataCollectionGroup) {
     this.dataCollectionGroup = dataCollectionGroup;    
     this.store.loadData([{containerIds:  this.getContainersId(this.dataCollectionGroup), selected :{}}]);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ContainersDataCollectionGrid = ContainersDataCollectionGrid;

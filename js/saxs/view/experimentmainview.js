@@ -98,3 +98,8 @@ ExperimentMainView.prototype.load = function(dataCollections, experimentId) {
 	this.panel.insert(this.activePanel.getPanel());	
 	this.activePanel.load(dataCollections, this.experimentId);	
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ExperimentMainView = ExperimentMainView;

@@ -167,3 +167,8 @@ var url;
 		$("#" + this.id + "-checkox-div").notify("Set the dates correctly and select the values to download.", { className : "error",elementPosition: 'top left'});
 	}
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ExperimentsForm = ExperimentsForm;

@@ -1148,3 +1148,10 @@ var MX_COMBOMANAGER = {
 		
 	};
 
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.BUI = BUI;
+window.BIOSAXS_COMBOMANAGER = BIOSAXS_COMBOMANAGER;
+window.MX_COMBOMANAGER = MX_COMBOMANAGER;

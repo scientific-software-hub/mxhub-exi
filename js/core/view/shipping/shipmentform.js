@@ -351,3 +351,11 @@ ShipmentForm.prototype.attachCallBackAfterRender = function () {
     };
     var timer3 = setTimeout(tabsEvents, 500, this);
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.sendNotificationWhenShippingStatusIsSentToFacility = sendNotificationWhenShippingStatusIsSentToFacility;
+window.sendNotificationWhenShippingStatusIsAtFacility = sendNotificationWhenShippingStatusIsAtFacility;
+window.sendNotificationWhenShippingStatusIsSentToUser = sendNotificationWhenShippingStatusIsSentToUser;
+window.ShipmentForm = ShipmentForm;

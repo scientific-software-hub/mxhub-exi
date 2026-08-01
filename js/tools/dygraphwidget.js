@@ -190,3 +190,9 @@ StdDevDyGraph.prototype.test = function(targetId) {
 
 	dygraphObject.draw(dygraphObject.input().data, dygraphObject.input().colors, dygraphObject.input().labels);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.DygraphWidget = DygraphWidget;
+window.StdDevDyGraph = StdDevDyGraph;

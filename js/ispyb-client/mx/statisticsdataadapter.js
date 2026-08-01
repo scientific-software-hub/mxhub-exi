@@ -85,3 +85,8 @@ StatisticsDataAdapter.prototype.getExperimentsStatisticsByDate = function(startD
 StatisticsDataAdapter.prototype.getExperimentsStatisticsByDateAndBeamline = function(startDate,endDate,testproposals,beamline){
 	return this.getUrl('/{token}/stats/experimentstatistics/{0}/{1}/{2}/csv?testproposals={3}'.format( [startDate,endDate,beamline,testproposals]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.StatisticsDataAdapter = StatisticsDataAdapter;

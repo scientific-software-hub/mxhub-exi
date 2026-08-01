@@ -205,3 +205,8 @@ AddCrystalFormView.prototype.manageCellValueUpdate = function (id, value) {
 		$(id).prop('disabled', false);
 	}
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.AddCrystalFormView = AddCrystalFormView;

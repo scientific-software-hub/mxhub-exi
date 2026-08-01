@@ -452,3 +452,8 @@ ContainerPrepareSpreadSheet.prototype.getRowsByContainerId = function (container
     var recordsByContainerId = _.filter(this.panel.store.data.items,function(o) {return o.data.containerId == containerId});
     return recordsByContainerId;
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.ContainerPrepareSpreadSheet = ContainerPrepareSpreadSheet;

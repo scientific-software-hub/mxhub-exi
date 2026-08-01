@@ -57,11 +57,11 @@
 		]);
 
 		if (location.href.indexOf("saxs") != -1){
-			EXI = new ExiSAXS();
+			window.EXI = new ExiSAXS();
 		}
 		else{
-            
-			EXI = new ExiMX();
+
+			window.EXI = new ExiMX();
 		}
 		
 		EXI.show();

@@ -48,3 +48,8 @@ XFEScanDataAdapter.prototype.getFile = function(xfeScanId, imageType){
 XFEScanDataAdapter.prototype.getCSV = function(xfeScanId){
 	 return this.getUrl('/{token}/proposal/{proposal}/mx/xrfscan/xrfscanId/{0}/csv'.format( [xfeScanId.toString()]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.XFEScanDataAdapter = XFEScanDataAdapter;

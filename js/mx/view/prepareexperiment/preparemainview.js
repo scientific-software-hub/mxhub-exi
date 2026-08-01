@@ -311,3 +311,8 @@ PrepareMainView.prototype.storeSampleChangerWidget = function (sampleChangerWidg
     var puckData = sampleChangerWidget.getPuckData();
     this.save('puckData',JSON.stringify(puckData));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.PrepareMainView = PrepareMainView;

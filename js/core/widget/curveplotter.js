@@ -408,3 +408,9 @@ AutoProcIntegrationCurvePlotter.prototype.getPanel = function() {
     });   
     return this.plotPanel;
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.CurvePlotter = CurvePlotter;
+window.AutoProcIntegrationCurvePlotter = AutoProcIntegrationCurvePlotter;

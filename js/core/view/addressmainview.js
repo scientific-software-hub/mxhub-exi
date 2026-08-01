@@ -38,3 +38,8 @@ AddressMainView.prototype.load = function(labContactId) {
 	
 	EXI.getDataAdapter({onSuccess : onSuccess}).proposal.labcontacts.getLabContactById(labContactId);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.AddressMainView = AddressMainView;

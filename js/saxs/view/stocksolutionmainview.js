@@ -60,3 +60,8 @@ StockSolutionMainView.prototype.load = function(stockSolutionId) {
 	this.stockSolutionForm.load(EXI.proposalManager.getStockSolutionById(stockSolutionId));	
 	this.panel.setTitle("Stock Solutions");
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.StockSolutionMainView = StockSolutionMainView;

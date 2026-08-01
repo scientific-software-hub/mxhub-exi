@@ -123,3 +123,8 @@ PhasingDataAdapter.prototype.downloadPhasingFilesByPhasingAttachmentId = functio
 PhasingDataAdapter.prototype.getCSVPhasingFilesByPhasingAttachmentIdURL = function(phasingAttachmentId){
 	return this.getUrl('/{token}/proposal/{proposal}/mx/phasing/phasingprogramattachmentid/{0}/csv'.format( [phasingAttachmentId]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.PhasingDataAdapter = PhasingDataAdapter;

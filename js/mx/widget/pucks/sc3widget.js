@@ -87,3 +87,8 @@ SC3Widget.prototype.convertSampleChangerLocationToId = function (sampleChangerLo
 		return null;
 	}
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.SC3Widget = SC3Widget;

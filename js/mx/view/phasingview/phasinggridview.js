@@ -356,3 +356,8 @@ var index2FOFC_MR, index2FOFC_REFINE, indexFOFC_MR, indexFOFC_REFINE;
                                     
     EXI.getDataAdapter({onSuccess : onSuccess, onError : onError}).mx.phasing.getPhasingViewByDataCollectionGroupId(this.dataCollectionGroupId);
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.PhasingGridView = PhasingGridView;

@@ -251,3 +251,9 @@ NodeLayout.prototype.setCoordinates = function(x, y){
 	this.changed.notify(this);
 };
 
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.LayoutDataset = LayoutDataset;
+window.NodeLayout = NodeLayout;

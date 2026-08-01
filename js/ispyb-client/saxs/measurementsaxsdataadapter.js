@@ -19,3 +19,8 @@ MeasurementSaxsDataAdapter.prototype.removeMeasurement= function(measurement){
 MeasurementSaxsDataAdapter.prototype.sortMeasurements= function(experimentId, type){
     this.get('/{token}/proposal/{proposal}/saxs/measurement/experiment/{0}/type/{1}/sort'.format( [experimentId, type]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.MeasurementSaxsDataAdapter = MeasurementSaxsDataAdapter;

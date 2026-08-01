@@ -97,3 +97,8 @@ FlexHCDUnipuckPlateWidget.prototype.onRender = function () {
 	this.addClassToPuck(puck24,"puck-recovery");
 	puck24.addClassToCells("cell-always-disabled");
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.FlexHCDUnipuckPlateWidget = FlexHCDUnipuckPlateWidget;

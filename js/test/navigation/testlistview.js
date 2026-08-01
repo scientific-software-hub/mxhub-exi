@@ -19,3 +19,8 @@ TestListView.prototype.getRow = function(record){
 TestListView.prototype.getFilter = function(value){	
 	return [{property : "name", value : value, anyMatch : true}];
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.TestListView = TestListView;

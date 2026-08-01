@@ -571,3 +571,8 @@ CollectedSpecimenGrid.prototype.test = function(targetId) {
 	panel.render(targetId);
 
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.CollectedSpecimenGrid = CollectedSpecimenGrid;

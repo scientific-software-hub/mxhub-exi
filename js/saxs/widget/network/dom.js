@@ -48,3 +48,8 @@ DOM.select = function(targetID)
   return document.getElementById(targetID);
 //  return $("#"+targetID);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.DOM = DOM;

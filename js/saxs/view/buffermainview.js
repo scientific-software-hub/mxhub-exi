@@ -48,3 +48,8 @@ BufferMainView.prototype.load = function(bufferId) {
 	this.panel.setTitle("Buffer");
 	this.bufferForm.load(EXI.proposalManager.getBufferById(bufferId));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.BufferMainView = BufferMainView;

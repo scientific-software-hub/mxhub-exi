@@ -43,3 +43,8 @@ SessionDataAdapter.prototype.saveComments = function(sessionId, comments){
     var url = '/{token}/proposal/{proposal}/mx/session/{0}/comments/save'.format( [sessionId]);
     this.post(url, {comments : comments});
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.SessionDataAdapter = SessionDataAdapter;

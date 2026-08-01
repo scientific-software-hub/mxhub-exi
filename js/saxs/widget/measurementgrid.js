@@ -781,3 +781,8 @@ MeasurementGrid.prototype._sortBy = function(sort) {
 	_this.grid.setLoading("Sorting");
 	EXI.getDataAdapter({onSuccess : onSuccess}).saxs.measurement.sortMeasurements(this.experimentList.experiments[0].experimentId, sort);
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.MeasurementGrid = MeasurementGrid;

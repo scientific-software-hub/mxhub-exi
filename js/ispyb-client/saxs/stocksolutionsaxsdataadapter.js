@@ -14,3 +14,8 @@ StockSolutionSaxsDataAdapter.prototype.saveStockSolution= function(stocksolution
     var url = ('/{token}/proposal/{proposal}/saxs/stocksolution/save');
 	this.post(url, {stocksolution : JSON.stringify(stocksolution)});
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.StockSolutionSaxsDataAdapter = StockSolutionSaxsDataAdapter;

@@ -63,3 +63,8 @@ DateRangePicker.prototype.select = function(){
         $("#" + this.id + "-form").notify("Select the start and the end date", { className : "error",elementPosition: 'top left'});
     }
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.DateRangePicker = DateRangePicker;

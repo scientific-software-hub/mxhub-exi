@@ -17,3 +17,8 @@ SubtractionSaxsDataAdapter.prototype.getImage = function(subtractionId, imageTyp
 SubtractionSaxsDataAdapter.prototype.getZip = function(subtractionId){
 	return this.getUrl('/{token}/proposal/{proposal}/saxs/subtraction/{0}/zip'.format([ subtractionId]));
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.SubtractionSaxsDataAdapter = SubtractionSaxsDataAdapter;

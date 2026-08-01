@@ -162,3 +162,8 @@ String.prototype.format = function (args) {
 String.prototype.format.regex = new RegExp("{-?[0-9]+}", "g");
 
 
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.DataAdapter = DataAdapter;

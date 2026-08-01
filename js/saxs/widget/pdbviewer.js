@@ -321,3 +321,11 @@ StructurePDBViewer.prototype.refresh = function(structures) {
 		this.webGLNotAvailable();
 	}
 };
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.PDBViewer = PDBViewer;
+window.SuperpositionPDBViewer = SuperpositionPDBViewer;
+window.AlignedSuperpositionPDBViewer = AlignedSuperpositionPDBViewer;
+window.StructurePDBViewer = StructurePDBViewer;

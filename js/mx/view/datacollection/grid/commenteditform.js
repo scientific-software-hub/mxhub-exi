@@ -54,3 +54,8 @@ CommentEditForm.prototype.save = function(){
         EXI.getDataAdapter({onSuccess : onSuccess}).proposal.session.saveComments(this.targetId,comment);
     }
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.CommentEditForm = CommentEditForm;

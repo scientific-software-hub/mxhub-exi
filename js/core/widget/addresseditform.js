@@ -126,3 +126,8 @@ AddressEditForm.prototype.getAddress = function () {
     
     return address;
 }
+
+// -- ESM interop (Grunt -> Vite migration): re-expose module-scope
+// declarations as globals, matching the semantics classic <script> tags
+// provided (other files still reference these as bare identifiers). --
+window.AddressEditForm = AddressEditForm;
