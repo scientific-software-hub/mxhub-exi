@@ -1,3 +1,24 @@
+# syntax=docker/dockerfile:1
+
+# ---- Build stage ----------------------------------------------------------
+# Runs `vite build` inside the image, so `docker build` is now the only
+# build step -- no host `npm run build` before this. @scientific-software-hub/
+# extjs is a private GitHub Packages package (see .npmrc's registry mapping),
+# so npm ci needs a `read:packages` PAT. Pass it as a BuildKit secret (never
+# a --build-arg: those land in the image history, a secret doesn't):
+#   docker build --secret id=npm_token,env=NPM_TOKEN .
+FROM node:22-alpine AS build
+WORKDIR /app
+
+COPY package.json package-lock.json .npmrc ./
+RUN --mount=type=secret,id=npm_token \
+    npm config set //npm.pkg.github.com/:_authToken="$(cat /run/secrets/npm_token)" && \
+    npm ci
+
+COPY . .
+RUN npm run build
+
+# ---- Runtime stage ----------------------------------------------------------
 # Use the official Nginx base image
 FROM nginx:1.25.3-alpine
 
@@ -5,11 +26,10 @@ FROM nginx:1.25.3-alpine
 WORKDIR /usr/share/nginx/html
 
 # Production MX module. dist/ is the `vite build` output for mx/ (entry
-# HTML, ExtJS + vendor libs, app bundle, CSS bundle) -- built on the host
-# before `docker build` runs (`npm run build`), same as the Grunt-built
-# mx/+min/ this replaces. images/, fonts/, csv/ are plain static assets
-# Vite doesn't touch, copied as siblings exactly as before.
-COPY --chown=nginx:nginx dist/       ./
+# HTML, ExtJS + vendor libs, app bundle, CSS bundle), produced by the build
+# stage above. images/, fonts/, csv/ are plain static assets Vite doesn't
+# touch, copied from the build context as siblings exactly as before.
+COPY --chown=nginx:nginx --from=build /app/dist/  ./
 COPY --chown=nginx:nginx images/     ./images/
 COPY --chown=nginx:nginx fonts/      ./fonts/
 COPY --chown=nginx:nginx csv/        ./csv/

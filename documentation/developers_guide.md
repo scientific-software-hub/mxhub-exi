@@ -80,6 +80,26 @@ npm run preview
 Serves the `dist/` build locally (`http://localhost:4173`) to sanity-check a
 production build before deploying.
 
+### Docker image
+
+The `Dockerfile` is multi-stage: it runs `npm ci && npm run build` itself in a
+`node:22-alpine` build stage, then copies only the resulting `dist/` (plus
+`images/`, `fonts/`, `csv/`) into a plain `nginx:1.25.3-alpine` runtime stage. You
+do **not** need to run `npm run build` on the host first — `docker build` is the
+only step.
+
+`@scientific-software-hub/extjs` is a private GitHub Packages dependency, so the
+build stage's `npm ci` needs a `read:packages` PAT — the same kind of token from
+[Prerequisites](#prerequisites) above, but passed separately here rather than
+read from your `~/.npmrc`, since that file lives on your host and isn't
+available inside the build container. Pass it as a BuildKit secret, not a
+`--build-arg` (build-args land in the image history; secrets don't):
+
+```bash
+export NPM_TOKEN=ghp_your_read_packages_token
+docker build --secret id=npm_token,env=NPM_TOKEN -t mxhub-exi .
+```
+
 ---
 
 ## Running Cypress Tests
