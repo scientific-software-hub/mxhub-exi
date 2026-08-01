@@ -7,6 +7,7 @@
 3. [Running Cypress Tests](#running-cypress-tests)
 4. [Developing Against a Local ISPyB](#developing-against-a-local-ispyb)
 5. [Debugging](#debugging)
+6. [Building the Documentation Site](#building-the-documentation-site)
 
 ---
 
@@ -136,6 +137,8 @@ cypress/fixtures/
   csv/            # *.csv files for CSV upload tests
 ```
 
+See [Testing & Quality](testing.md) for what the suite actually covers and why.
+
 ---
 
 ## Developing Against a Local ISPyB
@@ -204,3 +207,53 @@ You can now set breakpoints directly in the project JS files (`js/core/`, `js/mx
 - **Template changes** do require `grunt dev` before refreshing, because Dust templates are precompiled.
 - **Grunt watch** (`grunt watch`) re-runs `grunt dev` automatically when CSS or template files change.
 - To inspect a specific view, find its constructor (e.g. `PuckFormView`) and set a breakpoint in `load()` or `save()` — the route handler instantiates a fresh view on every navigation.
+
+---
+
+## Building the Documentation Site
+
+This documentation is a small static site, built from the markdown files in `documentation/`
+by a self-contained Node script — it does not depend on Grunt, Bower, or the private
+`@scientific-software-hub/extjs` registry.
+
+### Build once
+
+```bash
+npm run docs:build          # from the repo root — installs documentation/'s deps and builds
+```
+
+or, from inside `documentation/` directly:
+
+```bash
+cd documentation
+npm install
+npm run build                # -> documentation/_site/
+```
+
+### Preview locally
+
+```bash
+cd documentation
+npm run serve                 # builds, then serves _site/ on http://localhost:4000
+```
+
+### What the build checks
+
+`build-docs.js` runs two checks before writing any output, and **fails the build** (non-zero
+exit) if either doesn't pass:
+
+- **Link check** — every relative link between doc pages must resolve to a real page and, if it
+  points at a heading, a real `#anchor` on that page.
+- **Scrub check** — a list of real names, logins, emails, proposal codes and file paths that
+  must never reappear in the public docs (see the top of `build-docs.js` for the current list).
+  This exists because these docs were originally sanitised from working notes captured against
+  a real facility's data — the check keeps a future edit from reintroducing something real.
+
+Both checks run in CI (`.github/workflows/docs.yml`) on every pull request that touches
+`documentation/`, so a broken link or a leaked name fails the PR rather than shipping.
+
+### Publishing
+
+Pushes to `main` that touch `documentation/**` trigger the same workflow, which then deploys
+`documentation/_site/` to GitHub Pages. No manual steps beyond the initial one-time repo setting
+(Settings → Pages → Source → **GitHub Actions**).

@@ -2,6 +2,8 @@
 
 Widget relationships, routing, and ISPyB REST endpoints for the MX module of EXI.
 Use this as a guide when writing UI tests — work widget by widget rather than all at once.
+It pairs with the [Widget & Template Tree](widget-tree.md), which drills one level deeper into
+how each view assembles its ExtJS widgets and Dust templates.
 
 ---
 
@@ -388,7 +390,7 @@ The shipping module enforces sample validity at two points: **CSV bulk import** 
 | Protein + sample | unique **within the CSV being imported** | CSV only |
 | Parcel / Dewar name | not already present in this shipment | CSV only |
 | Container name | not already present in this shipment | CSV only |
-| Container type | `Unipuck` or `SPINEpuck` (DESY/MAX IV: `Unipuck` only) | CSV only |
+| Container type | `Unipuck` or `SPINEpuck` (this deployment: `Unipuck` only) | CSV only |
 | Sample position | 1-based integer, ≤ container capacity (Unipuck: 16, SPINEpuck: 10) | CSV only |
 
 ### 13.2 `PuckValidator.checkSampleNames` — The Shared Uniqueness Kernel

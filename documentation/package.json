@@ -1,0 +1,17 @@
+{
+  "name": "mxhub-exi-docs",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static documentation site builder for mxhub-exi (EXI). Converts documentation/*.md into a GitHub Pages site.",
+  "scripts": {
+    "build": "node build-docs.js",
+    "serve": "node build-docs.js && npx http-server _site -p 4000 -c-1"
+  },
+  "dependencies": {
+    "highlight.js": "^11.9.0",
+    "marked": "^12.0.2"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
