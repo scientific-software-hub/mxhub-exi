@@ -325,3 +325,10 @@ import './saxs/view/templatemainview.js';
 import './test/view/electrondensityviewer.js';
 import './test/view/puckwidgetview.js';
 import './test/view/testmainview.js';
+
+// Precompiled Dust templates (replaces min/precompiled.templates.min.js,
+// see vite-plugins.mjs). Position doesn't matter functionally -- dust.render()
+// calls only happen later, at runtime, well after all modules finish
+// evaluating -- kept last to match where the equivalent classic <script>
+// tag sat in mx/index.tpl.html.
+import 'virtual:dust-templates';

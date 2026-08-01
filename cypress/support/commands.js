@@ -78,5 +78,5 @@ Cypress.Commands.add('setAuthState', () => {
 });
 
 Cypress.Commands.add('visitMx', (hash = '') => {
-  cy.visit(`/mx/${Cypress.env('startPage')}${hash}`);
+  cy.visit(`/mx/index.html${hash}`);
 });

@@ -1,6 +1,7 @@
 package-lock.json
 cypress.env.json
 min/
+dist/
 report/
 documentation/
 .tern*
@@ -52,7 +53,6 @@ local.properties
 
 # development
 mx/config-localhost.js
-mx/dev.html
 saxs/dev.html
 tracking/dev.html
 

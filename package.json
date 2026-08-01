@@ -2,7 +2,7 @@
   "name": "exi-ui",
   "version": "5.13.4",
   "description": "Extended ISPyB",
-  "main": "Gruntfile.js",
+  "main": "vite.config.js",
   "dependencies": {
     "@scientific-software-hub/extjs": "5.0.1",
     "bootstrap": "3.4.1",
@@ -13,24 +13,11 @@
     "dygraphs": "1.1.1",
     "eonasdan-bootstrap-datetimepicker": "4.17.47",
     "file-saver": "1.3.8",
-    "grunt-asset-cachebuster": "^0.5.0",
-    "grunt-cli": "^0.1.13",
-    "grunt-contrib-concat": "^0.5.1",
-    "grunt-contrib-cssmin": "^0.14.0",
-    "grunt-contrib-jshint": "^0.11.3",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-contrib-yuidoc": "^1.0.0",
-    "grunt-debian-package": "^0.1.11",
-    "grunt-dustjs": "^1.3.0",
-    "grunt-include-source": "^0.7.0",
-    "grunt-plato": "^1.2.1",
-    "grunt-terser": "^2.0.0",
     "handsontable": "8.1.0",
     "html-docx-js": "0.3.1",
     "html-to-pdf": "^0.1.11",
     "jquery": "2.2.4",
     "jquery-lazy": "0.6.4",
-    "jshint-stylish": "^2.0.1",
     "lightbox2": "2.8.2",
     "linkifyjs": "2.1.9",
     "lodash": "4.17.20",
@@ -42,14 +29,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build:dev": "grunt dev",
-    "build": "grunt",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "http-server . -p 3000 -c-1",
+    "serve": "cp -r images fonts csv dist/ && http-server dist -p 3000 -c-1",
     "test:e2e": "cypress run --spec 'cypress/e2e/**/*.cy.js'",
-    "test:e2e:dev": "cypress run --spec 'cypress/e2e/**/*.cy.js' --env startPage=dev.html",
-    "cypress:open": "cypress open",
-    "cypress:open:dev": "cypress open --env startPage=dev.html"
+    "cypress:open": "cypress open"
   },
   "repository": {
     "type": "git",
@@ -67,10 +52,10 @@
   "homepage": "https://github.com/scientific-software-hub/mxhub-exi",
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "clean-css": "^3.4.28",
     "cypress": "^13.17.0",
-    "grunt": "^0.4.5",
-    "grunt-asset-cachebuster": "^0.5.0",
     "http-server": "^14.1.1",
-    "vite": "^8.2.0"
+    "vite": "^8.2.0",
+    "vite-plugin-static-copy": "^4.1.1"
   }
 }

@@ -1,79 +1,103 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <title>Extended ISPyB</title>
+    <link rel="icon" type="image/x-icon" href="../images/icon/EXIicon2.ico">
 
-<head>
-<title>Extended ISPyB</title>
+    <!-- ExtJS -->
+    <script src="../node_modules/@scientific-software-hub/extjs/build/ext-all.js"></script>
+    <script src="../node_modules/@scientific-software-hub/extjs/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+    <script>
+      // Theme CSS is added as a DOM element rather than a static <link> tag
+      // because Vite processes every <link rel="stylesheet" href="local
+      // path"> it finds in the HTML source through its CSS pipeline
+      // (PostCSS), with no opt-out equivalent to <script>'s
+      // type="module" escape hatch. This file's old-IE
+      // `filter:progid:...` syntax fails that strict parser (verified) --
+      // browsers have always tolerated it fine. The file itself is copied
+      // verbatim by vite-plugin-static-copy (see vite.config.js).
+      (function () {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '../node_modules/@scientific-software-hub/extjs/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css';
+        document.currentScript.insertAdjacentElement('afterend', link);
+      })();
+    </script>
 
-<link rel="icon" type="image/x-icon" href="../images/icon/EXIicon2.ico">
+    <!-- Vendor JS -- concatenated (not minified) by Grunt before this
+         migration; each stays a classic global script, referenced
+         individually so cross-plugin globals ($.fn.*, etc.) attach to the
+         one shared jQuery instance in the order they always have. -->
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/handsontable/dist/handsontable.full.js"></script>
+    <script src="../node_modules/jquery-lazy/jquery.lazy.min.js"></script>
+    <script src="../node_modules/dygraphs/dygraph-combined.js"></script>
+    <script src="../node_modules/vis/dist/vis.js"></script>
+    <script src="../node_modules/snapsvg/dist/snap.svg-min.js"></script>
+    <script src="../node_modules/pathjs-amd/dist/path.js"></script>
+    <script src="../node_modules/dustjs-linkedin/dist/dust-full.min.js"></script>
+    <script src="../node_modules/dustjs-helpers/dist/dust-helpers.min.js"></script>
+    <script src="../node_modules/lightbox2/dist/js/lightbox.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../node_modules/notifyjs-browser/dist/notify.js"></script>
+    <script src="../node_modules/lodash/lodash.js"></script>
+    <script src="../node_modules/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+    <script src="../node_modules/moment/moment.js"></script>
+    <script src="../node_modules/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../node_modules/html-docx-js/dist/html-docx.js"></script>
+    <script src="../node_modules/linkifyjs/dist/linkify.js"></script>
+    <script src="../node_modules/bootstrap-year-calendar/js/bootstrap-year-calendar.min.js"></script>
+    <script src="../node_modules/linkifyjs/dist/linkify-jquery.min.js"></script>
 
+    <!-- Vendored/minified third-party code kept as classic scripts -- not
+         ESM-converted (assigns to many single-letter identifiers
+         incompatible with strict mode). Loaded before js/main.js since
+         classic scripts run synchronously during parsing, ahead of any
+         deferred module. -->
+    <script src="../js/tools/a_three49custom.js"></script>
+    <script src="../js/tools/b_GLmol_modified.js"></script>
 
+    <!-- EXI application code -->
+    <script type="module" src="../js/main.js"></script>
+    <link rel="stylesheet" href="../css/main.css">
 
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      // type="module" (not a classic script) so this runs deferred, in
+      // document order relative to js/main.js -- a classic inline script
+      // here would run synchronously during parsing, before main.js (also
+      // deferred) has finished, and see ExiMX/ExiSAXS undefined.
+      function isNumber(value) {
+        if (value == "") return false;
+        var d = parseInt(value);
+        return !isNaN(d);
+      }
+      var exiSAXS;
+      Ext.onReady(function () {
+        Ext.Loader.setConfig({ enabled: true });
+        Ext.Loader.setPath('Ext.ux', '../node_modules/@scientific-software-hub/extjs/examples/ux/');
+        Ext.Loader.setPath('Ext.Extended', '../node_modules/@scientific-software-hub/extjs/extended/');
 
-<!-- CSS -->
+        Ext.require([
+          'Ext.ux.statusbar.StatusBar',
+          'Ext.Extended.RequiredTextField',
+          'Ext.Extended.RequiredNumberField',
+        ]);
 
-     
-<link rel="stylesheet" type="text/css" href="../min/extjs/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css?v=1777886200509">
-<link rel="stylesheet" type="text/css" href="../min/exi.min.css?v=1645196247039">
+        if (location.href.indexOf('saxs') != -1) {
+          window.EXI = new ExiSAXS();
+        } else {
+          window.EXI = new ExiMX();
+        }
 
-    <!-- CONFIG -->
-    <script type="text/javascript" src="config.js?v=1645196247039"></script>
-<!-- JS -->
-<script type="text/javascript" src="../min/extjs/build/ext-all.js?v=1777886200509"></script>
-<script type="text/javascript" src="../min/extjs/build/packages/ext-theme-crisp/build/ext-theme-crisp.js?v=1777886200509"></script>
+        EXI.show();
 
-<!-- BOWER -->
-<script type="text/javascript" src="../min/vendor.min.js?v=1645196247039"></script>
-
-
-
-<!-- EXI -->
-<script type="text/javascript" src="../min/exi.min.js?v=1645196247039"></script>
-
-
-
-
-</head>
-<script>
-	function isNumber(value) {
-		if (value=="") return false;
-
-		var d = parseInt(value);
-		if (!isNaN(d)) return true; else return false;		
-
-	} 
-	var exiSAXS;
-	Ext.onReady(function(){
-		Ext.Loader.setConfig({
-		    enabled: true
-		});
-
-		Ext.Loader.setPath('Ext.ux', '../min/extjs/examples/ux/');
-		Ext.Loader.setPath('Ext.Extended', '../min/extjs/extended/');
-
-		Ext.require([
-		  'Ext.ux.statusbar.StatusBar',
-		  'Ext.Extended.RequiredTextField',
-		  'Ext.Extended.RequiredNumberField'
-		]);
-
-		if (location.href.indexOf("saxs") != -1){
-			window.EXI = new ExiSAXS();
-		}
-		else{
-
-			window.EXI = new ExiMX();
-		}
-		
-		EXI.show();
-
-
-		EXI.onAfterRender.attach(function(){
-			Path.listen(); 	
-		});
-	});
-</script>	
-
-<body></body>
-
-<script type="text/javascript" src="../min/lightbox.js?v=1645196247039"></script>   
+        EXI.onAfterRender.attach(function () {
+          Path.listen();
+        });
+      });
+    </script>
+  </body>
 </html>

@@ -15,12 +15,15 @@
 | Layer | Tool              | Purpose |
 |---|-------------------|---|
 | Dev server | **Vite**          | Local dev server with an `/ispyb` proxy — no Tomcat needed to run EXI (see [Developing Against a Local ISPyB](#developing-against-a-local-ispyb)) |
-| Build | **Grunt**         | Template precompilation, JS bundling, CSS minification (production build; being migrated to Vite) |
+| Build | **Vite**          | `npm run build` — bundles js/main.js, precompiles Dust templates, bundles CSS, copies ExtJS/vendor assets. Output: `dist/` |
 | JS dependencies | **npm**           | Frontend libraries (jQuery, ExtJS, Handsontable, …) |
-| Dev tooling | **npm**           | Grunt plugins, Vite, Cypress, static dev server |
+| Dev tooling | **npm**           | Vite, Cypress, static dev server |
 | E2E tests | **Cypress 13**    | Shipping/MX widget tests with mocked ISPyB REST |
 | Framework | **ExtJS 5** (MVC) | Hash-based routing, panels, grids |
-| Templates | **Dust.js**       | Precompiled to `min/precompiled.templates.min.js` |
+| Templates | **Dust.js**       | Precompiled at dev/build time by a custom Vite plugin (`vite-plugins.mjs`, `virtual:dust-templates`) |
+
+Only the MX entry point (`mx/index.html`) is built by Vite. `saxs/` and `tracking/` are
+out of scope for this codebase (see `CLAUDE.md`) and are not part of this build.
 
 ---
 
@@ -28,13 +31,7 @@
 
 ### Prerequisites
 
-- **Node.js** (16+) and **npm**
-- **Grunt CLI** installed globally:
-
-```bash
-npm install -g grunt-cli
-```
-
+- **Node.js** (18+) and **npm**
 - **GitHub Packages authentication** — ExtJS is served from a private npm registry.
   Add the following to `~/.npmrc` (create the file if it does not exist):
 
@@ -48,33 +45,40 @@ Without this, `npm install` will fail to resolve `@scientific-software-hub/extjs
 ### Install dependencies
 
 ```bash
-# JS build tooling (Grunt plugins, Cypress, http-server, …)
 npm install
 ```
 
-This installs both build tooling (Grunt plugins, Cypress, http-server) and all frontend libraries (jQuery, Bootstrap, Handsontable, …) into `node_modules/`.
+Installs both dev tooling (Vite, Cypress, http-server, …) and all frontend libraries
+(jQuery, Bootstrap, Handsontable, ExtJS, …) into `node_modules/`.
 
-### Build for development
+### Run the dev server
 
 ```bash
-grunt dev
+npm run dev
 ```
 
-This runs three steps in order:
-
-1. **`dustjs`** — precompiles `templates/**/*.js` into `min/precompiled.templates.min.js`
-2. **`includeSource:dev`** — regenerates `mx/dev.html` from `mx/index.tpl.html`, injecting every JS source file individually (no bundling — ideal for debugging)
-3. **`cssmin:prod`** + **`asset_cachebuster`** — minifies CSS and cache-busts asset URLs
-
-Run `grunt dev` any time you add a new template or change CSS. Plain JS edits require no rebuild — `dev.html` references each source file directly so a browser refresh is enough.
+Opens a Vite dev server at `http://localhost:5173`. Every JS/CSS file is served
+individually (no bundling), and a `/ispyb` proxy makes REST calls same-origin
+against a local ISPyB — see [Developing Against a Local ISPyB](#developing-against-a-local-ispyb).
+Edit any `.js`/`.css`/template file and refresh; no build step in between.
 
 ### Build for production
 
 ```bash
-grunt
+npm run build
 ```
 
-The default task concatenates all JS into bundles under `min/`, runs Terser (minify + mangle), minifies CSS, compiles API docs, and cache-busts all asset URLs. Output entry point: `mx/index.html`.
+Runs `vite build`: bundles `js/main.js` (the whole app) into a single hashed chunk,
+precompiles Dust templates, bundles the legacy CSS list with `clean-css` (see
+`vite-plugins.mjs` for why this bypasses Vite's own stricter CSS pipeline), and
+copies ExtJS + vendor libraries verbatim. Output entry point: `dist/mx/index.html`.
+
+```bash
+npm run preview
+```
+
+Serves the `dist/` build locally (`http://localhost:4173`) to sanity-check a
+production build before deploying.
 
 ---
 
@@ -82,48 +86,28 @@ The default task concatenates all JS into bundles under `min/`, runs Terser (min
 
 ### Start the static dev server
 
-Cypress needs a running HTTP server. The simplest option is the bundled `http-server`:
+Cypress needs a running HTTP server against a **built** app (not the Vite dev server):
 
 ```bash
-npm run serve          # serves the repo root on http://localhost:3000
+npm run build   # produces dist/
+npm run serve   # copies images/fonts/csv into dist/, serves it on http://localhost:3000
 ```
 
-`cypress.config.js` points `baseUrl` at `http://localhost:3000`. Tests navigate to `mx/index.html` or `mx/dev.html` depending on the `startPage` env var (see below).
+`cypress.config.js` points `baseUrl` at `http://localhost:3000`.
 
 ### Run all E2E tests (headless)
 
 ```bash
-npm run test:e2e          # production bundle (mx/index.html)
-npm run test:e2e:dev      # dev build       (mx/dev.html)
+npm run test:e2e
 ```
 
 ### Open interactive Cypress runner
 
 ```bash
-npm run cypress:open      # production bundle (mx/index.html)
-npm run cypress:open:dev  # dev build       (mx/dev.html)
+npm run cypress:open
 ```
 
 Select **E2E Testing** → choose a browser → pick a spec file.
-
-### Switching start page
-
-Tests run against `mx/index.html` by default. The target page is controlled by the
-`startPage` env var. To override without changing `package.json`, add a
-`cypress.env.json` file in the repo root (it is gitignored):
-
-```json
-{ "startPage": "dev.html" }
-```
-
-Or pass it inline for a one-off run:
-
-```bash
-npx cypress open --env startPage=dev.html
-```
-
-Switching requires restarting Cypress — the env var is read at startup and cannot
-be changed mid-session.
 
 ### How the tests work
 
@@ -163,35 +147,10 @@ served by the same Tomcat.
 1. Have ISPyB running and reachable at `http://localhost:8080` (see the project's
    `ispyb-database` seeder docs for a local instance).
 2. `npm run dev`
-3. Open `http://localhost:5173/mx/dev.html` (or `mx/index.html` once Phase 3 of the
-   Vite migration lands). Log in as `hakanj` / `ispyb`.
+3. Open `http://localhost:5173/mx/index.html`. Log in as `hakanj` / `ispyb`.
 
 No build step, no IntelliJ artifact, no Tomcat deployment for EXI itself — only for
 ISPyB.
-
-### Alternative: same-Tomcat deployment (legacy)
-
-Still works if you'd rather avoid running a second process, or need to debug something
-Tomcat-specific:
-
-1. **Build the app** (`grunt dev` or `grunt` for production bundles).
-
-2. **Create an Artifact** in IntelliJ:
-   - **File → Project Structure → Artifacts → + → Other**
-   - Set the output directory to `<tomcat-webapps>/exi` (or configure the Tomcat deployment to map the artifact to context path `/exi`).
-   - Add the entire EXI repo root as the artifact content (so `mx/`, `js/`, `min/`, `css/`, `node_modules/` etc. are all served under `/exi`).
-
-3. **Run/Debug Configuration** — add a **Tomcat Local** server:
-   - On the **Deployment** tab, add the artifact above with context path `/exi`.
-   - ISPyB itself should already be deployed under `/ispyb`.
-
-4. **Access the app** at:
-   ```
-   http://localhost:8080/exi/mx/index.html       # production bundles
-   http://localhost:8080/exi/mx/dev.html         # individual source files (for debugging)
-   ```
-
-ISPyB REST is served from `http://localhost:8080/ispyb/ispyb-ws/rest` — same host, same port, no CORS preflight.
 
 ### Pointing EXI at ISPyB
 
@@ -201,21 +160,23 @@ ISPyB REST is served from `http://localhost:8080/ispyb/ispyb-ws/rest` — same h
 
 ## Debugging
 
-The combination of `grunt dev` + `dev.html` preserves the original source file names and line numbers throughout the browser, making breakpoints reliable.
+Vite's dev server serves every source file individually with accurate sourcemaps, so
+breakpoints resolve directly against files under `js/` — no separate "dev build" step
+(unlike the old Grunt `dev.html`, this needs no rebuild at all when you edit `.js`
+files; only template changes need a page refresh, since Dust templates are
+precompiled by a Vite plugin that re-runs automatically on change).
 
-### Step 1 — Build in dev mode
+### Step 1 — Start the dev server
 
 ```bash
-grunt dev
+npm run dev
 ```
-
-`mx/dev.html` references every JS file individually (no bundling, no minification). Changes to `.js` files are picked up on the next browser refresh — no rebuild needed.
 
 ### Step 2 — Start Chromium with a remote debug port
 
 ```bash
 chromium --remote-debugging-port=9222 \
-         http://localhost:8080/exi/mx/dev.html
+         http://localhost:5173/mx/index.html
 ```
 
 Or, if you prefer to launch from IntelliJ, add `--remote-debugging-port=9222` to the browser startup flags in **Settings → Tools → Web Browsers**.
@@ -223,14 +184,13 @@ Or, if you prefer to launch from IntelliJ, add `--remote-debugging-port=9222` to
 ### Step 3 — Attach the IntelliJ JavaScript debugger
 
 1. **Run → Edit Configurations → + → JavaScript Debug**
-2. Set URL to `http://localhost:8080/exi/mx/dev.html`
+2. Set URL to `http://localhost:5173/mx/index.html`
 3. Set the remote debug port to `9222`
 4. Click **Debug** — IntelliJ attaches to the running Chromium tab.
 
-You can now set breakpoints directly in the project JS files (`js/core/`, `js/mx/`, etc.). Because `dev.html` loads each file individually, the browser's script URLs match the repo paths exactly and breakpoints resolve without source-map gymnastics.
+You can now set breakpoints directly in the project JS files (`js/core/`, `js/mx/`, etc.).
 
 ### Tips
 
-- **Template changes** do require `grunt dev` before refreshing, because Dust templates are precompiled.
-- **Grunt watch** (`grunt watch`) re-runs `grunt dev` automatically when CSS or template files change.
 - To inspect a specific view, find its constructor (e.g. `PuckFormView`) and set a breakpoint in `load()` or `save()` — the route handler instantiates a fresh view on every navigation.
+- Editing a Dust template under `templates/` triggers Vite's dev-server watcher (see `dustTemplatesPlugin` in `vite-plugins.mjs`) — refresh the page to pick it up.
