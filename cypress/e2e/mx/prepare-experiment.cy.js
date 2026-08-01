@@ -23,8 +23,15 @@
 // GET /{token}/proposal/{proposal}/shipping/{shippingId}/status/{status}/update, reloading the
 // dewar list on success (this.load(), no shipment-form email side-effect, unlike A6).
 //
-// Site-dependent: mx/config.js's default_site is "LOCAL" (not "DESY"), so
-// getSiteName().startsWith("DESY") is false and the "×" icon transitions to "at FACILITY".
+// Site-dependent: the "×" icon transitions to "at DESY" or "at FACILITY" depending on
+// getSiteName().startsWith("DESY") (preparemainview.js:33-37). CORRECTION (2026-08-02, CI
+// failure): the committed mx/config.js has default_site: "DESY" — a prior pass of this comment
+// claimed it was "LOCAL", which was true only of an uncommitted local working-tree edit
+// (`git diff mx/config.js`) made during that dev session and never intended to be committed. That
+// local-only value is exactly why this test initially passed locally and then failed in CI, which
+// checks out the real committed "DESY" config. The test below no longer hardcodes either value —
+// it reads EXI.credentialManager.getSiteName() at run time and asserts against whichever status
+// that actually resolves to, so it's correct under either config.
 // Icons are `img.x-action-col-icon`, disambiguated by `[src$="add.png"]` /
 // `[src$="ic_highlight_remove_black_48dp.png"]` — both confirmed live; disabled state is the
 // `x-item-disabled` class.
@@ -77,8 +84,10 @@ function setupIntercepts(dewarsFixture = 'mx/prepare-dewars.json') {
 
   cy.intercept('GET', '**/shipping/*/status/processing/update',
     { fixture: 'shipping/update-status-processing.json' }).as('markProcessing');
+  // Matches both "at DESY" and "at FACILITY" — which one the app actually sends depends on
+  // getSiteName() at run time (see file header), not on this test file.
   cy.intercept('GET', '**/shipping/*/status/at%20*/update',
-    { fixture: 'shipping/update-status-at-facility.json' }).as('markAtFacility');
+    { fixture: 'shipping/update-status-at-facility.json' }).as('markAtSite');
 }
 
 // ─── Login helper (byte-identical convention used by every other spec) ────────
@@ -150,13 +159,22 @@ describe('Prepare Experiment — Step 1 grid, status-transition icons (B1)', () 
       .should('not.have.class', 'x-item-disabled');
   });
 
-  it('clicking "×" fires the status update to "at FACILITY" (site config is LOCAL, not DESY) and reloads', () => {
+  it('clicking "×" fires the status update to "at DESY" or "at FACILITY", whichever this environment\'s site config resolves to, and reloads', () => {
     visitPrepareStep1();
-    cy.contains('.x-grid-row', 'Test_SG')
-      .find('img.x-action-col-icon[src$="ic_highlight_remove_black_48dp.png"]')
-      .click();
 
-    cy.wait('@markAtFacility').its('request.url').should('include', '/shipping/288/status/at%20FACILITY/update');
+    // Read the ACTUAL resolved value rather than assuming one — mx/config.js's default_site
+    // differs between a plain checkout (committed: "DESY") and some local dev setups (see file
+    // header). Asserting against whatever getSiteName() really returns keeps this test correct
+    // under either.
+    cy.window().then((win) => {
+      const expected = win.EXI.credentialManager.getSiteName().startsWith('DESY') ? 'DESY' : 'FACILITY';
+
+      cy.contains('.x-grid-row', 'Test_SG')
+        .find('img.x-action-col-icon[src$="ic_highlight_remove_black_48dp.png"]')
+        .click();
+
+      cy.wait('@markAtSite').its('request.url').should('include', `/shipping/288/status/at%20${expected}/update`);
+    });
     cy.wait('@getDewars');
   });
 
