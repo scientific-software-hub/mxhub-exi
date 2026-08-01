@@ -147,7 +147,7 @@ served by the same Tomcat.
 1. Have ISPyB running and reachable at `http://localhost:8080` (see the project's
    `ispyb-database` seeder docs for a local instance).
 2. `npm run dev`
-3. Open `http://localhost:5173/mx/index.html`. Log in as `hakanj` / `ispyb`.
+3. Open `http://localhost:5173/mx/index.html`. Log in as `ispyb` / `ispyb`.
 
 No build step, no IntelliJ artifact, no Tomcat deployment for EXI itself — only for
 ISPyB.
