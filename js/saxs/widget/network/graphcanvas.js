@@ -1395,6 +1395,8 @@ GraphCanvas.prototype.renderEdge = function(edgeId) {
 };
 
 GraphCanvas.prototype._calculateEdgePointerPosition = function(sourceX, sourceY, targetX, targetY, radius) {
+var arrowX, arrowY;
+
 	var angle = Geometry.getAngleBetweenTwoPoints(sourceX, sourceY, targetX, targetY);
 
 	/** Suponiendo el node source que este a la derecha **/

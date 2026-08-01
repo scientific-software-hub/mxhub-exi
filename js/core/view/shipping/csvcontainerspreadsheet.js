@@ -285,6 +285,8 @@ CSVContainerSpreadSheet.prototype.loadData = function(data){
                     data.splice(index, numberOfRows);
                 },
 				beforeChange: function (changes, source) {
+var lastChange;
+
 					lastChange = changes;
 				},
 				afterChange: function (changes, source) {						  			
@@ -343,6 +345,8 @@ CSVContainerSpreadSheet.prototype.emptyToNull = function(value) {
 * @method getParcels
 */
 CSVContainerSpreadSheet.prototype.getParcels = function() {
+var key;
+
 	var _this = this;
 	function  getDiffrationPlanByRow(row){
 		return {

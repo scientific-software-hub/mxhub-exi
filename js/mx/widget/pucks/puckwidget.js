@@ -131,6 +131,8 @@ PuckWidget.prototype.getPanel = function () {
 * @method load
 */
 PuckWidget.prototype.emptyAll = function () {
+var cellIndex;
+
 	for (cellIndex in this.data.cells) {
 		this.data.cells[cellIndex].state = "EMPTY";
 		this.render(this.data.cells[cellIndex].location,true);
@@ -188,6 +190,8 @@ PuckWidget.prototype.loadSamples = function (samples, selectedLocation) {
 * @param {Object} data Data correctly parsed
 */
 PuckWidget.prototype.load = function (data) {
+var i, sampleIndex;
+
 	var _this = this;
 	$("#" + _this.data.id + "-loading-text").remove();
 
@@ -365,6 +369,8 @@ PuckWidget.prototype.render = function (location) {
 * @return The cell Index in the data of the puck
 */
 PuckWidget.prototype.findCellIndexById = function (id) {
+var cellIndex;
+
 	for (cellIndex in this.data.cells) {
 		if (this.data.cells[cellIndex].id == id){
 			return cellIndex;

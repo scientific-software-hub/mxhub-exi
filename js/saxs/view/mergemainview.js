@@ -9,6 +9,8 @@ function MergeMainView() {
 	this.plotter = new CurvePlotter({});
 	this.formPopulated = false;
 	this.plotter.onRendered.attach(function(sender) {
+var plotter;
+
 		/** only once * */
 		if (!_this.formPopulated) {
 			/** colors * */

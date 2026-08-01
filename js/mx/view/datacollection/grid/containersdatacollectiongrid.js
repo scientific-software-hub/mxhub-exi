@@ -45,6 +45,8 @@ ContainersDataCollectionGrid.prototype.getColumns = function() {
             flex: 1.5,
             hidden: false,
             renderer: function(grid, e, record) {
+var sample;
+
 
                 var data = record.data;  
                 var nContainers = data.containerIds.length;
@@ -83,6 +85,8 @@ ContainersDataCollectionGrid.prototype.getColumns = function() {
                     }
 
                     var onSuccess = function (sender, samples) {
+var cells;
+
                         if (samples) {
                             for (var i = 0 ; i < data.containerIds.length ; i++) {
                                 var containerId = Number(data.containerIds[i]);
@@ -176,7 +180,9 @@ ContainersDataCollectionGrid.prototype.getColumns = function() {
     return columns;
 };
 
-ContainersDataCollectionGrid.prototype.select = function(selectedDataCollectionGroup) {      
+ContainersDataCollectionGrid.prototype.select = function(selectedDataCollectionGroup) {
+var sample;
+      
     var selected = {};   
     for (sample in selectedDataCollectionGroup){
         if (selected[selectedDataCollectionGroup[sample].Container_containerId] == null){

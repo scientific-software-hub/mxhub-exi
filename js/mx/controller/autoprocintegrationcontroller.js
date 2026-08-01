@@ -77,6 +77,8 @@ AutoprocIntegrationController.prototype.init = function() {
         });
          /** Load view for autoprocessing */
         var onSuccess2 = function(sender, data){
+var results;
+
 			results = _.filter(data[0],function (r) {return r.AutoProcIntegration_autoProcIntegrationId == _this.params['autoprocIntegrationId']})
             // mainView.load(results);
             mainView.panel.setLoading(false);            

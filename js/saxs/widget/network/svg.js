@@ -261,6 +261,8 @@ var CanvasToSVG = {
 	},
 	
 	importSVG: function(sourceSVG, targetCanvas) {
+var svg_xml;
+
 	    svg_xml = sourceSVG;//(new XMLSerializer()).serializeToString(sourceSVG);
 	    var ctx = targetCanvas.getContext('2d');
 

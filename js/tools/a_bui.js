@@ -1,3 +1,5 @@
+
+var BUI;
 BUI = {
 	//interval : 60000,
 	interval : 40000,
@@ -223,6 +225,8 @@ BUI = {
 	},
 	
 	getHTMLTableForFrameAveraged : function(bufferAcronym, macromoleculeAcronym, bbmerges, molmerges, bamerges, totalframes, bufferId,macromoleculeId, macromoleculeColor) {
+var color;
+
 		
 		function getFrameSpan(framesMerged, total) {
 			return "<td style='font:normal 9px tahoma,arial,verdana,sans-serif;color:" + "black" + "'>(" + framesMerged + " of " + total + ")</td>";
@@ -280,6 +284,8 @@ BUI = {
 		return html + "</table>";
 	},
 	isWebGLEnabled : function(return_context) {
+var context, names;
+
 		if (!!window.WebGLRenderingContext) {
 			var canvas = document.createElement("canvas");
 			names = [ "webgl", "experimental-webgl", "moz-webgl", "webkit-3d" ];
@@ -311,6 +317,8 @@ BUI = {
 	getHTMLTableForPrefixes : function(bufferBeforeaverageFilePath, averageFilePath, bufferAfterAverageFilePath) {
 
 		function getRow(bufferBeforeaverageFilePath) {
+var file;
+
 			file = bufferBeforeaverageFilePath;
 			try {
 				file = bufferBeforeaverageFilePath.split("/")[bufferBeforeaverageFilePath.split("/").length - 1];

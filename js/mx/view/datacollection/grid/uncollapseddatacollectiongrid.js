@@ -253,7 +253,9 @@ UncollapsedDataCollectionGrid.prototype.displayPhasingTab = function(target, dat
 * @param {Integer} dataCollectionId 
 * @method displaySampleTab
 */
-UncollapsedDataCollectionGrid.prototype.displaySampleTab = function(target, dataCollectionId) {                 
+UncollapsedDataCollectionGrid.prototype.displaySampleTab = function(target, dataCollectionId) {
+var sample;
+                 
     var dc =_.find(grid.dataCollectionGroup, {"DataCollection_dataCollectionId":Number(dataCollectionId)});
     if (dc){
         /** Loading crystal snapshots within the DIV with id = sa_{.DataCollection_dataCollectionId}_crystal_snapshots */

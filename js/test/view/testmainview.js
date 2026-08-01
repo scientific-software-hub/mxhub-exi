@@ -101,7 +101,9 @@ TestMainView.prototype.load = function(name) {
 			"state": "Texas"
 			}];
 				
-	    dust.render("testmainview.template", data, function(err, out){		
+	    dust.render("testmainview.template", data, function(err, out){
+var html;
+		
         	html = out;
      	});	
 	}

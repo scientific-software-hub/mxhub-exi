@@ -40,6 +40,8 @@ EditLigands.prototype.load = function (crystal) {
 	
 	this.crystal.url = EXI.getDataAdapter().mx.crystal.getSaveStructureURL(this.crystal.crystalId);
 	dust.render("structure.crystal.edit.form.template", this.crystal, function (err, out) {
+var html;
+
 		html = out;
 	}); 
 

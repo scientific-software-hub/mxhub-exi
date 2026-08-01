@@ -74,6 +74,8 @@ ISARAWidget.prototype.convertSampleChangerLocationToId = function (sampleChanger
 };
 
 ISARAWidget.prototype.onRender = function () {
+var i;
+
 	//Disable the pucks 13, 14, 15 ,18 ,19 ,20 ,21, 24, 25, 26
 	//var puckIds = [13, 14, 15 ,18 ,19 ,20 ,21, 24, 25, 26];
 	var puckIds = [];

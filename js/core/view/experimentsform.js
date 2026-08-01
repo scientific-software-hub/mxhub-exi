@@ -81,6 +81,8 @@ debugger;
 }
 
 ExperimentsForm.prototype.plot = function() {
+var url;
+
 	var startDate= moment($("#" + this.id + "-start-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var endDate= moment($("#" + this.id + "-end-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var checkedValues = [];
@@ -117,6 +119,8 @@ ExperimentsForm.prototype.plot = function() {
 }
 
 ExperimentsForm.prototype.download = function() {
+var url;
+
 	var startDate= moment($("#" + this.id + "-start-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var endDate= moment($("#" + this.id + "-end-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var checkedValues = [];

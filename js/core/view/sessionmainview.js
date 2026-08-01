@@ -14,6 +14,8 @@ function SessionMainView(args) {
 SessionMainView.prototype.getPanel = MainView.prototype.getPanel;
 
 SessionMainView.prototype.getContainer = function() {
+var _this;
+
     _this = this;
     
     

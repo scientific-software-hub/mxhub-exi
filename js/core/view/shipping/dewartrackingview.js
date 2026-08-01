@@ -56,6 +56,8 @@ DewarTrackingView.prototype.load = function (shipment) {
 }
 
 DewarTrackingView.prototype.getSelectedDewarIds = function() {
+var multiselect;
+
 	return multiselect = $("#" + this.id + "-dewars").val();
 }
 

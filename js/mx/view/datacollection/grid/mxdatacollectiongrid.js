@@ -199,6 +199,8 @@ MXDataCollectionGrid.prototype.getToolBar = function() {
                 padding: '10px',
                 hidden: true,
                 handler: function(sender, target) {
+var data;
+
                     data = _this.dataCollectionGroup;
                     if (_this.filter) {
                         data = _this.filterBy(_this.filter);
@@ -271,6 +273,8 @@ MXDataCollectionGrid.prototype.reloadData = function(dataCollections) {
 };
 
 MXDataCollectionGrid.prototype.load = function(dataCollectionGroup) {
+var sessionId;
+
     this.dataCollectionGroup = dataCollectionGroup;
     this.activePanel.load(this.dataCollectionGroup);
 

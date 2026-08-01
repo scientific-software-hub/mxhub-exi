@@ -76,6 +76,8 @@ ReimbForm.prototype.hideReimbursedButton = function(shipment, dewar){
 }
 
 ReimbForm.prototype.getBoxLabelText = function(shipment, dewar){
+var boxLabelText;
+
 	
 	boxLabelText = '<center>Declaration</center>';
 	
@@ -86,6 +88,8 @@ ReimbForm.prototype.getBoxLabelText = function(shipment, dewar){
 }
 
 ReimbForm.prototype.getDeclarationText = function(shipment, dewar){
+var boxLabel1, startDate;
+
 	if (this.hideReimbursedButton(shipment, dewar) == true){
 		return ' ';
 	}

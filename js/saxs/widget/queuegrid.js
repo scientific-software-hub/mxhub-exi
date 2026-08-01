@@ -79,6 +79,8 @@ QueueGrid.prototype.getFields = function() {
 };
 
 QueueGrid.prototype.getRunHTML = function(sample) {
+var i;
+
 	var dataCollectionId = sample.data.dataCollectionId;
 	var table = document.createElement("table");
 	if (this.key[dataCollectionId] != null) {
@@ -146,6 +148,8 @@ QueueGrid.prototype.getPercentage = function(averaged, total) {
 };
 
 QueueGrid.prototype.getFramesHTML = function(sample) {
+var i;
+
 	var dataCollectionId = sample.data.dataCollectionId;
 	var table = document.createElement("table");
 	if (this.key[dataCollectionId] != null) {

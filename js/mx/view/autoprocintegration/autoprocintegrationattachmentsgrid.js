@@ -14,6 +14,8 @@ AutoProcIntegrationAttachmentGrid.prototype.load = function(data) {
 
 		/** URL to attachment */
 		_.forEach(data, function(row){
+var extension;
+
 			/** Get the extension of the file name */
 			extension = row.fileName.split(".").pop()
 			if (extension == "pdf") {

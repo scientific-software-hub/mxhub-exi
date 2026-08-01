@@ -133,6 +133,8 @@ ContainerSpreadSheet.prototype.load = function(puck){
                     data.splice(index, numberOfRows);
                 },
 				beforeChange: function (changes, source) {
+var lastChange;
+
 					lastChange = changes;
 				},
 				afterChange: function (changes, source) {

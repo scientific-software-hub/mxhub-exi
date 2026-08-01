@@ -409,6 +409,8 @@ DataCollectionPDBWidget.prototype.getPDBViewerPanel = function (model, width, he
 
 
 DataCollectionPDBWidget.prototype.getContainers = function (models) {
+var key;
+
 
 	var items = [];
 	if (models.length < 4) {

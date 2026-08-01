@@ -41,6 +41,8 @@ PDBViewer.prototype.getCanvas = function() {
 };
 
 PDBViewer.prototype.getDownload = function(type, abInitioModelId) {
+var html;
+
 	/** For title **/
 	var url = BUI.getPdbURL() + '&type=' + type + '&abInitioModelId=' + abInitioModelId;
 	html = '<a href=' + url + ' style="color:blue;font-weight:bold;"  height="80" width="80" >Download</a><br /><br />';

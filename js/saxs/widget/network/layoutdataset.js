@@ -66,6 +66,8 @@ LayoutDataset.prototype.getType = function(){
 };
 
 LayoutDataset.prototype._calculateLayoutVertices = function(type, count){
+var x, y;
+
 	
 	if (type == "CIRCLE"){
 			var radius = 0.4;
@@ -83,6 +85,8 @@ LayoutDataset.prototype._calculateLayoutVertices = function(type, count){
 
 
 LayoutDataset.prototype._calculateLayout = function(){
+var x, y;
+
 	var _this = this;
 	if (this.getType() == "RANDOM"){
 		for ( var vertex in this.dataset.getVertices()) {

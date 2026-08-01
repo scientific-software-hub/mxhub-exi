@@ -131,7 +131,9 @@ PhasingGridView.prototype.printHTML = function(target) {
                        return fileAttachmentsId;
                }
 
-               function getNodeByPhasingStep(node, stepsBySpaceGroup, step){                                      
+               function getNodeByPhasingStep(node, stepsBySpaceGroup, step){
+var index2FOFC_MR, index2FOFC_REFINE, indexFOFC_MR, indexFOFC_REFINE;
+                                      
                    var steps = _.filter(stepsBySpaceGroup, {"PhasingStep_phasingStepType" : step});
                    node["metrics"] = [];
                    if (steps){                       

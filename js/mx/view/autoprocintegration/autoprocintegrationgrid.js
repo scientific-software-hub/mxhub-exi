@@ -42,7 +42,9 @@ function AutoProcIntegrationGrid(args) {
 	this.onSelected = new Event(this);
 }
 
-AutoProcIntegrationGrid.prototype.parseData = function(data) {        
+AutoProcIntegrationGrid.prototype.parseData = function(data) {
+var anomalousdata, nonanomalousdata;
+        
      /** Adding stats */
     for(var i = 0; i < data.length; i++){
          try{             

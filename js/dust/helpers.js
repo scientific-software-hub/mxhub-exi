@@ -187,7 +187,9 @@ dust.helpers.fileName = function (chunk, context, bodies, params) {
     return chunk;
 }
 
-dust.helpers.formatDate = function (chunk, context, bodies, params) {    
+dust.helpers.formatDate = function (chunk, context, bodies, params) {
+var formatted;
+    
     if (params.date) {       
             if (params.format != null) {
                 try {

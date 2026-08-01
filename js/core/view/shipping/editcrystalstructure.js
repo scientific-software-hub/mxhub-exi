@@ -59,6 +59,8 @@ EditCrystalStructure.prototype.load = function (crystal) {
 	this.crystal.label = this.label;
 	this.crystal.types = this.types;
 	dust.render("structure.crystal.edit.form.template", this.crystal, function (err, out) {
+var html;
+
 		html = out;
 	}); 
 

@@ -31,6 +31,8 @@ function DewarListSelectorGrid(args){
 * @param {Object} dewars Array of containers
 */
 DewarListSelectorGrid.prototype.load = function(dewars){
+var i;
+
     var _this = this;
     this.dewars = dewars;
     /** Filter by Dewars */ 

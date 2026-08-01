@@ -76,6 +76,8 @@ PuckWidgetView.prototype.getPanel = function() {
 };
 
 PuckWidgetView.prototype.load = function(data) {
+var sample;
+
     var _this = this;
     _this.panel.setTitle("Test Widget");
 	

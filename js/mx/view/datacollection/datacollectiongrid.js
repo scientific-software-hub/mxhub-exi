@@ -67,7 +67,9 @@ DataCollectionGrid.prototype.getPanel = function (dataCollectionGroup) {
 * @param {Object} data Record with all the information that it is stored in the store
 * @return {Object} return all statistics sorted by best values
 */
-DataCollectionGrid.prototype._getAutoprocessingStatistics = function(data) {    
+DataCollectionGrid.prototype._getAutoprocessingStatistics = function(data) {
+var listResultsNoanom;
+    
     /** This converts and array of comma separated value in a array */
     function getArrayValues(value) {
         /** It splits every value */

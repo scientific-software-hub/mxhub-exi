@@ -161,7 +161,9 @@ ManagerWelcomeMainView.prototype.loadByDate = function(username, start, end) {
 * @param {String} sessions List of sessions
 * @method filterSessions
 */
-ManagerWelcomeMainView.prototype.filterSessions = function(sessions) {    
+ManagerWelcomeMainView.prototype.filterSessions = function(sessions) {
+var data;
+    
         var realLength = sessions.length;
         data = _.slice(sessions, 0, 500);
         // Sorting by start date because sessionId does not sort by date

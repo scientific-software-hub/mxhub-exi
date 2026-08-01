@@ -181,6 +181,8 @@ NetworkWidget.prototype.visitNode = function(nodeId, nodosVisitados, aristasVisi
 
 /** COLLAPSE SELECTED VERTICES * */
 NetworkWidget.prototype.collapse = function() {
+var x, y;
+
 	var selectedVertices = this.getGraphCanvas().getSelectedVertices();
 	var xMin = -Infinity;
 	var xMax = Infinity;

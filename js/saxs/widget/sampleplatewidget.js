@@ -466,6 +466,8 @@ SamplePlateWidget.prototype.relayout = function(network, rows, columns) {
 };
 
 SamplePlateWidget.prototype.squareRelayout = function(network, rows, columns) {
+var x, y;
+
 	var count = network.getDataset()._getVerticesCount();
 	var yMin = 0.07;
 	var yMax = 0.9;

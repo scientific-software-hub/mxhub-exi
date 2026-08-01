@@ -128,6 +128,8 @@ PhasingGrid.prototype.getPanel = function() {
 			dataIndex : 'phasingStepType',
 			flex : 1,
             renderer : function(e, sample, record){
+var k;
+
 				var html  = "";
                 var output = function(err, out){
                             html = html + "<br />" + out;

@@ -80,6 +80,8 @@ DatacollectionForm.prototype.load = function(data) {
 }
 
 DatacollectionForm.prototype.plot = function() {
+var url;
+
 	var startDate= moment($("#" + this.id + "-start-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var endDate= moment($("#" + this.id + "-end-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var checkedValues = [];
@@ -111,6 +113,8 @@ DatacollectionForm.prototype.plot = function() {
 }
 
 DatacollectionForm.prototype.download = function() {
+var url;
+
 	var startDate= moment($("#" + this.id + "-start-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var endDate= moment($("#" + this.id + "-end-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var checkedValues = [];

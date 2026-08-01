@@ -35,6 +35,8 @@ AutoprocessingRanker.prototype.rank = function(array, spacegroudFieldName){
    
     
      function sortByHighestSymmetry(a, b) {
+var indexOfSpaceGroupA, indexOfSpaceGroupB;
+
         var spaceGroupA = a[spacegroudFieldName].replace(/\s/g, "");
         var spaceGroupB = b[spacegroudFieldName].replace(/\s/g, "");
 

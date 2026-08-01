@@ -64,6 +64,8 @@ AutoProcIntegrationPlots.prototype.getPanel = function() {
 * @method load
 */
 AutoProcIntegrationPlots.prototype.load = function(data) {
+var autoprocProgram;
+
 	var _this = this;
     
     var autoProcIntegrationId = [];

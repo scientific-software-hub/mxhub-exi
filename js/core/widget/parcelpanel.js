@@ -413,6 +413,8 @@ ParcelPanel.prototype.showCaseForm = function() {
 * @method showReimbForm
 */
 ParcelPanel.prototype.showReimbForm = function(shipment) {
+var hideReimb;
+
 	var _this = this;
 	hideReimb = false;//true;
 	if (this.dewar.isReimbursed) {

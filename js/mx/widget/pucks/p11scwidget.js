@@ -75,6 +75,8 @@ P11SCWidget.prototype.convertSampleChangerLocationToId = function (sampleChanger
 };
 
 P11SCWidget.prototype.onRender = function () {
+var i;
+
 	debugger
 	//TODO check if this method is needed
 	var puckIds = [];

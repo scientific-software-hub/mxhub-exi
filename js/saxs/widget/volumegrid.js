@@ -168,6 +168,8 @@ VolumeGrid.prototype.getPanel = function(data, title) {
 };
 
 VolumeGrid.prototype._prepareData = function(experiment) {
+var macromoleculeId;
+
 	var keys = {};
 	for ( var i = 0; i < experiment.getSamples().length; i++) {
 		var sample = experiment.getSamples()[i];

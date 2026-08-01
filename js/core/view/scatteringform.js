@@ -65,6 +65,8 @@ ScatteringForm.prototype.load = function(data) {
 }
 
 ScatteringForm.prototype.plot = function() {
+var url;
+
 	var endDate= moment($("#" + this.id + "-date").val(),"DD-MM-YYYY").format("YYYY-MM-DD");
 	var checkedValues = [];
 	$('.scattering-checkbox:checked').each(function(i){

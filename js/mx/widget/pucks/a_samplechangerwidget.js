@@ -256,6 +256,8 @@ SampleChangerWidget.prototype.getPuckIndexFromAngle = function (x0,y0,x1,y1,angl
 }
 
 SampleChangerWidget.prototype.getPanel = function () {
+var puckType;
+
 	
 	var _this = this;
 	
@@ -298,6 +300,8 @@ SampleChangerWidget.prototype.getPanel = function () {
 * @return {Array} An array of the pucks that couldn't be loaded
 */
 SampleChangerWidget.prototype.loadSamples = function (samples, containerIdsMap) {
+var puckIndex, sampleIndex;
+
 	//TODO refactor with JS Array
 	var pucksToBeLoaded = {};
 	var errorPucks = [];
@@ -353,7 +357,9 @@ SampleChangerWidget.prototype.loadSamples = function (samples, containerIdsMap) 
 * @method load
 * @param {Object} data Keys are the ids and the values are puckWidget data 
 */
-SampleChangerWidget.prototype.load = function (data) {	
+SampleChangerWidget.prototype.load = function (data) {
+var i;
+	
 	for (i in _.keys(data)){
 		var location = _.keys(data)[i].substring(_.keys(data)[i].indexOf('-')+1);
 		var puck = this.findPuckById(this.id + "-" + location);
@@ -481,6 +487,8 @@ SampleChangerWidget.prototype.findPuckById = function (id) {
 * @return An array of all the pucks of the sample changer
 */
 SampleChangerWidget.prototype.getAllPucks = function () {
+var puckType;
+
 	var allPucks = [];
 	for (puckType in this.pucks) {
 		allPucks = allPucks.concat(this.pucks[puckType]);
@@ -505,6 +513,8 @@ SampleChangerWidget.prototype.getAllFilledPucks = function () {
 * @method render
 */
 SampleChangerWidget.prototype.render = function () {
+var cell;
+
     var allPucks = this.getAllPucks();
     for (puck in allPucks){
         var puck = allPucks[puck].puckWidget;
@@ -520,6 +530,8 @@ SampleChangerWidget.prototype.render = function () {
 * @method setClickListeners
 */
 SampleChangerWidget.prototype.setClickListeners = function () {
+var puckIndex;
+
     var _this = this;
 	var allPucks = this.getAllPucks();
 	for (puckIndex in allPucks) {
@@ -540,6 +552,8 @@ SampleChangerWidget.prototype.setClickListeners = function () {
 * @param {Integer} capacity The capacity of the allowed pucks
 */
 SampleChangerWidget.prototype.disablePucksOfDifferentCapacity = function (capacity) {
+var puckIndex;
+
 	var allPucks = this.getAllPucks();
 	for (puckIndex in allPucks) {
 		var puck = allPucks[puckIndex];
@@ -578,6 +592,8 @@ SampleChangerWidget.prototype.addClassToPuck = function (puck,cls) {
 * @method enableAllPucks
 */
 SampleChangerWidget.prototype.enableAllPucks = function () {
+var puckIndex;
+
 	var allPucks = this.getAllPucks();
 	for (puckIndex in allPucks) {
 		var puck = allPucks[puckIndex];
@@ -603,6 +619,8 @@ SampleChangerWidget.prototype.enablePuck = function (puck) {
 * @method removeClassToAllPucks
 */
 SampleChangerWidget.prototype.removeClassToAllPucks = function (className) {
+var puckIndex;
+
 	var allPucks = this.getAllPucks();
 	for (puckIndex in allPucks) {
 		var puck = allPucks[puckIndex];
@@ -618,6 +636,8 @@ SampleChangerWidget.prototype.removeClassToAllPucks = function (className) {
 * @return An object containing the puckData of the filled pucks indexed by the idLocation
 */
 SampleChangerWidget.prototype.getPuckData = function () {
+var puckContainerIndex;
+
 	var filledPucks = this.getAllFilledPucks();
 	var puckData = {};
     for (puckContainerIndex in filledPucks) {
@@ -637,6 +657,8 @@ SampleChangerWidget.prototype.getPuckData = function () {
 * @return 
 */
 SampleChangerWidget.prototype.emptyAllPucks = function () {
+var puckIndex;
+
 	var allFilledPucks = this.getAllFilledPucks();
 	for (puckIndex in allFilledPucks) {
 		var puck = allFilledPucks[puckIndex];
