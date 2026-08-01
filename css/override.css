@@ -15,10 +15,12 @@ border-top : 1px gray dotted;
 	min-height: 30px;
 }
 
-#.x-tab-bar-default {
-#	background-color: #E4EAFF;
-#	 border: 5px solid red;
-#}
+/*
+.x-tab-bar-default {
+	background-color: #E4EAFF;
+	 border: 5px solid red;
+}
+*/
 
 
 .x-tab-default {

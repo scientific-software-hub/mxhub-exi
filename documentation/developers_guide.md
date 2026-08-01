@@ -14,9 +14,10 @@
 
 | Layer | Tool              | Purpose |
 |---|-------------------|---|
-| Build | **Grunt**         | Template precompilation, JS bundling, CSS minification |
+| Dev server | **Vite**          | Local dev server with an `/ispyb` proxy — no Tomcat needed to run EXI (see [Developing Against a Local ISPyB](#developing-against-a-local-ispyb)) |
+| Build | **Grunt**         | Template precompilation, JS bundling, CSS minification (production build; being migrated to Vite) |
 | JS dependencies | **npm**           | Frontend libraries (jQuery, ExtJS, Handsontable, …) |
-| Dev tooling | **npm**           | Grunt plugins, Cypress, static dev server |
+| Dev tooling | **npm**           | Grunt plugins, Vite, Cypress, static dev server |
 | E2E tests | **Cypress 13**    | Shipping/MX widget tests with mocked ISPyB REST |
 | Framework | **ExtJS 5** (MVC) | Hash-based routing, panels, grids |
 | Templates | **Dust.js**       | Precompiled to `min/precompiled.templates.min.js` |
@@ -140,9 +141,38 @@ cypress/fixtures/
 
 ## Developing Against a Local ISPyB
 
-Running EXI through the same Tomcat instance as ISPyB eliminates CORS entirely — all REST calls are same-origin.
+### Setup (Vite — recommended)
 
-### Setup in IntelliJ IDEA
+EXI no longer needs to be deployed into the same Tomcat instance as ISPyB to avoid CORS.
+`vite.config.js` runs a dev server with a `/ispyb` proxy to Tomcat:
+
+```js
+server: {
+  proxy: {
+    '/ispyb': { target: 'http://localhost:8080', changeOrigin: false },
+  },
+},
+```
+
+`mx/config.js` already points at the relative path `/ispyb/ispyb-ws/rest`, and ISPyB
+authentication is token-in-URL rather than cookie-based
+(`js/ispyb-client/dataadapter.js`), so the proxy needs no cookie rewriting — every
+REST call is same-origin from the browser's point of view, exactly as if EXI were
+served by the same Tomcat.
+
+1. Have ISPyB running and reachable at `http://localhost:8080` (see the project's
+   `ispyb-database` seeder docs for a local instance).
+2. `npm run dev`
+3. Open `http://localhost:5173/mx/dev.html` (or `mx/index.html` once Phase 3 of the
+   Vite migration lands). Log in as `hakanj` / `ispyb`.
+
+No build step, no IntelliJ artifact, no Tomcat deployment for EXI itself — only for
+ISPyB.
+
+### Alternative: same-Tomcat deployment (legacy)
+
+Still works if you'd rather avoid running a second process, or need to debug something
+Tomcat-specific:
 
 1. **Build the app** (`grunt dev` or `grunt` for production bundles).
 
