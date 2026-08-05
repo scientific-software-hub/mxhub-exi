@@ -1,8 +1,9 @@
-package-lock.json
+/package-lock.json
 cypress.env.json
 min/
 report/
-documentation/
+documentation/_site/
+documentation/node_modules/
 .tern*
 *~
 .bowerrc

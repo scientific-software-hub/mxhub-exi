@@ -16,13 +16,23 @@ EXI extends the capabilities of **ISPyB** (Information System for Protein Crysta
 - Role-based permissions to ensure data security and integrity.
 
 
-## [User Guide](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/user_guide.md)
+## Documentation
 
-## Developers Guide
- * [Technical Details](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/developers_guide.md)
- * [Installation](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/developers_guide.md)
-      * [Installation: production](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/developers_guide.md)
-      * [Installation: development](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/developers_guide.md)
- * [Development](https://github.com/scientific-software-hub/mxhub-exi/blob/main/documentation/developers_guide.md)
+Full documentation — user guide, live-validated user journeys, MX module architecture, widget/template
+tree, developer guide, and test coverage — is published at
+**[scientific-software-hub.github.io/mxhub-exi](https://scientific-software-hub.github.io/mxhub-exi/)**.
+
+Three starting points, depending on what you're after:
+
+* **Using EXI** — [User Guide](https://scientific-software-hub.github.io/mxhub-exi/user-guide.html),
+  [User Journeys](https://scientific-software-hub.github.io/mxhub-exi/user-journeys.html)
+* **Building EXI** — [Developer Guide](https://scientific-software-hub.github.io/mxhub-exi/developer-guide.html),
+  [MX Module Architecture](https://scientific-software-hub.github.io/mxhub-exi/architecture.html),
+  [Widget & Template Tree](https://scientific-software-hub.github.io/mxhub-exi/widget-tree.html)
+* **Trusting EXI** — [Testing & Quality](https://scientific-software-hub.github.io/mxhub-exi/testing.html)
+
+The site is generated from the Markdown sources in [`documentation/`](documentation/) — see
+[Building the Documentation Site](https://scientific-software-hub.github.io/mxhub-exi/developer-guide.html#building-the-documentation-site)
+to build or preview it locally.
 
 
