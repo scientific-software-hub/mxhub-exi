@@ -1,0 +1,12 @@
+{
+  "shippingId": 99,
+  "shippingName": "My-Shipment-2026",
+  "shippingStatus": "Not set",
+  "shippingType": "INTERNAL",
+  "comments": null,
+  "sendingLabContactVO": null,
+  "returnLabContactVO": null,
+  "returnCourier": null,
+  "dewarVOs": [],
+  "sessions": []
+}

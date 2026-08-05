@@ -185,4 +185,75 @@ describe('Login — manager welcome page', () => {
       .its('request.url')
       .should('include', '20260201');
   });
+
+  // ── Journey A1 (proposal-pick-by-click) / X1 (credential dropdown is informational only) ──
+  //
+  // Every other spec in this repo activates the proposal directly via
+  // win.EXI.credentialManager.setActiveProposal(...) — no test ever does it the way A1 actually
+  // describes: clicking a session-grid row. That row's href
+  // (SessionGrid.prototype.getDataCollectionURL, js/core/widget/sessiongrid.js:45-53) is one of
+  // the X2 deep-link redirector routes (js/mx/controller/mxdatacollectioncontroller.js:88-99):
+  // "#/mx/proposal/" + Proposal_proposalCode + Proposal_ProposalNumber (note the capital P — a
+  // naming inconsistency vs. the rest of the app, harmless only because our fixture happens to
+  // use the same capitalization) + "/datacollection/session/" + sessionId + "/main". Since we're
+  // already authenticated at that point, it takes ExiGenericController.prototype.redirect's
+  // "already authenticated" branch (js/core/controller/exigenericcontroller.js:26-30): a
+  // synchronous setActiveProposal(credentials[0].username, proposal) with no REST call, then
+  // location.hash = the non-prefixed session route.
+  //
+  // X1 turned out not to be a distinct UI flow: user-journeys.md assumed the credential
+  // splitbutton's {proposal}@{username} dropdown items were how you switch proposals mid-session.
+  // Source-checked: those menu items are built with disabled: true unconditionally
+  // (js/core/menu/mainmenu.js:424-434) — purely informational. Clicking a session row (X2's
+  // mechanism) is the only way to change the active proposal once inside the app.
+
+  it('clicking a session row activates its proposal and navigates via the X2 redirector route', () => {
+    // sessions-date-range.json's one row carries Proposal_proposalCode: 'MX',
+    // Proposal_ProposalNumber: '1234', sessionId: 1 — a well-formed redirector target.
+    cy.intercept('GET', '**/session/date/**', { fixture: 'sessions/sessions-date-range.json' }).as('getSessions');
+    // Stub the redirect target's own requests (the ordinary DC session route, A7/B3) so
+    // navigation completes without hanging — their content isn't what this test is about.
+    cy.intercept('GET', '**/datacollection/session/*/list', { body: [] }).as('getDCs');
+    cy.intercept('GET', '**/energyscan/session/*/list',    { body: [] }).as('getEnergyScans');
+    cy.intercept('GET', '**/xrfscan/session/*/list',       { body: [] }).as('getXrfScans');
+
+    loginAndWaitForWelcome();
+    cy.window().then((win) => {
+      win.location.hash = '#/welcome/manager/ispyb/date/20260201/20260228/main';
+    });
+    cy.wait('@getSessions');
+
+    // beamLineOperator 'Paul Carroll' uniquely identifies the fixture's one row (same convention
+    // as mx/data-collections.cy.js's own welcome-grid drill-down test).
+    cy.contains('Paul Carroll', { timeout: 8000 }).should('be.visible');
+    cy.contains('td', 'Paul Carroll').parents('tr').find('a').first().click();
+
+    cy.wait('@getDCs');
+    cy.location('hash', { timeout: 8000 }).should('include', '/mx/datacollection/session/1/main');
+    cy.window().its('EXI.credentialManager').invoke('getActiveProposal').should('deep.equal', ['MX1234']);
+  });
+
+  it('the credential splitbutton dropdown lists {proposal}@{username} but its items are not clickable', () => {
+    loginAndWaitForWelcome();
+    cy.window().then((win) => {
+      win.EXI.credentialManager.setActiveProposal('ispyb', 'MX1234');
+
+      // Ext.Button (split:true) decides handler-vs-menu purely by click X-coordinate against a
+      // narrow "trigger region" at the button's right edge (min/extjs/build/ext-all-debug.js
+      // isWithinTrigger/getTriggerRegion, ~line 87116-87134) — there is no separate arrow DOM
+      // element a Cypress selector could target. Rather than fight pixel-perfect click
+      // coordinates, invoke the same component API a real arrow-click ends up calling — the same
+      // "drive the ExtJS component directly" convention already established in
+      // shipping/shipment-create.cy.js for the Shipments submenu that "only reveals via a real
+      // hover, not a click".
+      const button = win.Ext.ComponentQuery.query('splitbutton')
+        .find((b) => b.cls && b.cls.indexOf('button_log_out') !== -1);
+      button.showMenu();
+    });
+
+    // Exact class confirmed live (Playwright against a running instance) — ExtJS 5 renders
+    // disabled menu items with `x-menu-item-disabled`, not `x-item-disabled`.
+    cy.get('.x-menu-item').should('be.visible').and('contain.text', '@');
+    cy.contains('.x-menu-item', '@').should('have.class', 'x-menu-item-disabled');
+  });
 });

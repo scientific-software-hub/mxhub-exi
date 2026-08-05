@@ -1,0 +1,65 @@
+name: E2E tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          # @scientific-software-hub/extjs is published on GitHub Packages, not npmjs — this
+          # writes a scoped registry + auth token entry to ~/.npmrc for the install step below.
+          registry-url: https://npm.pkg.github.com
+          scope: '@scientific-software-hub'
+
+      # Cypress's own binary download is the slow part of `npm install`; cache it across runs,
+      # keyed on the pinned version in package.json.
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-binary-${{ runner.os }}-${{ hashFiles('package.json') }}
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+        env:
+          # No package-lock.json is committed (see .gitignore), so this is a plain `npm install`,
+          # not `npm ci`.
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # `grunt` (the default task) compiles dust templates, concatenates + minifies js/ and css/,
+      # and copies ExtJS into min/ — all gitignored build output that mx/index.html requires.
+      - name: Build app bundle
+        run: npm run build
+
+      - name: Start static server
+        run: npx http-server . -p 3000 -c-1 &
+
+      - name: Wait for server
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000/mx/index.html > /dev/null && exit 0
+            sleep 1
+          done
+          echo "Server did not become ready in time" >&2
+          exit 1
+
+      - name: Run Cypress
+        run: npm run test:e2e
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
