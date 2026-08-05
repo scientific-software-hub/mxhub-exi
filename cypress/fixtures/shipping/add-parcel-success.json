@@ -1,0 +1,19 @@
+{
+  "shippingId": 1,
+  "shippingName": "Shipment-001",
+  "shippingStatus": "opened",
+  "comments": null,
+  "sendingLabContactVO": null,
+  "returnLabContactVO": null,
+  "dewarVOs": [
+    {
+      "dewarId": 12,
+      "code": "Dewar1",
+      "comments": null,
+      "dewarStatus": null,
+      "isReimbursed": false,
+      "containerVOs": []
+    }
+  ],
+  "sessions": []
+}

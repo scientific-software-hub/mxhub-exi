@@ -1,0 +1,71 @@
+[
+  {
+    "labContactId": 157,
+    "cardName": "Bender-Roga i Kopyta Ltd",
+    "defaultCourrierCompany": "-1",
+    "courierAccount": "ACC-2026-01",
+    "billingReference": "REF-2026-01",
+    "dewarAvgCustomsValue": 150,
+    "dewarAvgTransportValue": 300,
+    "pcStateManager": null,
+    "personVO": {
+      "personId": 6579,
+      "laboratoryVO": {
+        "laboratoryId": 5292,
+        "name": "Roga i Kopyta Ltd",
+        "address": "1 Fiction Avenue\r\n00000 Chernomorsk",
+        "city": "Chernomorsk",
+        "country": "DE"
+      },
+      "familyName": "Bender",
+      "givenName": "Ostap",
+      "title": "Dr.",
+      "emailAddress": "ostap.bender@rogaikopyta.example",
+      "phoneNumber": "0000000001",
+      "login": "obender",
+      "sessionVOs": []
+    }
+  },
+  {
+    "labContactId": 156,
+    "cardName": "Vorobyaninov-Chernomorsk Institute",
+    "defaultCourrierCompany": null,
+    "courierAccount": null,
+    "billingReference": null,
+    "dewarAvgCustomsValue": 0,
+    "dewarAvgTransportValue": 0,
+    "pcStateManager": null,
+    "personVO": {
+      "personId": 21113,
+      "laboratoryVO": null,
+      "familyName": "Vorobyaninov",
+      "givenName": "Ippolit",
+      "title": "Dr.",
+      "emailAddress": "ippolit.vorobyaninov@chernomorsk.example",
+      "phoneNumber": "00000",
+      "login": "ivorobyaninov",
+      "sessionVOs": []
+    }
+  },
+  {
+    "labContactId": 158,
+    "cardName": "Balaganov-Chernomorsk Lab",
+    "defaultCourrierCompany": null,
+    "courierAccount": null,
+    "billingReference": null,
+    "dewarAvgCustomsValue": 0,
+    "dewarAvgTransportValue": 0,
+    "pcStateManager": null,
+    "personVO": {
+      "personId": 7001,
+      "laboratoryVO": null,
+      "familyName": "Balaganov",
+      "givenName": "Shura",
+      "title": "Dr.",
+      "emailAddress": "shura.balaganov@chernomorsk.example",
+      "phoneNumber": null,
+      "login": "sbalaganov",
+      "sessionVOs": []
+    }
+  }
+]
