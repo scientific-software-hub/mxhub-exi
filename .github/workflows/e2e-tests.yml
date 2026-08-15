@@ -36,13 +36,11 @@ jobs:
           # not `npm ci`.
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # `grunt` (the default task) compiles dust templates, concatenates + minifies js/ and css/,
-      # and copies ExtJS into min/ — all gitignored build output that mx/index.html requires.
       - name: Build app bundle
         run: npm run build
 
       - name: Start static server
-        run: npx http-server . -p 3000 -c-1 &
+        run: npm run serve &
 
       - name: Wait for server
         run: |

@@ -134,6 +134,14 @@ export default defineConfig({
                 { src: 'node_modules/@scientific-software-hub/extjs/examples/ux', dest: '.' },
                 { src: 'node_modules/@scientific-software-hub/extjs/extended', dest: '.' },
                 ...VENDOR_FILES.map((src) => ({ src, dest: '.' })),
+                // Plain static assets, referenced by relative URL from the app and
+                // never touched by Vite's module graph. Copied here (rather than
+                // left to whoever serves dist/) so `emptyOutDir: true` doesn't
+                // leave dist/ incomplete -- one self-contained build output for
+                // `npm run serve`, CI's e2e job, and the Dockerfile alike.
+                { src: 'images', dest: '.' },
+                { src: 'fonts', dest: '.' },
+                { src: 'csv', dest: '.' },
             ],
         }),
     ],
