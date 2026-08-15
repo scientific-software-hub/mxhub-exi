@@ -175,12 +175,17 @@ CSVPuckFormView.prototype.addProtein = function(){
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
 */
 CSVPuckFormView.prototype.save = async function() {
+	Ext.getBody().mask("Saving CSV. Please wait…");
+	// Yield to the browser so the mask is painted before synchronous work begins.
+	await new Promise(resolve => setTimeout(resolve, 0));
+
 	const sampleNamesProteinIds = _.cloneDeep(this.proposalSamples);
 	var forceUpdate = true;
 	EXI.proposalManager.getProteins(forceUpdate);
     var _this = this;
     var parcels = this.containerSpreadSheet.getParcels();
 	if(parcels.length === 0){
+		Ext.getBody().unmask();
 		$.notify("Sorry. There are no Dewars to safe! Please use Browse button to upload Dewars", "error");
 		return;
 	}
@@ -190,22 +195,22 @@ CSVPuckFormView.prototype.save = async function() {
 	const isValid= await this.containerSpreadSheet.isDataValid(sampleNamesProteinIds)
 	if(isValid){
 		var onError = function (sender, error, mesg) {
-			_this.panel.setLoading(false);
+			Ext.getBody().unmask();
 			EXI.setError(error.responseText);
 			$.notify(error.responseText, "error");
 		};
 
 		var onSuccess = function (sender, puck) {
-			_this.panel.setLoading(false);
+			Ext.getBody().unmask();
 			_this.returnToShipment();
 		};
-		this.panel.setLoading("Saving CSV");
 
 		EXI.getDataAdapter({
 			onSuccess: onSuccess,
 			onError: onError
 		}).proposal.shipping.addDewarsToShipment(this.shippingId, parcels);
 	} else {
+		Ext.getBody().unmask();
 		$.notify("Sorry. Your data contain errors!", "error");
 		var errors = (this.containerSpreadSheet.getErrors());
 		if (this.displayErrors(errors.INCORRECT_PARCEL_NAME, this.uniquenessParcelPanelId, " contain parcel names that are not unique within the proposal")){

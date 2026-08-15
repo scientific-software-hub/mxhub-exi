@@ -92,7 +92,7 @@ DataAdapter.prototype.getUrl = function(url){
 */
 DataAdapter.prototype.get = function(url){
 	var _this = this;
-		$.ajax({
+	$.ajax({
 			  url: this.getUrl( url),
 			  type: 'get',
 			  async : this.async,

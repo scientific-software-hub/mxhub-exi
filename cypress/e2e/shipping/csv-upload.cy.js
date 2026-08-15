@@ -339,6 +339,67 @@ describe('CSV Import — #/shipping/1/import/csv', () => {
     cy.get('@addDewars.all').should('have.length', 0);
   });
 
+  // ── Overlay / double-submit guard ────────────────────────────────────────────
+
+  it('shows a full-screen overlay while the save request is in-flight', () => {
+    cy.intercept('POST', '**/shipping/1/dewars/add', (req) => {
+      req.reply({ delay: 1500, fixture: 'shipping/add-dewars-success.json' });
+    }).as('addDewarsSlow');
+
+    visitCsvImportPage();
+    uploadCsv('valid.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+
+    cy.get('.x-mask', { timeout: 3000 }).should('be.visible');
+    cy.get('.x-mask-msg').should('contain', 'Saving CSV');
+
+    cy.wait('@addDewarsSlow');
+    cy.get('.x-mask').should('not.exist');
+  });
+
+  it('removes the overlay when the save request fails so the user can retry', () => {
+    cy.intercept('POST', '**/shipping/1/dewars/add', {
+      statusCode: 500,
+      body: 'Internal Server Error',
+    }).as('addDewarsFail');
+
+    visitCsvImportPage();
+    uploadCsv('valid.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+    cy.wait('@addDewarsFail');
+
+    cy.get('.x-mask', { timeout: 3000 }).should('not.exist');
+    cy.contains('Save').should('be.visible');
+  });
+
+  it('sends only one save request when Save is clicked multiple times', () => {
+    cy.intercept('POST', '**/shipping/1/dewars/add', (req) => {
+      req.reply({ delay: 1000, fixture: 'shipping/add-dewars-success.json' });
+    }).as('addDewarsSlow');
+
+    visitCsvImportPage();
+    uploadCsv('valid.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@getProposalInfo');
+
+    // Mask should now be visible — attempt a second click through it
+    cy.get('.x-mask', { timeout: 3000 }).should('be.visible');
+    cy.contains('Save').click({ force: true });
+
+    cy.wait('@addDewarsSlow');
+
+    // Exactly one POST — no duplicate
+    cy.get('@addDewarsSlow.all').should('have.length', 1);
+  });
+
   // ── DUPLICATE_SAMPLE_NAME (conflict with existing proposal sample) ───────────
 
   it('shows the uniqueness warning when a protein+sample combination already exists in the proposal', () => {
