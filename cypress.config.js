@@ -1,9 +1,9 @@
 const { defineConfig } = require('cypress');
 const fs = require('fs');
-const path = require('path');
-
-// Start a static file server before running tests: npm run serve
-// Then set baseUrl below to match (default: http://localhost:3000).
+const path = require('path')// `npm run serve` serves the `vite build` output (dist/) on :3000, matching
+// baseUrl below -- the same artifact CI builds and the Dockerfile ships.
+// Override with CYPRESS_BASE_URL to point elsewhere, e.g.
+// http://localhost:5173 for the Vite dev server (`npm run dev`).
 
 module.exports = defineConfig({
   e2e: {

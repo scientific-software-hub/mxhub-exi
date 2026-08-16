@@ -175,12 +175,28 @@ CSVPuckFormView.prototype.addProtein = function(){
 	this.uniquenessSampleNamePanelId = this.id + "_uniquenessSampleNamePanelId";
 */
 CSVPuckFormView.prototype.save = async function() {
+	// Re-entrancy guard: the full-screen mask below stops real pointer clicks
+	// from reaching the Save button while a save is in flight, but it cannot
+	// stop a second invocation triggered another way (e.g. keyboard
+	// activation). This flag is the actual guarantee against duplicate saves;
+	// it is set for the whole in-flight window and cleared on every exit path.
+	if (this._saving) {
+		return;
+	}
+	this._saving = true;
+
+	Ext.getBody().mask("Saving CSV. Please wait…");
+	// Yield to the browser so the mask is painted before synchronous work begins.
+	await new Promise(resolve => setTimeout(resolve, 0));
+
 	const sampleNamesProteinIds = _.cloneDeep(this.proposalSamples);
 	var forceUpdate = true;
 	EXI.proposalManager.getProteins(forceUpdate);
     var _this = this;
     var parcels = this.containerSpreadSheet.getParcels();
 	if(parcels.length === 0){
+		Ext.getBody().unmask();
+		this._saving = false;
 		$.notify("Sorry. There are no Dewars to safe! Please use Browse button to upload Dewars", "error");
 		return;
 	}
@@ -190,22 +206,25 @@ CSVPuckFormView.prototype.save = async function() {
 	const isValid= await this.containerSpreadSheet.isDataValid(sampleNamesProteinIds)
 	if(isValid){
 		var onError = function (sender, error, mesg) {
-			_this.panel.setLoading(false);
+			Ext.getBody().unmask();
+			_this._saving = false;
 			EXI.setError(error.responseText);
 			$.notify(error.responseText, "error");
 		};
 
 		var onSuccess = function (sender, puck) {
-			_this.panel.setLoading(false);
+			Ext.getBody().unmask();
+			_this._saving = false;
 			_this.returnToShipment();
 		};
-		this.panel.setLoading("Saving CSV");
 
 		EXI.getDataAdapter({
 			onSuccess: onSuccess,
 			onError: onError
 		}).proposal.shipping.addDewarsToShipment(this.shippingId, parcels);
 	} else {
+		Ext.getBody().unmask();
+		this._saving = false;
 		$.notify("Sorry. Your data contain errors!", "error");
 		var errors = (this.containerSpreadSheet.getErrors());
 		if (this.displayErrors(errors.INCORRECT_PARCEL_NAME, this.uniquenessParcelPanelId, " contain parcel names that are not unique within the proposal")){

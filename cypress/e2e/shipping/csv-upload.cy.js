@@ -35,6 +35,26 @@ function setupIntercepts() {
     { fixture: 'shipping/add-dewars-success.json' }).as('addDewars');
 }
 
+// Same as setupIntercepts() but deliberately omits the dewars/add stub — used
+// by tests that need to register their own (e.g. delayed) intercept for that
+// route as the *only* handler. Registering a second overlapping intercept for
+// the same route on top of setupIntercepts()'s immediate stub does not
+// reliably override its response timing in this Cypress version: the earlier
+// static stub can still win the race, so a delayed override placed after it
+// is not a safe way to simulate a slow save.
+function setupInterceptsWithoutDewarsAdd() {
+  cy.intercept('POST', '**/authenticate*', {
+    body: { roles: ['Manager'], token: 'test-token' },
+  }).as('authenticate');
+  cy.intercept('GET', '**/session/date/**', { body: [] }).as('getSessions');
+  cy.intercept('GET', '**/proposal/list',   { body: [] }).as('getProposals');
+  cy.intercept('GET', '**/shipping/1/get',             { fixture: 'shipping/shipment.json' }).as('getShipment');
+  cy.intercept('GET', '**/shipping/1/shipmentIds',     { body: [] }).as('getShipmentIds');
+  cy.intercept('GET', '**/mx/sample/shipmentid/*/list',{ body: [] }).as('getSamples');
+  cy.intercept('GET', '**/info/get', { fixture: 'proposal/info.json' }).as('getProposalInfo');
+  cy.intercept('GET', '**/shipping/1/datacollecitons/list', { body: [] }).as('getDataCollections');
+}
+
 // ─── Login helper ───────────────────────────────────────────────────────────
 
 // Simulates a real user login: fills the ExtJS auth form and clicks Login.
@@ -358,5 +378,106 @@ describe('CSV Import — #/shipping/1/import/csv', () => {
     cy.wait('@getProposalInfo');
     cy.contains('data contain errors', { timeout: 6000 }).should('be.visible');
     cy.get('@addDewars.all').should('have.length', 0);
+  });
+});
+
+// ─── Overlay / double-submit guard ─────────────────────────────────────────
+//
+// A separate describe block (own beforeEach) so its dewars/add intercept is
+// registered exactly once per test — see setupInterceptsWithoutDewarsAdd().
+//
+// CSVPuckFormView.save() has two layers of protection against duplicate
+// saves (see js/core/view/shipping/csvpuckformview.js):
+//   1. this._saving — a re-entrancy guard set for the whole in-flight
+//      window and checked at the top of save(). This is the actual
+//      guarantee: it blocks a second invocation regardless of how it was
+//      triggered (mouse, keyboard, or a Cypress-forced synthetic click).
+//   2. Ext.getBody().mask(...) — a full-screen ExtJS mask, for user-facing
+//      feedback ("page looks frozen" -> now shows Saving CSV). It also
+//      physically covers the Save button so a REAL mouse click can't reach
+//      it, but that alone wouldn't stop a non-pointer re-invocation, which
+//      is why (1) exists.
+//
+// These tests verify the mechanism directly via spies on
+// Ext.dom.Element.prototype.mask/unmask (deterministic — no dependency on
+// transient DOM/CSS state or response timing, both of which proved flaky:
+// the app also uses panel.setLoading() elsewhere, which creates an
+// Ext.LoadMask component reusing the exact same x-mask/x-mask-msg CSS
+// classes, and a `delay:` option on a stubbed response was observed to
+// resolve near-instantly regardless of the configured delay in this
+// environment) and on the actual request count for the double-click case.
+describe('CSV Import — Save overlay / double-submit guard', () => {
+  beforeEach(() => {
+    setupInterceptsWithoutDewarsAdd();
+  });
+
+  function spyOnMask() {
+    return cy.window().then((win) => {
+      cy.spy(win.Ext.dom.Element.prototype, 'mask').as('maskSpy');
+      cy.spy(win.Ext.dom.Element.prototype, 'unmask').as('unmaskSpy');
+    });
+  }
+
+  it('masks the page while saving and unmasks it once the save succeeds', () => {
+    cy.intercept('POST', '**/shipping/1/dewars/add',
+      { fixture: 'shipping/add-dewars-success.json' }).as('addDewars');
+
+    visitCsvImportPage();
+    spyOnMask();
+    uploadCsv('valid.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+
+    cy.get('@maskSpy').should('have.been.calledWith', 'Saving CSV. Please wait…');
+    cy.wait('@addDewars');
+    cy.get('@unmaskSpy').should('have.been.called');
+  });
+
+  it('unmasks the page when the save request fails so the user can retry', () => {
+    cy.intercept('POST', '**/shipping/1/dewars/add', {
+      statusCode: 500,
+      body: 'Internal Server Error',
+    }).as('addDewarsFail');
+
+    visitCsvImportPage();
+    spyOnMask();
+    uploadCsv('valid.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    cy.wait('@addDewarsFail');
+
+    cy.get('@maskSpy').should('have.been.calledWith', 'Saving CSV. Please wait…');
+    cy.get('@unmaskSpy').should('have.been.called');
+    cy.contains('Save').should('be.visible');
+  });
+
+  it('sends only one save request when Save is clicked multiple times', () => {
+    // Held open deterministically so the forced second click reliably lands
+    // while the first save() call is still in flight (this._saving = true),
+    // regardless of how fast a stubbed response would otherwise resolve.
+    let release;
+    const held = new Promise((resolve) => { release = resolve; });
+    cy.intercept('POST', '**/shipping/1/dewars/add', (req) => {
+      return held.then(() => req.reply({ fixture: 'shipping/add-dewars-success.json' }));
+    }).as('addDewarsSlow');
+
+    visitCsvImportPage();
+    uploadCsv('valid.csv');
+    waitForSpreadsheetRows();
+
+    cy.contains('Save').click();
+    // Bypass actionability (the mask visually covers the button for a real
+    // click) to prove the _saving guard — not just the overlay — is what
+    // blocks re-entrancy.
+    cy.contains('Save').click({ force: true });
+    cy.contains('Save').click({ force: true });
+
+    cy.then(() => release());
+    cy.wait('@addDewarsSlow');
+
+    // Exactly one POST — no duplicate, despite three clicks.
+    cy.get('@addDewarsSlow.all').should('have.length', 1);
   });
 });
