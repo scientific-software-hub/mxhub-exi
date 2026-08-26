@@ -154,6 +154,17 @@ export default defineConfig({
             },
         },
     },
+    // Vite's own asset pipeline (module entry script, favicon, anything it
+    // rewrites via transformIndexHtml) emits absolute paths rooted at
+    // `base` -- e.g. "/assets/index-XYZ.js". Defaults to "/", correct for
+    // `npm run dev`/`preview` and for hitting the built container directly.
+    // In production the app is served behind a reverse proxy under an
+    // "/exi/" prefix (the legacy Tomcat context path), so those absolute
+    // paths need that prefix too, or the browser requests them from the
+    // proxy root and gets a 404. Set via VITE_BASE_PATH (see Dockerfile's
+    // BASE_PATH build arg) rather than hardcoded, since the same image
+    // build is also used/tested without the proxy in front.
+    base: process.env.VITE_BASE_PATH || '/',
     build: {
         outDir: 'dist',
         emptyOutDir: true,

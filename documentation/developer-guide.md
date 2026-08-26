@@ -110,6 +110,23 @@ export NPM_TOKEN=ghp_your_read_packages_token
 docker build --secret id=npm_token,env=NPM_TOKEN -t mxhub-exi .
 ```
 
+#### Production builds: reverse-proxy path prefix
+
+Production serves this container behind a reverse proxy under an `/exi/`
+prefix (the legacy Tomcat context path), but the plain builds above emit
+absolute asset URLs rooted at `/` (e.g. `/assets/index-XYZ.js`) — correct
+when hitting the container directly, but a 404 once a proxy is in front
+without rewriting that prefix away. Pass `BASE_PATH` to bake the prefix in
+at build time (threads through to Vite's `base` option — see
+`vite.config.js`):
+
+```bash
+docker build --secret id=npm_token,src=<(grep -oP '(?<=_authToken=).*' ~/.npmrc) \
+  --build-arg BASE_PATH=/exi/ -t mxhub-exi .
+```
+
+Leave `BASE_PATH` unset for local/direct-container use — it defaults to `/`.
+
 ---
 
 ## Running Cypress Tests

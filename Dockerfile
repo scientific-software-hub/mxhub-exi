@@ -21,6 +21,13 @@ RUN --mount=type=secret,id=npm_token \
     npm install --no-audit --no-fund
 
 COPY . .
+# Production is served behind a reverse proxy under an "/exi/" prefix, so
+# Vite's absolute asset URLs (JS bundle, favicon) need that prefix baked in
+# at build time -- see vite.config.js's VITE_BASE_PATH comment. Defaults to
+# "/" (unprefixed), matching hitting this container directly.
+#   docker build --build-arg BASE_PATH=/exi/ ...
+ARG BASE_PATH=/
+ENV VITE_BASE_PATH=$BASE_PATH
 RUN npm run build
 
 # ---- Runtime stage ----------------------------------------------------------
