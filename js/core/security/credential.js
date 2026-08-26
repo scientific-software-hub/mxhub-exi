@@ -12,15 +12,15 @@ function Credential(username, roles, token, url, exiUrl,activeProposals, tokenEx
 }
 
 Credential.prototype.isManager = function() {
-	return this._checkRole("manager");
+	return this._checkRole("Manager");
 };
 
 Credential.prototype.isLocalContact = function() {
-	return this._checkRole("localcontact");
+	return this._checkRole("Localcontact");
 };
 
 Credential.prototype._checkRole = function(role) {
-	return JSON.stringify(this.roles).toLowerCase().indexOf(role) != -1;
+	return this.roles.includes(role);
 };
 
 Credential.prototype.getRoles = function() {
