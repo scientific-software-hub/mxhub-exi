@@ -7,7 +7,10 @@
 # `npm ci` (matches the e2e CI workflow). @scientific-software-hub/extjs is
 # a private GitHub Packages package (see .npmrc's registry mapping), so the
 # install needs a `read:packages` PAT. Pass it as a BuildKit secret (never
-# a --build-arg: those land in the image history, a secret doesn't):
+# a --build-arg: those land in the image history, a secret doesn't). If the
+# token is already in ~/.npmrc, pull it from there directly:
+#   docker build --secret id=npm_token,src=<(grep -oP '(?<=_authToken=).*' ~/.npmrc) .
+# Otherwise:
 #   docker build --secret id=npm_token,env=NPM_TOKEN .
 FROM node:22-alpine AS build
 WORKDIR /app

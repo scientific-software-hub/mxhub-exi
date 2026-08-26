@@ -94,7 +94,16 @@ build stage's `npm ci` needs a `read:packages` PAT — the same kind of token fr
 [Prerequisites](#prerequisites) above, but passed separately here rather than
 read from your `~/.npmrc`, since that file lives on your host and isn't
 available inside the build container. Pass it as a BuildKit secret, not a
-`--build-arg` (build-args land in the image history; secrets don't):
+`--build-arg` (build-args land in the image history; secrets don't).
+
+If the token is already in your `~/.npmrc` (per Prerequisites), pull it straight
+from there — no need to `export` it separately:
+
+```bash
+docker build --secret id=npm_token,src=<(grep -oP '(?<=_authToken=).*' ~/.npmrc) -t mxhub-exi .
+```
+
+Or, if you're passing a token that isn't already in `~/.npmrc`:
 
 ```bash
 export NPM_TOKEN=ghp_your_read_packages_token
