@@ -4,7 +4,7 @@
   "description": "Extended ISPyB",
   "main": "vite.config.js",
   "dependencies": {
-    "@scientific-software-hub/extjs": "5.0.1",
+    "extjs-gpl": "6.2.0",
     "bootstrap": "3.4.1",
     "bootstrap-multiselect": "0.9.15",
     "bootstrap-year-calendar": "1.1.1",

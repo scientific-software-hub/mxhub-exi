@@ -81,7 +81,7 @@ function login() {
   cy.visitMx();
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
   cy.wait('@authenticate');
 }
 
@@ -93,6 +93,17 @@ function decodeFormBody(body) {
 }
 
 // ─── Navigation helpers ────────────────────────────────────────────────────────
+
+// Ext 6 menus hand focus back to their owner button (the main-menu "Proteins" button) ~140ms
+// after the item's handler has already opened the window and focused it. Anything typed
+// before that lands on the button instead of the input (observed: the first keystrokes
+// vanished). Wait until that hand-back has happened — focus is outside the window — so the
+// following `.type()` can't be pre-empted. This is a framework behaviour difference vs Ext 5.
+function waitForDialogFocusToSettle() {
+  cy.document().should((doc) => {
+    expect(doc.activeElement.closest('.x-window'), 'focus settled outside the dialog').to.equal(null);
+  });
+}
 
 // Logs in, activates MX1234 (required for the menu's own hasActiveProposal() gate), and opens
 // the "Add Protein" dialog from the persistent main menu bar on the post-login welcome page.
@@ -107,6 +118,8 @@ function visitAndOpenAddProteinDialog() {
   cy.contains('.x-menu-item', 'Add new Protein').should('not.have.class', 'x-menu-item-disabled').click();
 
   cy.get('.x-window').should('be.visible').and('contain.text', 'Protein');
+
+  waitForDialogFocusToSettle();
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -189,6 +202,7 @@ describe('Proteins and Crystals — Add Protein dialog (A3)', () => {
     cy.contains('.x-btn', 'Proteins').click();
     cy.contains('.x-menu-item', 'Add new Protein').should('not.have.class', 'x-menu-item-disabled').click();
     cy.get('.x-window').should('be.visible');
+    waitForDialogFocusToSettle();
 
     cy.get('[id$="-name"]').type('New Protein');
     cy.get('[id$="-acronym"]').type('NEWP');

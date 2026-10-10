@@ -63,7 +63,7 @@ AddCrystalFormView.prototype.render = function () {
 	});
 	
 	$('#' + this.id).hide().html(html).fadeIn('fast');
-	this.panel.doLayout();
+	this.panel.updateLayout();
 
 	$('#' + this.id + "-space-group").on('change', function() {
 		_this.setCellValuesBySpaceGroup(this.value);	

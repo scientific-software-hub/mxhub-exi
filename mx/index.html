@@ -4,23 +4,31 @@
     <title>Extended ISPyB</title>
     <link rel="icon" type="image/x-icon" href="../images/icon/EXIicon2.ico">
 
-    <!-- ExtJS -->
-    <script src="../node_modules/@scientific-software-hub/extjs/build/ext-all.js"></script>
-    <script src="../node_modules/@scientific-software-hub/extjs/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+    <!-- ExtJS (extjs-gpl: Ext 6.2 classic toolkit, crisp theme, prebuilt ux bundle) -->
+    <script src="../node_modules/extjs-gpl/build/ext-all.js"></script>
+    <script src="../node_modules/extjs-gpl/build/classic/theme-crisp/theme-crisp.js"></script>
+    <script src="../node_modules/extjs-gpl/build/packages/ux/classic/ux.js"></script>
     <script>
-      // Theme CSS is added as a DOM element rather than a static <link> tag
+      // Theme/ux CSS is added as DOM elements rather than static <link> tags
       // because Vite processes every <link rel="stylesheet" href="local
       // path"> it finds in the HTML source through its CSS pipeline
       // (PostCSS), with no opt-out equivalent to <script>'s
-      // type="module" escape hatch. This file's old-IE
+      // type="module" escape hatch. These files' old-IE
       // `filter:progid:...` syntax fails that strict parser (verified) --
-      // browsers have always tolerated it fine. The file itself is copied
-      // verbatim by vite-plugin-static-copy (see vite.config.js).
+      // browsers have always tolerated it fine. The files themselves are
+      // copied verbatim by vite-plugin-static-copy (see vite.config.js).
       (function () {
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = '../node_modules/@scientific-software-hub/extjs/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css';
-        document.currentScript.insertAdjacentElement('afterend', link);
+        var anchor = document.currentScript;
+        [
+          '../node_modules/extjs-gpl/build/classic/theme-crisp/resources/theme-crisp-all.css',
+          '../node_modules/extjs-gpl/build/packages/ux/classic/crisp/resources/ux-all.css',
+        ].forEach(function (href) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          anchor.parentNode.insertBefore(link, anchor.nextSibling);
+          anchor = link;
+        });
       })();
     </script>
 
@@ -76,16 +84,6 @@
       }
       var exiSAXS;
       Ext.onReady(function () {
-        Ext.Loader.setConfig({ enabled: true });
-        Ext.Loader.setPath('Ext.ux', '../node_modules/@scientific-software-hub/extjs/examples/ux/');
-        Ext.Loader.setPath('Ext.Extended', '../node_modules/@scientific-software-hub/extjs/extended/');
-
-        Ext.require([
-          'Ext.ux.statusbar.StatusBar',
-          'Ext.Extended.RequiredTextField',
-          'Ext.Extended.RequiredNumberField',
-        ]);
-
         if (location.href.indexOf('saxs') != -1) {
           window.EXI = new ExiSAXS();
         } else {

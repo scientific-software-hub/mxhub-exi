@@ -77,7 +77,7 @@ ShipmentEditForm.prototype.load = function(shipment) {
 	}
 	
 	$('#' + this.id).hide().html(html).fadeIn('fast');
-	this.panel.doLayout();
+	this.panel.updateLayout();
 };
 
 ShipmentEditForm.prototype.getPanel = function() {

@@ -29,7 +29,7 @@ ProteinEditForm.prototype.load = function(protein) {
 		html = out;
 	});
 	$('#' + this.id).hide().html(html).fadeIn('fast');
-	this.panel.doLayout();
+	this.panel.updateLayout();
 };
 
 ProteinEditForm.prototype.getPanel = function() {

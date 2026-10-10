@@ -55,7 +55,7 @@ function login() {
   cy.visitMx();
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
   cy.wait('@authenticate');
 }
 
@@ -138,12 +138,12 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
     visitPuckFormPage();
     // fillSamplesGrid() enables Save only when withoutCollection.length == samples.length.
     // With all samples collected that condition is false — button stays disabled.
-    cy.contains('a.x-btn', 'Save').should('have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Save').should('have.class', 'x-item-disabled');
   });
 
   it('enables the Save button when all samples have no data collections', () => {
     visitPuckFormPage();
-    cy.contains('a.x-btn', 'Save').should('not.have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Save').should('not.have.class', 'x-item-disabled');
   });
 
   // ── Happy path ──────────────────────────────────────────────────────────────
@@ -151,7 +151,7 @@ describe(`Puck Form — #/shipping/${SHIPPING_ID}/${SHIPPING_STATUS}/containerId
   it('saves and redirects to the shipment page on valid data', () => {
     visitPuckFormPage();
     waitForGridReady();
-    cy.contains('a.x-btn', 'Save').should('not.have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Save').should('not.have.class', 'x-item-disabled');
 
     cy.contains('Save').click();
     cy.wait('@saveContainer').its('request.body').should('include', 'puck');

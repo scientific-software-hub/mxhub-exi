@@ -32,7 +32,7 @@ function loginWithForm(user, pass) {
   cy.visitMx();
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type(user);
   cy.get('input[name="password"]', { timeout: 5000  }).type(pass);
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
 }
 
 // Login and wait for the welcome page to fully settle (both XHRs resolve).
@@ -70,20 +70,20 @@ describe('Login — auth form', () => {
 
   it('Login button is disabled before any input is entered', () => {
     cy.visitMx();
-    cy.contains('a.x-btn', 'Login', { timeout: 10000 }).should('have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Login', { timeout: 10000 }).should('have.class', 'x-item-disabled');
   });
 
   it('Login button stays disabled when only the user field is filled', () => {
     cy.visitMx();
     cy.get('input[name="user"]', { timeout: 10000 }).type('ispyb');
-    cy.contains('a.x-btn', 'Login').should('have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Login').should('have.class', 'x-item-disabled');
   });
 
   it('Login button enables once both fields are filled', () => {
     cy.visitMx();
     cy.get('input[name="user"]',     { timeout: 10000 }).type('ispyb');
     cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
-    cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled');
+    cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled');
   });
 
   // ── Happy path ──────────────────────────────────────────────────────────

@@ -46,7 +46,7 @@ var html;
 	}); 
 
 	$('#' + this.id).hide().html(html).fadeIn('fast');
-	this.panel.doLayout();
+	this.panel.updateLayout();
 } 
 
 

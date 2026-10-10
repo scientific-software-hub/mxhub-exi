@@ -14,6 +14,8 @@
 // vendored/minified third-party code (THREE.js r49, GLmol) that assigns to
 // many single-letter identifiers incompatible with strict mode.
 
+import './core/extended/RequiredTextField.js';
+import './core/extended/RequiredNumberField.js';
 import './tools/a_bui.js';
 import './tools/dygraphwidget.js';
 import './tools/event.js';

@@ -174,6 +174,11 @@ DataCollectionGrid.prototype.getColumns = function() {
             name: 'dataCollectionGroup',
             flex: 1.5,
             hidden: false,
+            // The cell is a dust-rendered HTML card with its own jQuery-bound
+            // controls (comment icons, tabs, links). Ext 6 otherwise focuses the
+            // whole cell on mousedown, which scrolls the tall cell and moves the
+            // clicked control out from under the pointer before `click` fires.
+            cellFocusable: false,
             renderer: function(grid, e, record) {
 
                 var data = record.data;                              

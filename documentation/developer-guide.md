@@ -33,15 +33,9 @@ out of scope for this codebase (see `CLAUDE.md`) and are not part of this build.
 ### Prerequisites
 
 - **Node.js** (18+) and **npm**
-- **GitHub Packages authentication** — ExtJS is served from a private npm registry.
-  Add the following to `~/.npmrc` (create the file if it does not exist):
 
-```
-//npm.pkg.github.com/:_authToken=YOUR_PAT
-```
-
-Replace `YOUR_PAT` with a GitHub Personal Access Token that has the `read:packages` scope.
-Without this, `npm install` will fail to resolve `@scientific-software-hub/extjs`.
+No registry authentication is needed: every dependency, including ExtJS
+(`extjs-gpl`, the GPL-3 build of Ext JS 6.2 on public npm), installs from npmjs.
 
 ### Install dependencies
 
@@ -89,25 +83,10 @@ The `Dockerfile` is multi-stage: it runs `npm ci && npm run build` itself in a
 do **not** need to run `npm run build` on the host first — `docker build` is the
 only step.
 
-`@scientific-software-hub/extjs` is a private GitHub Packages dependency, so the
-build stage's `npm ci` needs a `read:packages` PAT — the same kind of token from
-[Prerequisites](#prerequisites) above, but passed separately here rather than
-read from your `~/.npmrc`, since that file lives on your host and isn't
-available inside the build container. Pass it as a BuildKit secret, not a
-`--build-arg` (build-args land in the image history; secrets don't).
-
-If the token is already in your `~/.npmrc` (per Prerequisites), pull it straight
-from there — no need to `export` it separately:
+All dependencies come from public npm, so the build needs no credentials:
 
 ```bash
-docker build --secret id=npm_token,src=<(grep -oP '(?<=_authToken=).*' ~/.npmrc) -t mxhub-exi .
-```
-
-Or, if you're passing a token that isn't already in `~/.npmrc`:
-
-```bash
-export NPM_TOKEN=ghp_your_read_packages_token
-docker build --secret id=npm_token,env=NPM_TOKEN -t mxhub-exi .
+docker build -t mxhub-exi .
 ```
 
 #### Production builds: reverse-proxy path prefix
@@ -121,8 +100,7 @@ at build time (threads through to Vite's `base` option — see
 `vite.config.js`):
 
 ```bash
-docker build --secret id=npm_token,src=<(grep -oP '(?<=_authToken=).*' ~/.npmrc) \
-  --build-arg BASE_PATH=/exi/ -t mxhub-exi .
+docker build --build-arg BASE_PATH=/exi/ -t mxhub-exi .
 ```
 
 Leave `BASE_PATH` unset for local/direct-container use — it defaults to `/`.
@@ -249,8 +227,8 @@ You can now set breakpoints directly in the project JS files (`js/core/`, `js/mx
 ## Building the Documentation Site
 
 This documentation is a small static site, built from the markdown files in `documentation/`
-by a self-contained Node script — it does not depend on Grunt, Bower, or the private
-`@scientific-software-hub/extjs` registry.
+by a self-contained Node script — it does not depend on Grunt, Bower, or the app's own
+dependency install.
 
 ### Build once
 

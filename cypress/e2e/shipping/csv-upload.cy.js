@@ -67,7 +67,7 @@ function login() {
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
 
   // formBind button is disabled until both fields are valid
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
 
   cy.wait('@authenticate');
 }

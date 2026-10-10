@@ -83,7 +83,7 @@ function login() {
   cy.visitMx();
   cy.get('input[name="user"]', { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000 }).type('ispyb');
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
   cy.wait('@authenticate');
 }
 
@@ -206,7 +206,10 @@ describe('Shipment Detail — ShipmentForm header (#/shipping/1/main)', () => {
 
     cy.get('[id$="-send-button"]').children().click();
     cy.wait('@updateStatus').its('request.url').should('include', 'sent%20to%20DESY');
-    cy.contains('You have sent your shipment to the facility.').should('be.visible');
+    // The text is the Ext.Msg *title*. Under Cypress the Ext 6 header lays the title out at 0px
+    // wide (not reproducible in a plain Chromium session), so `contains(text).be.visible` would
+    // resolve to that zero-size element. Assert on the visible dialog + its text instead.
+    cy.get('.x-message-box').should('be.visible').and('contain', 'You have sent your shipment to the facility.');
     cy.wait('@sendEmail');
 
     // ShipmentForm's sentNotification listeners fire the email POST, then refresh.notify()
@@ -349,7 +352,10 @@ describe('Shipment Detail — ParcelGrid parcel management', () => {
     cy.window().then(stubLabelUrl);
 
     cy.contains('a', 'Print dewar label').first().click();
-    cy.contains('You have printed dewar label.').should('be.visible');
+    // The text is the Ext.Msg *title*. Under Cypress the Ext 6 header lays the title out at 0px
+    // wide (not reproducible in a plain Chromium session), so `contains(text).be.visible` would
+    // resolve to that zero-size element. Assert on the visible dialog + its text instead.
+    cy.get('.x-message-box').should('be.visible').and('contain', 'You have printed dewar label.');
     cy.window().its('__labelUrls').should('deep.equal', [
       '/ispyb/ispyb-ws/rest/test-token/proposal/MX1234/shipping/10/dewar/10/labels',
     ]);

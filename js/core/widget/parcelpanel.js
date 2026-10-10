@@ -80,7 +80,7 @@ ParcelPanel.prototype.load = function(dewar, shipment, samples, withoutCollectio
 	
 	/** Setting click listeners **/			
 	$('#' + this.id).hide().html(html).fadeIn("fast");
-	this.panel.doLayout();
+	this.panel.updateLayout();
 
 	if (this.shippingStatus != "processing"){
 		$("#" + this.id + "-add-button").removeClass("disabled");
@@ -373,7 +373,7 @@ ParcelPanel.prototype.showCaseForm = function() {
                             	_this.renderDewarParameters(_this.dewar);
 							}
 							_this.renderDewarComments(_this.dewar);
-							_this.panel.doLayout();
+							_this.panel.updateLayout();
 						}
 					}, {
 						text : 'Cancel',
@@ -444,7 +444,7 @@ var hideReimb;
 									_this.renderDewarParameters(_this.dewar);
 								}
 								_this.renderDewarComments(_this.dewar);
-								_this.panel.doLayout();
+								_this.panel.updateLayout();
 						},
 						hidden : hideReimb						
 					}, 
