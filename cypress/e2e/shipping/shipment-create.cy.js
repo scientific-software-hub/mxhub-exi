@@ -137,6 +137,15 @@ function openCreateShipmentDialog() {
 
   cy.wait('@getSessionList');
   cy.get('.x-window').should('be.visible').and('contain', 'Create New Shipment');
+
+  // Ext 6 menus hand focus back to their owner button ~140ms after the item's handler has
+  // already opened the window and focused it. Keystrokes typed before that land on the menu
+  // button instead of the input (observed: "Name field is mandatory" right after typing a name).
+  // Wait until the hand-back has happened — focus is outside the window — before the tests
+  // `.type()`. A framework behaviour difference vs Ext 5; same wait as shipping/protein.cy.js.
+  cy.document().should((doc) => {
+    expect(doc.activeElement.closest('.x-window'), 'focus settled outside the dialog').to.equal(null);
+  });
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
