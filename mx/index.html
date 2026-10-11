@@ -17,17 +17,36 @@
       // `filter:progid:...` syntax fails that strict parser (verified) --
       // browsers have always tolerated it fine. The files themselves are
       // copied verbatim by vite-plugin-static-copy (see vite.config.js).
+      //
+      // Script-attached stylesheets do not block script execution, and
+      // theme-crisp-all.css itself @imports two more sheets. Ext measures
+      // elements while building its first windows/toolbars and does not
+      // re-measure when styles arrive later, so booting before the CSS is
+      // applied leaves e.g. window title bars laid out at 0px wide (seen
+      // intermittently under Cypress's proxy). window.__extStylesReady
+      // resolves once every sheet (imports included) has loaded; the boot
+      // below waits for it. A load error or the timeout also resolves it,
+      // so a missing file degrades to the old behaviour instead of hanging.
       (function () {
         var anchor = document.currentScript;
-        [
+        var hrefs = [
           '../node_modules/extjs-gpl/build/classic/theme-crisp/resources/theme-crisp-all.css',
           '../node_modules/extjs-gpl/build/packages/ux/classic/crisp/resources/ux-all.css',
-        ].forEach(function (href) {
-          var link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = href;
-          anchor.parentNode.insertBefore(link, anchor.nextSibling);
-          anchor = link;
+        ];
+        window.__extStylesReady = new Promise(function (resolve) {
+          var pending = hrefs.length;
+          var done = function () {
+            if (--pending === 0) resolve();
+          };
+          setTimeout(resolve, 10000);
+          hrefs.forEach(function (href) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onload = link.onerror = done;
+            anchor.parentNode.insertBefore(link, anchor.nextSibling);
+            anchor = link;
+          });
         });
       })();
     </script>
@@ -84,16 +103,20 @@
       }
       var exiSAXS;
       Ext.onReady(function () {
-        if (location.href.indexOf('saxs') != -1) {
-          window.EXI = new ExiSAXS();
-        } else {
-          window.EXI = new ExiMX();
-        }
+        window.__extStylesReady.then(function () {
+          if (location.href.indexOf('saxs') != -1) {
+            window.EXI = new ExiSAXS();
+          } else {
+            window.EXI = new ExiMX();
+          }
 
-        EXI.show();
+          // Attach before show(): once Ext is already ready, Ext.application
+          // launches (and fires afterRender) synchronously inside show().
+          EXI.onAfterRender.attach(function () {
+            Path.listen();
+          });
 
-        EXI.onAfterRender.attach(function () {
-          Path.listen();
+          EXI.show();
         });
       });
     </script>

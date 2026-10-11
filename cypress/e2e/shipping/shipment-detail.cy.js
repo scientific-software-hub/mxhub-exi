@@ -206,10 +206,7 @@ describe('Shipment Detail — ShipmentForm header (#/shipping/1/main)', () => {
 
     cy.get('[id$="-send-button"]').children().click();
     cy.wait('@updateStatus').its('request.url').should('include', 'sent%20to%20DESY');
-    // The text is the Ext.Msg *title*. Under Cypress the Ext 6 header lays the title out at 0px
-    // wide (not reproducible in a plain Chromium session), so `contains(text).be.visible` would
-    // resolve to that zero-size element. Assert on the visible dialog + its text instead.
-    cy.get('.x-message-box').should('be.visible').and('contain', 'You have sent your shipment to the facility.');
+    cy.contains('You have sent your shipment to the facility.').should('be.visible');
     cy.wait('@sendEmail');
 
     // ShipmentForm's sentNotification listeners fire the email POST, then refresh.notify()
@@ -352,10 +349,7 @@ describe('Shipment Detail — ParcelGrid parcel management', () => {
     cy.window().then(stubLabelUrl);
 
     cy.contains('a', 'Print dewar label').first().click();
-    // The text is the Ext.Msg *title*. Under Cypress the Ext 6 header lays the title out at 0px
-    // wide (not reproducible in a plain Chromium session), so `contains(text).be.visible` would
-    // resolve to that zero-size element. Assert on the visible dialog + its text instead.
-    cy.get('.x-message-box').should('be.visible').and('contain', 'You have printed dewar label.');
+    cy.contains('You have printed dewar label.').should('be.visible');
     cy.window().its('__labelUrls').should('deep.equal', [
       '/ispyb/ispyb-ws/rest/test-token/proposal/MX1234/shipping/10/dewar/10/labels',
     ]);
