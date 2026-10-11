@@ -306,7 +306,7 @@ ProteinListMainView.prototype.attachCallBackAfterRender = function () {
 				}
 			}
 		});
-		_this.panel.doLayout();
+		_this.panel.updateLayout();
 
 	};
 	var timer3 = setTimeout(tabsEvents, 500, _this);

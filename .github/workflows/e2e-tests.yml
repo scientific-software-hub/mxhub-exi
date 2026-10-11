@@ -9,17 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: read
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          # @scientific-software-hub/extjs is published on GitHub Packages, not npmjs — this
-          # writes a scoped registry + auth token entry to ~/.npmrc for the install step below.
-          registry-url: https://npm.pkg.github.com
-          scope: '@scientific-software-hub'
 
       # Cypress's own binary download is the slow part of `npm install`; cache it across runs,
       # keyed on the pinned version in package.json.
@@ -31,10 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-        env:
-          # No package-lock.json is committed (see .gitignore), so this is a plain `npm install`,
-          # not `npm ci`.
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # No package-lock.json is committed (see .gitignore), so this is a plain `npm install`,
+        # not `npm ci`.
 
       - name: Build app bundle
         run: npm run build

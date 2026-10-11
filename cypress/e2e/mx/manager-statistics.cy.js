@@ -69,7 +69,7 @@ function login() {
   cy.visitMx();
   cy.get('input[name="user"]',     { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000  }).type('ispyb');
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
   cy.wait('@authenticate');
 }
 
@@ -90,8 +90,12 @@ function openStatisticsForm(itemText) {
   cy.contains('.x-menu-item', 'Statistics').invoke('attr', 'id').then((id) => {
     cy.window().then((win) => {
       const item = win.Ext.getCmp(id);
-      item.activate(true); // doExpandMenu() no-ops unless the item is "activated" first
-      item.expandMenu(0);
+      // Ext 6: a menu item is "activated" by taking focus (Ext.menu.Item#onFocus),
+      // and doExpandMenu() no-ops unless it is activated first.
+      item.focus();
+      cy.wrap(item).its('activated').should('be.true').then(() => {
+        item.expandMenu(null, 0);
+      });
     });
   });
   cy.contains('.x-menu-item', itemText).click();

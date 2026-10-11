@@ -29,7 +29,7 @@ AddressEditForm.prototype.load = function(address) {
 		html = out;
 	});
 	$('#' + this.id).hide().html(html).fadeIn('fast');
-	this.panel.doLayout();
+	this.panel.updateLayout();
 };
 
 AddressEditForm.prototype.getPanel = function() {

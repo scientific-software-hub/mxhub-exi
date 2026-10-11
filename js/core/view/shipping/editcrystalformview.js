@@ -51,7 +51,7 @@ EditCrystalFormView.prototype.load = function(crystal) {
 		}
 	} else {
 		$('#' + this.id).hide().html("<div id='" + this.id + "-error' style='margin:30px;'><h4>There was an error loading the crystal</h4></div>").fadeIn('fast');
-		this.panel.doLayout();
+		this.panel.updateLayout();
 	}
 }
 
@@ -68,7 +68,7 @@ EditCrystalFormView.prototype.render = function () {
 	});
 	
 	$('#' + this.id).hide().html(html).fadeIn('fast');
-	this.panel.doLayout();
+	this.panel.updateLayout();
 
 	$('#' + this.id + "-space-group").on('change', function() {
 		_this.setCellValuesBySpaceGroup(this.value);	

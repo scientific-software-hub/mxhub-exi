@@ -185,7 +185,7 @@ ParcelGrid.prototype.fillTab = function (tabName, dewars) {
 				_this.panel.setLoading(false);							
 				_this.refreshReimbursementContentHTML( _this.getCurrentReimbursedDewars(shipment.dewarVOs), _this.getAuthorizedReimbursedDewars(shipment.sessions));
 				_this.currentReimbursedDewars = _this.getCurrentReimbursedDewars(shipment.dewarVOs);
-				_this.panel.doLayout();	
+				_this.panel.updateLayout();	
 			};
 			EXI.getDataAdapter({onSuccess : onSuccess}).proposal.dewar.saveDewar(_this.shipment.shippingId, dewar);
     }
@@ -196,7 +196,7 @@ ParcelGrid.prototype.fillTab = function (tabName, dewars) {
         var onRemoveSuccess = function (sender, shipment) {
             _this.panel.setLoading(false);
             _this.load(shipment);
-            _this.panel.doLayout();
+            _this.panel.updateLayout();
         };
 
         var onError = function(sender,error) {
@@ -220,8 +220,8 @@ ParcelGrid.prototype.fillTab = function (tabName, dewars) {
 		parcelPanel.onSavedClick.attach(onSaved);
 		parcelPanel.onRemovedClick.attach(onRemoved);
 	}
-	this.parcelPanels[tabName].doLayout();
-	this.panel.doLayout();
+	this.parcelPanels[tabName].updateLayout();
+	this.panel.updateLayout();
 }
 // "Add new Dewar manually" button in Shipment
 ParcelGrid.prototype.edit = function(dewar) {
@@ -319,7 +319,7 @@ ParcelGrid.prototype.attachCallBackAfterRender = function () {
 			if (target.startsWith("#st")){
 				_this.fillTab("statistics",_this.dewars);
 			}
-			_this.panel.doLayout();
+			_this.panel.updateLayout();
 		});
     };
     var timer3 = setTimeout(tabsEvents, 500, this);

@@ -101,7 +101,7 @@ function login() {
   cy.visitMx();
   cy.get('input[name="user"]', { timeout: 10000 }).should('be.visible').type('ispyb');
   cy.get('input[name="password"]', { timeout: 5000 }).type('ispyb');
-  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-disabled').click();
+  cy.contains('a.x-btn', 'Login').should('not.have.class', 'x-item-disabled').click();
   cy.wait('@authenticate');
 }
 
@@ -121,18 +121,31 @@ function openCreateShipmentDialog() {
   // A plain DOM mouseover/`.trigger()` is unreliable against ExtJS's own mouse-monitor wiring
   // here (Cypress's synthetic event gets lost before `Ext.menu.Menu#onMouseOver` reacts to it).
   // Call the framework method directly instead — deterministic, and it's exactly what a real
-  // mouseover ends up invoking (`Ext.menu.Item#expandMenu`, ext-all-debug.js:149453).
+  // mouseover ends up invoking (`Ext.menu.Item#expandMenu`, extjs-gpl/build/ext-all-debug.js).
   cy.contains('.x-menu-item', 'Shipments').invoke('attr', 'id').then((id) => {
     cy.window().then((win) => {
-      var item = win.Ext.getCmp(id);
-      item.activate(true); // doExpandMenu() no-ops unless the item is "activated" first
-      item.expandMenu(0);
+      const item = win.Ext.getCmp(id);
+      // Ext 6: a menu item is "activated" by taking focus (Ext.menu.Item#onFocus),
+      // and doExpandMenu() no-ops unless it is activated first.
+      item.focus();
+      cy.wrap(item).its('activated').should('be.true').then(() => {
+        item.expandMenu(null, 0);
+      });
     });
   });
   cy.contains('.x-menu-item', 'Add new').click();
 
   cy.wait('@getSessionList');
   cy.get('.x-window').should('be.visible').and('contain', 'Create New Shipment');
+
+  // Ext 6 menus hand focus back to their owner button ~140ms after the item's handler has
+  // already opened the window and focused it. Keystrokes typed before that land on the menu
+  // button instead of the input (observed: "Name field is mandatory" right after typing a name).
+  // Wait until the hand-back has happened — focus is outside the window — before the tests
+  // `.type()`. A framework behaviour difference vs Ext 5; same wait as shipping/protein.cy.js.
+  cy.document().should((doc) => {
+    expect(doc.activeElement.closest('.x-window'), 'focus settled outside the dialog').to.equal(null);
+  });
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────

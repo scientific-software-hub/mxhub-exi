@@ -82,7 +82,7 @@ const VENDOR_FILES = [
 // (needed for @import / CSS-modules / JS `import './x.css'`), even when the
 // request comes from a plain <link> tag and nothing ever imports the file
 // from JS. That pipeline requires spec-compliant CSS, but the vendored ExtJS
-// theme CSS under node_modules uses legacy syntax browsers tolerate but
+// theme/ux CSS under node_modules uses legacy syntax browsers tolerate but
 // strict CSS parsers reject (old-IE `filter:progid:...`). Serve .css
 // requests as raw static files, bypassing that pipeline entirely. (Our own
 // bundled CSS -- css/main.css -- is handled separately by cssBundlePlugin,
@@ -115,12 +115,10 @@ export default defineConfig({
         // <script src> / <link href> tags -- it warns and leaves the
         // reference as literal text, so every vendor file mx/index.html
         // points at by its node_modules (or js/tools/) path needs to
-        // actually exist there under dist/ too. Mirrors Gruntfile.js's
-        // copy-extjs task for the ExtJS build/examples/ux/extended
-        // directories (Ext.Loader dynamically script-injects Ext.ux.* /
-        // Ext.Extended.* at runtime -- paths Vite's HTML scanner can't see
-        // to begin with) plus one entry per individually-referenced vendor
-        // file.
+        // actually exist there under dist/ too. ExtJS (core, crisp theme,
+        // prebuilt ux bundle) is preloaded by those tags -- Ext.Loader is
+        // not used -- so its entries are the same kind of verbatim copy,
+        // plus one entry per individually-referenced vendor file.
         viteStaticCopy({
             // `dest` is NOT "the directory to place this in" -- the plugin
             // always preserves src's full relative path underneath dest
@@ -130,9 +128,12 @@ export default defineConfig({
             // dist/node_modules/jquery/dist/jquery.js -- matching the
             // unmodified '../node_modules/...' references in mx/index.html.
             targets: [
-                { src: 'node_modules/@scientific-software-hub/extjs/build', dest: '.' },
-                { src: 'node_modules/@scientific-software-hub/extjs/examples/ux', dest: '.' },
-                { src: 'node_modules/@scientific-software-hub/extjs/extended', dest: '.' },
+                // extjs-gpl ships ~450MB (examples, modern toolkit, every
+                // theme) -- copy only what mx/index.html actually references.
+                { src: 'node_modules/extjs-gpl/build/ext-all.js', dest: '.' },
+                { src: 'node_modules/extjs-gpl/build/classic/theme-crisp', dest: '.' },
+                { src: 'node_modules/extjs-gpl/build/packages/ux/classic/ux.js', dest: '.' },
+                { src: 'node_modules/extjs-gpl/build/packages/ux/classic/crisp', dest: '.' },
                 ...VENDOR_FILES.map((src) => ({ src, dest: '.' })),
                 // Plain static assets, referenced by relative URL from the app and
                 // never touched by Vite's module graph. Copied here (rather than

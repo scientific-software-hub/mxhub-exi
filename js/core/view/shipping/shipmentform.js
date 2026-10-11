@@ -70,7 +70,7 @@ function ShipmentForm(args) {
 
 	this.dewarTrackingView = new DewarTrackingView();
 	this.dewarTrackingView.onLoaded.attach(function(sender){
-		_this.panel.doLayout();
+		_this.panel.updateLayout();
 	});
 	
 	this.fedexCode = "fedexCode";
@@ -234,7 +234,7 @@ ShipmentForm.prototype.load = function(shipment,hasExportedData) {
 
 	$("#transport-history-" + this.id).html(this.dewarTrackingView.getPanel());
 
-	this.panel.doLayout();
+	this.panel.updateLayout();
 	this.attachCallBackAfterRender();
 };
 
@@ -346,7 +346,7 @@ ShipmentForm.prototype.attachCallBackAfterRender = function () {
 			if (target.startsWith("#tr")){
 				_this.dewarTrackingView.load(_this.shipment);
 			}
-			_this.panel.doLayout();
+			_this.panel.updateLayout();
 		});
     };
     var timer3 = setTimeout(tabsEvents, 500, this);

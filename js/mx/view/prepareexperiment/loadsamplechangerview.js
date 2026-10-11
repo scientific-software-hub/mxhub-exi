@@ -467,7 +467,7 @@ LoadSampleChangerView.prototype.reloadSampleChangerWidget = function () {
     });
     this.sampleChangerWidget.render();
     $("#" + this.id + "-scw-label").html(this.sampleChangerWidget.beamlineName + " (" + this.sampleChangerWidget.label + ")");
-    this.panel.doLayout();
+    this.panel.updateLayout();
 }
 
 /**

@@ -85,7 +85,7 @@ CrystalFormView.prototype.load = function(containerId, sampleId, shippingId){
                 
                 $('#' + _this.id).hide().html(html).fadeIn('fast');
                 $('#' + _this.id).css("padding",_this.padding);
-                _this.panel.doLayout();
+                _this.panel.updateLayout();
             }
         }
     }

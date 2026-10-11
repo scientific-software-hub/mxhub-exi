@@ -478,7 +478,7 @@ PuckFormView.prototype.setValuesForEditCrystalColumn = function(capacity) {
 	for (var i = 0; i < rows.length; i++) {
 		this.containerSpreadSheet.addEditCrystalFormButton(rows[i].location-1,columnIndex);
 	}
-	this.panel.doLayout();
+	this.panel.updateLayout();
 };
 
 PuckFormView.prototype.showReturnWarning = function() {

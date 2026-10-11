@@ -216,7 +216,10 @@ Exi.prototype.getSelectedDataCollections = function() {
 Exi.prototype.addNavigationPanel = function(listView) {
 	Ext.getCmp('navigation').add(listView.getPanel());
 	if (Ext.getCmp("navigation") != null){
-		Ext.getCmp("navigation").expand();
+		// No animation: callers load the list right after this returns, and Ext 6 blocks a
+		// view's refresh while an ancestor is collapsing/expanding (see Ext.view.Table#refreshView),
+		// leaving the grid permanently empty since nothing re-lays it out afterwards.
+		Ext.getCmp("navigation").expand(false);
         this.showNavigationPanel();
 	}
     this.clearTimers();
@@ -226,7 +229,7 @@ Exi.prototype.addNavigationPanel = function(listView) {
 Exi.prototype.addNavigationPanelWithTimer = function(listView) {
 	Ext.getCmp('navigation').add(listView.getPanel());
 	if (Ext.getCmp("navigation") != null){
-		Ext.getCmp("navigation").expand();
+		Ext.getCmp("navigation").expand(false); // see addNavigationPanel
         this.showNavigationPanel();
 	}
      
